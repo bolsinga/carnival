@@ -1,0 +1,333 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 38;
+	objects = {
+		014CEA520018CE5811CA2923 = {
+			buildRules = (
+			);
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				OPTIMIZATION_CFLAGS = "-O0";
+			};
+			isa = PBXBuildStyle;
+			name = Development;
+		};
+		014CEA530018CE5811CA2923 = {
+			buildRules = (
+			);
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			isa = PBXBuildStyle;
+			name = Deployment;
+		};
+//010
+//011
+//012
+//013
+//014
+//030
+//031
+//032
+//033
+//034
+		034768E8FF38A79811DB9C8B = {
+			isa = PBXExecutableFileReference;
+			path = carnival;
+			refType = 3;
+		};
+//030
+//031
+//032
+//033
+//034
+//080
+//081
+//082
+//083
+//084
+		08FB7793FE84155DC02AAC07 = {
+			buildStyles = (
+				014CEA520018CE5811CA2923,
+				014CEA530018CE5811CA2923,
+			);
+			hasScannedForEncodings = 1;
+			isa = PBXProject;
+			mainGroup = 08FB7794FE84155DC02AAC07;
+			projectDirPath = "";
+			targets = (
+				08FB779FFE84155DC02AAC07,
+			);
+		};
+		08FB7794FE84155DC02AAC07 = {
+			children = (
+				08FB7795FE84155DC02AAC07,
+				FE857E410465826700000102,
+				C6A0FF2B0290797F04C91782,
+				1AB674ADFE9D54B511CA2CBB,
+			);
+			isa = PBXGroup;
+			name = carnival;
+			refType = 4;
+		};
+		08FB7795FE84155DC02AAC07 = {
+			children = (
+				FE857E2F0465815D00000102,
+				FE857E300465815D00000102,
+				FE857E310465815D00000102,
+				FE857E320465815D00000102,
+				FE857E330465815D00000102,
+				FE857E340465815D00000102,
+				FE857E350465815D00000102,
+				FE857E360465815D00000102,
+				FE857E370465815D00000102,
+			);
+			isa = PBXGroup;
+			name = Source;
+			refType = 4;
+		};
+		08FB779FFE84155DC02AAC07 = {
+			buildPhases = (
+				08FB77A0FE84155DC02AAC07,
+				08FB77A1FE84155DC02AAC07,
+				08FB77A3FE84155DC02AAC07,
+				08FB77A5FE84155DC02AAC07,
+				C6A0FF2D029079AD04C91782,
+			);
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-lGL -lGLU -lobjc";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = carnival;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+			);
+			isa = PBXToolTarget;
+			name = carnival;
+			productName = carnival;
+			productReference = 034768E8FF38A79811DB9C8B;
+		};
+		08FB77A0FE84155DC02AAC07 = {
+			buildActionMask = 2147483647;
+			files = (
+				FE857E390465815D00000102,
+				FE857E3B0465815D00000102,
+				FE857E3D0465815D00000102,
+				FE857E400465815D00000102,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08FB77A1FE84155DC02AAC07 = {
+			buildActionMask = 2147483647;
+			files = (
+				FE857E380465815D00000102,
+				FE857E3A0465815D00000102,
+				FE857E3C0465815D00000102,
+				FE857E3E0465815D00000102,
+				FE857E3F0465815D00000102,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08FB77A3FE84155DC02AAC07 = {
+			buildActionMask = 2147483647;
+			files = (
+				FE857E420465826700000102,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08FB77A5FE84155DC02AAC07 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+//080
+//081
+//082
+//083
+//084
+//1A0
+//1A1
+//1A2
+//1A3
+//1A4
+		1AB674ADFE9D54B511CA2CBB = {
+			children = (
+				034768E8FF38A79811DB9C8B,
+			);
+			isa = PBXGroup;
+			name = Products;
+			refType = 4;
+		};
+//1A0
+//1A1
+//1A2
+//1A3
+//1A4
+//C60
+//C61
+//C62
+//C63
+//C64
+		C6A0FF2B0290797F04C91782 = {
+			children = (
+			);
+			isa = PBXGroup;
+			name = Documentation;
+			refType = 4;
+		};
+		C6A0FF2D029079AD04C91782 = {
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+//C60
+//C61
+//C62
+//C63
+//C64
+//FE0
+//FE1
+//FE2
+//FE3
+//FE4
+		FE857E2F0465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = carnival.c;
+			refType = 4;
+		};
+		FE857E300465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = carnival.h;
+			refType = 4;
+		};
+		FE857E310465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = coaster.c;
+			refType = 4;
+		};
+		FE857E320465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = coaster.h;
+			refType = 4;
+		};
+		FE857E330465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = ferris.c;
+			refType = 4;
+		};
+		FE857E340465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = ferris.h;
+			refType = 4;
+		};
+		FE857E350465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = main.c;
+			refType = 4;
+		};
+		FE857E360465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = tent.c;
+			refType = 4;
+		};
+		FE857E370465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			path = tent.h;
+			refType = 4;
+		};
+		FE857E380465815D00000102 = {
+			fileRef = FE857E2F0465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E390465815D00000102 = {
+			fileRef = FE857E300465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E3A0465815D00000102 = {
+			fileRef = FE857E310465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E3B0465815D00000102 = {
+			fileRef = FE857E320465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E3C0465815D00000102 = {
+			fileRef = FE857E330465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E3D0465815D00000102 = {
+			fileRef = FE857E340465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E3E0465815D00000102 = {
+			fileRef = FE857E350465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E3F0465815D00000102 = {
+			fileRef = FE857E360465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E400465815D00000102 = {
+			fileRef = FE857E370465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE857E410465826700000102 = {
+			isa = PBXFrameworkReference;
+			name = GLUT.framework;
+			path = /System/Library/Frameworks/GLUT.framework;
+			refType = 0;
+		};
+		FE857E420465826700000102 = {
+			fileRef = FE857E410465826700000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+	};
+	rootObject = 08FB7793FE84155DC02AAC07;
+}
