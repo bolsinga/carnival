@@ -18,15 +18,12 @@
 #include "coaster.h"
 
 #define TRUE 1
-#define ID 1
 
-/*
 Matrix ID = {
        {1,0,0,0},
        {0,1,0,0},
        {0,0,1,0},
        {0,0,0,1}};
-*/
 
 /* The following is a function that assigns one 3D coordinate to another. */
 

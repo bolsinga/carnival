@@ -15,14 +15,9 @@
 /*   where (xl,yl,zl) is where you are, and           */
 /*         (xa,ya,za) is where you are looking at.    */
 
-/* #include <gl.h> */
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
+#include <gl.h>
 
 #include <math.h>
-
-typedef GLdouble Coord;
 
 #define PI acos(-1.0)
 #define PARTITIONS 64.0
