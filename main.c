@@ -2,6 +2,7 @@
 #include "coaster.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 typedef enum {
 	View_Coaster,
@@ -18,25 +19,17 @@ static int gCurrentCoaster = 0;
 static Coord gFWV[3] = {0.0, -6.0, 0.0 };	/* initial Ferris wheel view */
 
 static GLdouble geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz;
-			   
-static void Init(int argc, char** argv)
-{
-	if (argc > 1)
-	{
-		if (strcmp(argv[1], "-c") == 0)
-		{
-			gStyle = View_Coaster;
-		}
-		else if (strcmp(argv[1], "-w") == 0)
-		{
-			gStyle = View_Ferris;
-		}
-		else if (strcmp(argv[1], "-l") == 0)
-		{
-			gStyle = View_Point;
-		}
-	}
 
+static void dump()
+{
+	fprintf(stderr, "gAnimating: %d gStyle: %d gRollPts: %d gCurrentCoaster: %d gRotation: %f\n", gAnimating, gStyle, gRollPts, gCurrentCoaster, gRotation);
+	fprintf(stderr, "Ferris View: (%f, %f, %f)\n", gFWV[0], gFWV[1], gFWV[2]);
+	fprintf(stderr, "LookAt: eye (%f, %f, %f) center (%f, %f, %f) up (%f, %f, %f)\n", geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz);
+	fprintf(stderr, "**********\n");
+}
+
+static void Init()
+{
 	gRollPts = getCoasterPts();
 
 	glClearColor(0.33, 0.67, 1.0, 1.0);
@@ -53,7 +46,7 @@ static void Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//	gluLookAt(geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz);
+	gluLookAt(geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz);
 
 	drawScene(gRotation, gRollPts, gFWV);
 
@@ -137,7 +130,10 @@ static void Idle()
 
 static void SpecialKey(int key, int x, int y)
 {
-	// Rotate display in view mode
+	if (gStyle == View_Point)
+	{
+		// Rotate display in view mode
+	}
 }
 
 static void Key(unsigned char key, int x, int y)
@@ -150,8 +146,14 @@ static void Key(unsigned char key, int x, int y)
 			gAnimating = !gAnimating;
 			glutIdleFunc(gAnimating ? Idle : NULL);
 		break;
-		
-		// Toggle through styles (Coaster, Ferris, Point)
+		case 't':
+			// Toggle through styles (Coaster, Ferris, Point)
+			gStyle++;
+			if (gStyle > View_Point)
+			{
+				gStyle = View_Coaster;
+			}
+			break;
 	}
 	glutPostRedisplay();
 }
@@ -169,9 +171,9 @@ int main(int argc, char** argv)
 	
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	
-	glutCreateWindow("Carnival");
+	glutCreateWindow("carnival");
 	
-	Init(argc, argv);
+	Init();
 	
 	glutDisplayFunc(Display);
 	glutSpecialFunc(SpecialKey);
