@@ -21,7 +21,7 @@ int getCoasterPts()
     theta = atan(slope);	/* This is for calculating the line	*/
     dy = SPEED1 * JUMP * sin(theta); /* Change in y on falling pt	*/
     dz = SPEED1 * JUMP * cos(theta); /* Change in z on the falling pt	*/
-    totalDist = fsqrt(LENGTH*LENGTH + maxy*maxy); /*length of falling pt*/
+    totalDist = sqrt(LENGTH*LENGTH + maxy*maxy); /*length of falling pt*/
 
 /* calculates points for the first part of the flat straightaway */
 
@@ -118,14 +118,14 @@ void drawStrut(int i)
 	{
     	assignCoord(support, rollerin[strut]);
     	support[1] = height;
-    	bgnline();
-    	v3f(rollerin[i]);v3f(support);
-    	endline();
+    	glBegin(GL_LINE_STRIP);
+    	glVertex3fv(rollerin[i]);glVertex3fv(support);
+    	glEnd();
     	assignCoord(support, rollerout[strut]);
 	support[1] = height;
-    	bgnline();
-    	v3f(rollerout[i]);v3f(support);
-    	endline();
+    	glBegin(GL_LINE_STRIP);
+    	glVertex3fv(rollerout[i]);glVertex3fv(support);
+    	glEnd();
 	}
 }
 
@@ -139,27 +139,27 @@ void coaster(int numpts) /* This is the number of pts in the roller arrays */
     int i, alternate = 0;
     short tracks[3] = {51, 51, 51};
 
-    c3s(tracks);
+    glColor3sv(tracks);
     for(i=0;i<numpts;i++)
     {
-	linewidth(3);
-	bgnline();
-	v3f(rollerin[i]);v3f(rollerin[i+1]);
-	endline();
-	bgnline();
-	v3f(rollerout[i]);v3f(rollerout[i+1]);
-	endline();
-	linewidth(2);
+	glLineWidth(3);
+	glBegin(GL_LINE_STRIP);
+	glVertex3fv(rollerin[i]);glVertex3fv(rollerin[i+1]);
+	glEnd();
+	glBegin(GL_LINE_STRIP);
+	glVertex3fv(rollerout[i]);glVertex3fv(rollerout[i+1]);
+	glEnd();
+	glLineWidth(2);
 	/* alternate the beams of the track so that motion is better */
 	/* simulated.						     */
 	if (alternate)
 	    {
-	    bgnline();
-	    v3f(rollerin[i]);v3f(rollerout[i]);
-	    endline();
+	    glBegin(GL_LINE_STRIP);
+	    glVertex3fv(rollerin[i]);glVertex3fv(rollerout[i]);
+	    glEnd();
 	    drawStrut(i);
 	    }
 	alternate = !alternate;
     }
-    linewidth(1);
+    glLineWidth(1);
 }

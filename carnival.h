@@ -15,7 +15,11 @@
 /*   where (xl,yl,zl) is where you are, and           */
 /*         (xa,ya,za) is where you are looking at.    */
 
-#include <gl.h>
+#include <OpenGL/gl.h>
+#include <GLUT/glut.h>
+
+typedef GLfloat		Coord;
+typedef GLfloat*	Matrix;
 
 #include <math.h>
 

@@ -5,7 +5,7 @@
 /* Prof Hearn */
 
 /* SGI: compile using cc carnival.c -lgl_s -lm -o carnival */
-/* Mac OS X: compile using */
+/* Mac OS X: compile using cc -Wall *.c -framework OpenGL -framework GLUT -o carnival */
 /* ride the roller coaster by typing 'carnival -c'    */
 /* ride the ferris wheel by typing 'carnival -w'      */
 /* look around with 'carnival -l xl yl zl xa ya za'   */
@@ -16,14 +16,11 @@
 #include "tent.h"
 #include "ferris.h"
 #include "coaster.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define TRUE 1
-
-Matrix ID = {
-       {1,0,0,0},
-       {0,1,0,0},
-       {0,0,1,0},
-       {0,0,0,1}};
 
 /* The following is a function that assigns one 3D coordinate to another. */
 
@@ -62,20 +59,20 @@ void mountains()
 	short brown[3] = {116, 87, 11};
 	short snow[3] = {196, 196, 196};
 
-	bgnpolygon();
-	  c3s(brown);v3f(mnt1b1);v3f(mnt1b2);
-	  c3s(snow);v3f(mnt1p);
-	endpolygon();
+	glBegin(GL_POLYGON);
+	  glColor3sv(brown);glVertex3fv(mnt1b1);glVertex3fv(mnt1b2);
+	  glColor3sv(snow);glVertex3fv(mnt1p);
+	glBegin(GL_POLYGON);
 
-	bgnpolygon();
-	  c3s(brown);v3f(mnt2b1);v3f(mnt2b2);
-	  c3s(snow);v3f(mnt2p);
-	endpolygon();
+	glBegin(GL_POLYGON);
+	  glColor3sv(brown);glVertex3fv(mnt2b1);glVertex3fv(mnt2b2);
+	  glColor3sv(snow);glVertex3fv(mnt2p);
+	glBegin(GL_POLYGON);
 
-	bgnpolygon();
-	  c3s(brown);v3f(mnt3b1);v3f(mnt3b2);
-	  c3s(snow);v3f(mnt3p);
-	endpolygon();
+	glBegin(GL_POLYGON);
+	  glColor3sv(brown);glVertex3fv(mnt3b1);glVertex3fv(mnt3b2);
+	  glColor3sv(snow);glVertex3fv(mnt3p);
+	glBegin(GL_POLYGON);
 }
 
 /* The folowing draws the entire scene. It takes the current rotation 	*/
@@ -92,37 +89,35 @@ void drawScene(Coord rotation, int rollPts, Coord fwv[3])
 	short grass[3] = {123, 193, 87};
 	short sky[3] = {85, 172, 255};
 
-	int i;
-
-	c3s(sky);
+	glColor3sv(sky);
         clear();
-        zclear();
+	glClearDepth(1.); glClear(GL_DEPTH_BUFFER_BIT);
 
 	/* Draw the ground */
-	c3s(grass);
-	bgnpolygon();
-	v3f(gr1);v3f(gr2);v3f(gr3);v3f(gr4);
-	endpolygon();
+	glColor3sv(grass);
+	glBegin(GL_POLYGON);
+	glVertex3fv(gr1);glVertex3fv(gr2);glVertex3fv(gr3);glVertex3fv(gr4);
+	glBegin(GL_POLYGON);
 
 	/* Draw some mountains */
 	mountains();
 
 	coaster(rollPts);
-	pushmatrix();
-	  translate(-25.0,6.5,0);
+	glPushMatrix();
+	  glTranslatef(-25.0,6.5,0);
           ferris(rotation, fwv);
 	  fwv[0] += -25.0;
 	  fwv[1] += 6.5;
-	popmatrix();
-        pushmatrix();
-          translate(17,-1.0,-8);
-          rotate(-900,'y');
+	glPopMatrix();
+        glPushMatrix();
+          glTranslatef(17,-1.0,-8);
+		  glRotatef(.1*(-900), 0, 1, 0);
           tent();
-        popmatrix();
-	pushmatrix();
-	  translate(-22,-1,-11);
+        glPopMatrix();
+	glPushMatrix();
+	  glTranslatef(-22,-1,-11);
 	  tent();
-	popmatrix();
+	glPopMatrix();
 
 /*
 	for(i=0; i<100000; i++);
@@ -175,15 +170,15 @@ int main(int argc, char** argv)
 	  RGBmode();
 	  doublebuffer();
 	  gconfig();
-	  mmode(MVIEWING);
-	  perspective(600,1265.0/983.0,0.01,150.0);
-	  zbuffer(TRUE);
+	  glMatrixMode(GL_MODELVIEW);
+	  {GLint mm;glGetIntegerv(GL_MATRIX_MODE, &mm);glMatrixMode(GL_PROJECTION);glLoadIdentity();gluPerspective(.1*(600), 1265.0/983.0, 0.01, 150.0);glMatrixMode(mm);}
+	  glEnable(GL_DEPTH_TEST);
 	  }
 
 	if (style == 1)
 	  for(i=1;i<TRIPS*TOUR;i++)
 	    {
-	    loadmatrix(ID);
+	    glLoadIdentity();
             lookat(fwv[0],fwv[1],fwv[2],fwv[0]+1.0,fwv[1],fwv[2],0);
 	    drawScene(rotation,rollPts, fwv);
 	    rotation -= WHEELROT;
@@ -195,7 +190,7 @@ int main(int argc, char** argv)
 	      {
 	      avgPts(rollerin[i], rollerout[i], rider);
 	      avgPts(rollerin[i+1], rollerout[i+1], nextrider);
-	      loadmatrix(ID);
+	      glLoadIdentity();
 	/* These set the tilt of the roller coaster rider to simulate */
 	/* the momentum.  They are just picked values.		      */
 	      if ((i>=37 && i<=56)||(i>=174 && i<=193)||
@@ -213,7 +208,7 @@ int main(int argc, char** argv)
 	else if (style == 3)
 	  for(i=1; i < TRIPS * TOUR; i++)
 	    {
-	    loadmatrix(ID);
+	    glLoadIdentity();
 	    lookat(xl,yl,zl,xa,ya,za,0);
 	    drawScene(rotation, rollPts, fwv);
 	    rotation -= WHEELROT;
