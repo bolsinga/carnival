@@ -16,8 +16,8 @@
 #define SPEED2 5.555  /* multiplier for the flat part, to simulate speed */
 #define PI acos(-1.0)
 
-Coord rollerin[350][3];         /* Coords for the inner rail */
-Coord rollerout[350][3];        /* Coords for the outer rail */
+extern Coord rollerin[350][3];         /* Coords for the inner rail */
+extern Coord rollerout[350][3];        /* Coords for the outer rail */
 
 /* The following calculates the points of the coaster so that they 	*/
 /* don't have to be calculated each time it is drawn.  It returns the	*/

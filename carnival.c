@@ -20,6 +20,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+Coord rollerin[350][3];         /* Coords for the inner rail */
+Coord rollerout[350][3];        /* Coords for the outer rail */
+
 /* The following is a function that assigns one 3D coordinate to another. */
 
 void assignCoord(Coord a[3], Coord b[3])
