@@ -47,40 +47,40 @@ void avgPts(Coord a[3], Coord b[3], Coord result[3])
 
 void mountains()
 {
-	Coord mnt1p[3] = {80,50,0};
-	Coord mnt1b1[3] = {80,-1.0,-50};
-	Coord mnt1b2[3] = {80,-1.0,50};
-	Coord mnt2p[3] = {75,40,-20};
-	Coord mnt2b1[3] = {75,-1.0,-40};
-	Coord mnt2b2[3] = {75,-1.0,0};
-	Coord mnt3p[3] = {85,45,-45};
-	Coord mnt3b1[3] = {85,-1,-70};
-	Coord mnt3b2[3] = {85,-1,-5};
+	Coord mnt1p[3] = {80, 50, 0 };
+	Coord mnt1b1[3] = {80, -1.0, -50 };
+	Coord mnt1b2[3] = {80, -1.0, 50 };
+	Coord mnt2p[3] = {75, 40, -20 };
+	Coord mnt2b1[3] = {75, -1.0, -40 };
+	Coord mnt2b2[3] = {75, -1.0, 0.0 };
+	Coord mnt3p[3] = {85, 45, -45 };
+	Coord mnt3b1[3] = {85, -1, -70 };
+	Coord mnt3b2[3] = {85, -1, -5 };
 	
-	short brown[3] = {116, 87, 11};
-	short snow[3] = {196, 196, 196};
+	GLbyte brown[3] = {116, 87, 11 };
+	GLbyte snow[3] = {196, 196, 196 };
 	
 	glBegin(GL_POLYGON);
-		glColor3sv(brown);
+		glColor3bv(brown);
 			glVertex3fv(mnt1b1);
 			glVertex3fv(mnt1b2);
-		glColor3sv(snow);
+		glColor3bv(snow);
 			glVertex3fv(mnt1p);
 	glEnd();
 	
 	glBegin(GL_POLYGON);
-		glColor3sv(brown);
+		glColor3bv(brown);
 			glVertex3fv(mnt2b1);
 			glVertex3fv(mnt2b2);
-		glColor3sv(snow);
+		glColor3bv(snow);
 			glVertex3fv(mnt2p);
 	glEnd();
 	
 	glBegin(GL_POLYGON);
-		glColor3sv(brown);
+		glColor3bv(brown);
 			glVertex3fv(mnt3b1);
 			glVertex3fv(mnt3b2);
-		glColor3sv(snow);
+		glColor3bv(snow);
 			glVertex3fv(mnt3p);
 	glEnd();
 }
@@ -91,21 +91,21 @@ void mountains()
 
 void drawScene(Coord rotation, int rollPts, Coord fwv[3])
 {
-	Coord gr1[3] = {100,-1.0,100};
-	Coord gr2[3] = {100,-1.0,-100};
-	Coord gr3[3] = {-100,-1.0,-100};
-	Coord gr4[3] = {-100,-1.0,100};
+	Coord gr1[3] = {100, -1.0, 100 };
+	Coord gr2[3] = {100, -1.0, -100 };
+	Coord gr3[3] = {-100, -1.0, -100 };
+	Coord gr4[3] = {-100, -1.0, 100 };
 	
-	short grass[3] = {123, 193, 87};
-	short sky[3] = {85, 172, 255};
+	GLbyte grass[3] = {123, 193, 87 };
+	GLbyte sky[3] = {85, 172, 255 };
 	
-	glColor3sv(sky);
+	glColor3bv(sky);
 	clear();
 	glClearDepth(1.);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
 	/* Draw the ground */
-	glColor3sv(grass);
+	glColor3bv(grass);
 	glBegin(GL_POLYGON);
 		glVertex3fv(gr1);
 		glVertex3fv(gr2);
@@ -119,20 +119,20 @@ void drawScene(Coord rotation, int rollPts, Coord fwv[3])
 	coaster(rollPts);
 	
 	glPushMatrix();
-		glTranslatef(-25.0,6.5,0);
+		glTranslatef(-25.0, 6.5, 0.0);
 		ferris(rotation, fwv);
 		fwv[0] += -25.0;
 		fwv[1] += 6.5;
 	glPopMatrix();
 	
 	glPushMatrix();
-		glTranslatef(17,-1.0,-8);
+		glTranslatef(17, -1.0, -8);
 		glRotatef(.1*(-900), 0, 1, 0);
 		tent();
 	glPopMatrix();
 	
 	glPushMatrix();
-		glTranslatef(-22,-1,-11);
+		glTranslatef(-22, -1, -11);
 		tent();
 	glPopMatrix();
 	
@@ -147,7 +147,7 @@ int main(int argc, char** argv)
 {
 	Coord xl, yl, zl, xa, ya, za;  /* these are the lookat points */
 	Coord rotation = 0.0;	/* the rotation of the ferris wheel */
-	Coord fwv[3] = {0.0, -6.0, 0.0};	/* initial Ferris wheel view */
+	Coord fwv[3] = {0.0, -6.0, 0.0 };	/* initial Ferris wheel view */
 	Coord rider[3], nextrider[3];	/* points for the coaster rider */
 	int i, j, rollPts, tilt = 0;
 	char style = 0;
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
 			glGetIntegerv(GL_MATRIX_MODE, &mm);
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			gluPerspective(.1*(600), 1265.0/983.0, 0.01, 150.0);
+			gluPerspective(0.1 * (600), 1265.0 / 983.0, 0.01, 150.0);
 			glMatrixMode(mm);
 		}
 		glEnable(GL_DEPTH_TEST);

@@ -163,9 +163,9 @@ void drawStrut(int i)
 void coaster(int numpts) /* This is the number of pts in the roller arrays */
 {
 	int i, alternate = 0;
-	short tracks[3] = {51, 51, 51};
+	GLbyte tracks[3] = {51, 51, 51 };
 	
-	glColor3sv(tracks);
+	glColor3bv(tracks);
 	for(i=0;i<numpts;i++)
 	{
 		glLineWidth(3);

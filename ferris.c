@@ -10,14 +10,14 @@
 
 void carriage(Coord wheel1[3], Coord wheel2[3])
 {
-	Coord v1[3],v2[3],v3[3],v4[3],v5[3],v6[3];
-	Coord v7[3],v8[3],v9[3],v10[3],v11[3],v12[3];
+	Coord v1[3], v2[3], v3[3], v4[3], v5[3], v6[3];
+	Coord v7[3], v8[3], v9[3], v10[3], v11[3], v12[3];
 	Coord side1[3], side2[3];
 	
-	short dkgrey[3] = {76, 66, 102};
-	short dkrgrey[3] = {40, 40, 40};
-	short blue[3] = {66, 66, 230};
-	short steel[3] = {65, 74, 82};
+	GLbyte dkgrey[3] = {76, 66, 102 };
+	GLbyte dkrgrey[3] = {40, 40, 40 };
+	GLbyte blue[3] = {66, 66, 230 };
+	GLbyte steel[3] = {65, 74, 82 };
 	
 	/* The following sets up all the proper coordinates. */
 	
@@ -44,7 +44,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 	v3[1] = v4[1] = v9[1] = v10[1] -= 0.5;
 	v11[1] = v12[1] -= 0.7;
 	
-	glColor3sv(dkgrey);
+	glColor3bv(dkgrey);
 	glBegin(GL_POLYGON); /* back of chair */
 		glVertex3fv(v1);
 		glVertex3fv(v2);
@@ -52,7 +52,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 		glVertex3fv(v4);
 	glEnd();
 	
-	glColor3sv(dkrgrey);
+	glColor3bv(dkrgrey);
 	glBegin(GL_POLYGON); /* seat of chair */
 		glVertex3fv(v4);
 		glVertex3fv(v3);
@@ -60,7 +60,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 		glVertex3fv(v9);
 	glEnd();
 	
-	glColor3sv(dkgrey);
+	glColor3bv(dkgrey);
 	glBegin(GL_POLYGON); /* foot part */
 		glVertex3fv(v11);
 		glVertex3fv(v12);
@@ -68,7 +68,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 		glVertex3fv(v9);
 	glEnd();
 	
-	glColor3sv(blue);
+	glColor3bv(blue);
 	glBegin(GL_POLYGON); /*one side*/
 		glVertex3fv(v4);
 		glVertex3fv(v5);
@@ -83,7 +83,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 		glVertex3fv(v10);
 	glEnd();
 	
-	glColor3sv(steel);
+	glColor3bv(steel);
 	glBegin(GL_LINE_STRIP); /*draw axels */
 		glVertex3fv(side1);
 		glVertex3fv(wheel1);
@@ -104,54 +104,54 @@ void ferris(Coord angle, Coord* sight)
 {
 	int i;
 	Coord bottom; /* the angle of the 'bottom' spoke */
-	Coord center1[3] = {0.0,0.0,1.5};
-	Coord center2[3] = {0.0,0.0,-1.5};
-	Coord axel1[3] = {0.0,0.0,2.5};
-	Coord axel2[3] = {0.0,0.0,-2.5};
-	Coord b1[3] = {-4.5,-7.0,3.0};
-	Coord b2[3] = {4.5,-7.0,3.0};
-	Coord b3[3] = {4.5,-7.0,-3.0};
-	Coord b4[3] = {-4.5,-7.0,-3.0};
+	Coord center1[3] = {0.0, 0.0, 1.5 };
+	Coord center2[3] = {0.0, 0.0, -1.5 };
+	Coord axel1[3] = {0.0, 0.0, 2.5 };
+	Coord axel2[3] = {0.0, 0.0, -2.5 };
+	Coord b1[3] = {-4.5, -7.0, 3.0 };
+	Coord b2[3] = {4.5, -7.0, 3.0 };
+	Coord b3[3] = {4.5, -7.0, -3.0 };
+	Coord b4[3] = {-4.5, -7.0, -3.0 };
 	Coord temp1[8][3], temp2[8][3];
 	
-	short yellow[3] = {255, 255, 40};
-	short steel[3] = {65, 74, 82};
+	GLbyte yellow[3] = {255, 255, 40 };
+	GLbyte steel[3] = {65, 74, 82 };
 	
 	glLineWidth(2);
-	glColor3sv(yellow);
+	glColor3bv(yellow);
 	glPushMatrix();
-		glTranslatef(0.0,0.0,-1.5);
+		glTranslatef(0.0, 0.0, -1.5);
 		{
 			GLUquadricObj *qobj = gluNewQuadric();
 			gluQuadricDrawStyle(qobj, GLU_SILHOUETTE);
 			glPushMatrix();
 				glTranslatef(0.0, 0.0, 0.);
-				gluDisk( qobj, 0., 6.0, 32, 1);
+				gluDisk(qobj, 0.0, 6.0, 32, 1);
 			glPopMatrix();
 			gluDeleteQuadric(qobj);
 		}
 	glPopMatrix();
 	glPushMatrix();
-		glTranslatef(0.0,0.0,1.5);
+		glTranslatef(0.0, 0.0, 1.5);
 		{
 			GLUquadricObj *qobj = gluNewQuadric();
 			gluQuadricDrawStyle(qobj, GLU_SILHOUETTE);
 			glPushMatrix();
 				glTranslatef(0.0, 0.0, 0.);
-				gluDisk( qobj, 0., 6.0, 32, 1);
+				gluDisk(qobj, 0.0, 6.0, 32, 1);
 			glPopMatrix();
 			gluDeleteQuadric(qobj);
 		}
 	glPopMatrix();
-	for(i=0; i<=7; i++)
+	for(i = 0; i <= 7; i++)
 	{
-		if (i==6)
+		if (i == 6)
 		{
 			/* this is the rider position */
 			bottom = angle;
 		}
-		temp1[i][0] = 6.0*cos(angle);
-		temp1[i][1] = 6.0*sin(angle);
+		temp1[i][0] = 6.0 * cos(angle);
+		temp1[i][1] = 6.0 * sin(angle);
 		temp1[i][2] = 1.5;
 		assignCoord(temp2[i], temp1[i]);
 		temp2[i][2] = -1.5;
@@ -167,11 +167,11 @@ void ferris(Coord angle, Coord* sight)
 		glEnd();
 		
 		carriage(temp1[i], temp2[i]);
-		glColor3sv(yellow);
+		glColor3bv(yellow);
 		angle += SPOKE;
 	}
 	
-	glColor3sv(steel);
+	glColor3bv(steel);
 	glLineWidth(4);
 	glBegin(GL_LINE_STRIP);
 		glVertex3fv(axel1);
@@ -190,9 +190,10 @@ void ferris(Coord angle, Coord* sight)
 		glVertex3fv(b4);
 	glEnd();
 	
-	sight[0] = 6.0*cos(bottom-0.1);
-	sight[1] = 6.0*sin(bottom-0.1) + 0.5;
+	sight[0] = 6.0 * cos(bottom - 0.1);
+	sight[1] = 6.0 * sin(bottom - 0.1) + 0.5;
 	sight[2] = 0.0;
+	
 	glLineWidth(1);
 	/* Returns position of 'bottom' spoke of the next */
 	/* iteration (angle - 0.1 is the next iteration) */
