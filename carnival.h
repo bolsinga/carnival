@@ -1,6 +1,6 @@
 /* Greg Bolsinga */
 /* carnival rides animation project */
-/* April 28, 1992
+/* April 28, 1992 */
 /* cs319 */
 /* Prof Hearn */
 
@@ -19,7 +19,6 @@
 #include <GLUT/glut.h>
 
 typedef GLfloat		Coord;
-typedef GLfloat*	Matrix;
 
 #include <math.h>
 
