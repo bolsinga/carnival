@@ -4,6 +4,12 @@
 #include <string.h>
 #include <stdio.h>
 
+/*
+	GL documentation: <http://publibn.boulder.ibm.com/doc_link/en_US/a_doc_lib/libs/gl32tref/gl32tref02.htm#ToC>
+	OpenGL Documentation: <http://www.cevis.uni-bremen.de/~uwe/opengl/opengl.html>
+		<http://www.opengl.org/developers/documentation/Specs/glspec1.1/glspec.html>
+*/
+
 typedef enum {
 	View_Coaster,
 	View_Ferris,
