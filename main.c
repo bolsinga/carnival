@@ -3,10 +3,17 @@
 #include <stdlib.h>
 
 static GLboolean gAnimating = GL_TRUE;
+enum {
+	View_Coaster,
+	View_Ferris,
+	View_Point
+} View_Style;
 
-static void Init()
+static View_Style gStyle = View_Coaster;
+
+static void Init(int argc, char** argv)
 {
-
+	
 }
 
 static void Display()
