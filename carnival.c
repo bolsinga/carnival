@@ -100,14 +100,6 @@ void drawScene(Coord rotation, int rollPts, Coord fwv[3])
 	Coord gr4[3] = {-100, -1.0, 100 };
 	
 	GLubyte grass[3] = {123, 193, 87 };
-	GLubyte sky[3] = {85, 172, 255 };
-
-#ifndef USE_GLUT	
-	glColor3ubv(sky);
-	clear();
-	glClearDepth(1.);
-	glClear(GL_DEPTH_BUFFER_BIT);
-#endif
 	
 	/* Draw the ground */
 	glColor3ubv(grass);

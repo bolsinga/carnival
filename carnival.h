@@ -18,8 +18,6 @@
 #include <OpenGL/gl.h>
 #include <GLUT/glut.h>
 
-#define USE_GLUT
-
 typedef GLfloat		Coord;
 
 #include <math.h>
