@@ -1,29 +1,138 @@
 #include "carnival.h"
 #include "coaster.h"
 #include <stdlib.h>
+#include <string.h>
 
-static GLboolean gAnimating = GL_TRUE;
-enum {
+typedef enum {
 	View_Coaster,
 	View_Ferris,
 	View_Point
 } View_Style;
 
+static GLboolean gAnimating = GL_TRUE;
 static View_Style gStyle = View_Coaster;
 
+static Coord gRotation = 0.0;
+static int gRollPts;
+static int gCurrentCoaster = 0;
+static Coord gFWV[3] = {0.0, -6.0, 0.0 };	/* initial Ferris wheel view */
+
+static GLdouble geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz;
+			   
 static void Init(int argc, char** argv)
 {
-	
+	if (argc > 1)
+	{
+		if (strcmp(argv[1], "-c") == 0)
+		{
+			gStyle = View_Coaster;
+		}
+		else if (strcmp(argv[1], "-w") == 0)
+		{
+			gStyle = View_Ferris;
+		}
+		else if (strcmp(argv[1], "-l") == 0)
+		{
+			gStyle = View_Point;
+		}
+	}
+
+	gRollPts = getCoasterPts();
+
+	glClearColor(0.33, 0.67, 1.0, 1.0);
+	glEnable(GL_DEPTH_TEST);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(0.1 * (600), 640.0 / 480.0, 0.01, 150.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 }
 
 static void Display()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+//	gluLookAt(geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz);
+
+	drawScene(gRotation, gRollPts, gFWV);
+
+	glutSwapBuffers();
 }
 
 static void Idle()
 {
+	Coord rider[3], nextrider[3];	/* points for the coaster rider */
+	int tilt;
+	
 	// Increment animation counters
+	gRotation -= WHEELROT;
+	
+	switch (gStyle)
+	{
+		case View_Coaster:			
+			gCurrentCoaster++;
+			if (gCurrentCoaster > gRollPts)
+			{
+				gCurrentCoaster = 0;
+			}
+
+			avgPts(rollerin[gCurrentCoaster], rollerout[gCurrentCoaster], rider);
+			avgPts(rollerin[gCurrentCoaster + 1], rollerout[gCurrentCoaster + 1], nextrider);
+
+			/* These set the tilt of the roller coaster rider to simulate */
+			/* the momentum.  They are just picked values.		      */
+			if ((gCurrentCoaster >= 37 && gCurrentCoaster <= 56) || (gCurrentCoaster >= 174 && gCurrentCoaster <= 193) ||
+				(gCurrentCoaster >= 233 && gCurrentCoaster <= 238) || (gCurrentCoaster >= 258 && gCurrentCoaster <= 263))
+			{
+				tilt = -15;
+			}
+			else if ((gCurrentCoaster >= 57 && gCurrentCoaster <= 173) || (gCurrentCoaster >= 239 && gCurrentCoaster <= 262))
+			{
+				tilt = -30;
+			}
+			else
+			{
+				tilt = 0;
+			}
+
+			geyex = rider[0];
+			geyey = rider[1] + 0.5;
+			geyez = rider[2];
+			gcenterx = nextrider[0];
+			gcentery = nextrider[1] + 0.5;
+			gcenterz = nextrider[2];
+			gupx = 0.0;
+			gupy = 1.0;
+			gupz = 0.0;
+			break;
+			
+		case View_Ferris:
+			geyex = gFWV[0];
+			geyey = gFWV[1];
+			geyez = gFWV[2];
+			gcenterx = gFWV[0] + 1.0;
+			gcentery = gFWV[1];
+			gcenterz = gFWV[2];
+			gupx = 0.0;
+			gupy = 1.0;
+			gupz = 0.0;
+			break;
+			
+		case View_Point:
+			geyex = 0;
+			geyey = 0;
+			geyez = 0;
+			gcenterx = 0;
+			gcentery = 0;
+			gcenterz = 0;
+			gupx = 0.0;
+			gupy = 1.0;
+			gupz = 0.0;
+			break;
+	}
+	
+	glutPostRedisplay();
 }
 
 static void SpecialKey(int key, int x, int y)
@@ -42,9 +151,7 @@ static void Key(unsigned char key, int x, int y)
 			glutIdleFunc(gAnimating ? Idle : NULL);
 		break;
 		
-		// Handle riding ferris wheel
-		
-		// Handle riding roller coaster
+		// Toggle through styles (Coaster, Ferris, Point)
 	}
 	glutPostRedisplay();
 }
@@ -64,7 +171,7 @@ int main(int argc, char** argv)
 	
 	glutCreateWindow("Carnival");
 	
-	Init();
+	Init(argc, argv);
 	
 	glutDisplayFunc(Display);
 	glutSpecialFunc(SpecialKey);
