@@ -20,6 +20,9 @@ static Coord gFWV[3] = {0.0, -6.0, 0.0 };	/* initial Ferris wheel view */
 
 static GLdouble geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz;
 
+static GLint gThreshhold = 750;
+static GLint gCurrentIteration = 0;
+
 static void dump()
 {
 	fprintf(stderr, "gAnimating: %d gStyle: %d gRollPts: %d gCurrentCoaster: %d gRotation: %f\n", gAnimating, gStyle, gRollPts, gCurrentCoaster, gRotation);
@@ -34,27 +37,29 @@ static void Init()
 
 	glClearColor(0.33, 0.67, 1.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(0.1 * (600), 640.0 / 480.0, 0.01, 150.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }
 
 static void Display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	gluLookAt(geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz);
-
-	drawScene(gRotation, gRollPts, gFWV);
-
+	glPushMatrix();
+		gluLookAt(geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz);
+		
+		drawScene(gRotation, gRollPts, gFWV);
+	glPopMatrix();
+	
 	glutSwapBuffers();
 }
 
 static void Idle()
 {
+	if (++gCurrentIteration < gThreshhold)
+	{
+		return;
+	}
+	gCurrentIteration = 0;
+	
 	Coord rider[3], nextrider[3];	/* points for the coaster rider */
 	int tilt;
 	
@@ -163,6 +168,16 @@ static void Visibility(int visible)
 	glutIdleFunc(((visible == GLUT_VISIBLE) && gAnimating) ? Idle : NULL);
 }
 
+static void Reshape(int width, int height)
+{
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(0.1 * (600), (float)(width / height), 0.01, 150.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
 #ifdef USE_GLUT
 int main(int argc, char** argv)
 {
@@ -179,6 +194,7 @@ int main(int argc, char** argv)
 	glutSpecialFunc(SpecialKey);
 	glutKeyboardFunc(Key);
 	glutVisibilityFunc(Visibility);
+	glutReshapeFunc(Reshape);
 	
 	glutMainLoop();
 	
