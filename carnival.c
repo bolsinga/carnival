@@ -20,8 +20,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define TRUE 1
-
 /* The following is a function that assigns one 3D coordinate to another. */
 
 void assignCoord(Coord a[3], Coord b[3])
