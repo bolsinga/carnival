@@ -60,30 +60,30 @@ void mountains()
 	Coord mnt3b1[3] = {85, -1, -70 };
 	Coord mnt3b2[3] = {85, -1, -5 };
 	
-	GLbyte brown[3] = {116, 87, 11 };
-	GLbyte snow[3] = {196, 196, 196 };
+	GLubyte brown[3] = {116, 87, 11 };
+	GLubyte snow[3] = {196, 196, 196 };
 	
 	glBegin(GL_POLYGON);
-		glColor3bv(brown);
+		glColor3ubv(brown);
 			glVertex3fv(mnt1b1);
 			glVertex3fv(mnt1b2);
-		glColor3bv(snow);
+		glColor3ubv(snow);
 			glVertex3fv(mnt1p);
 	glEnd();
 	
 	glBegin(GL_POLYGON);
-		glColor3bv(brown);
+		glColor3ubv(brown);
 			glVertex3fv(mnt2b1);
 			glVertex3fv(mnt2b2);
-		glColor3bv(snow);
+		glColor3ubv(snow);
 			glVertex3fv(mnt2p);
 	glEnd();
 	
 	glBegin(GL_POLYGON);
-		glColor3bv(brown);
+		glColor3ubv(brown);
 			glVertex3fv(mnt3b1);
 			glVertex3fv(mnt3b2);
-		glColor3bv(snow);
+		glColor3ubv(snow);
 			glVertex3fv(mnt3p);
 	glEnd();
 }
@@ -99,18 +99,18 @@ void drawScene(Coord rotation, int rollPts, Coord fwv[3])
 	Coord gr3[3] = {-100, -1.0, -100 };
 	Coord gr4[3] = {-100, -1.0, 100 };
 	
-	GLbyte grass[3] = {123, 193, 87 };
-	GLbyte sky[3] = {85, 172, 255 };
+	GLubyte grass[3] = {123, 193, 87 };
+	GLubyte sky[3] = {85, 172, 255 };
 
 #ifndef USE_GLUT	
-	glColor3bv(sky);
+	glColor3ubv(sky);
 	clear();
 	glClearDepth(1.);
 	glClear(GL_DEPTH_BUFFER_BIT);
 #endif
 	
 	/* Draw the ground */
-	glColor3bv(grass);
+	glColor3ubv(grass);
 	glBegin(GL_POLYGON);
 		glVertex3fv(gr1);
 		glVertex3fv(gr2);

@@ -23,12 +23,12 @@ void tent()
 	Coord v12[3] = {0.0, 0.5, 2.5 };
 	Coord v13[3] = {4.5, 0.5, 2.5 };
 	
-	GLbyte dkgrey[3] = {110, 110, 110 };
-	GLbyte ltgrey[3] = {230, 230, 230 };
-	GLbyte blue[3] = {0, 0, 255 };
-	GLbyte ltblue[3] = {0, 0, 175 };
-	GLbyte red[3] = {255, 0, 0 };
-	GLbyte ltpink[3] = {255, 223, 227 };
+	GLubyte dkgrey[3] = {110, 110, 110 };
+	GLubyte ltgrey[3] = {230, 230, 230 };
+	GLubyte blue[3] = {0, 0, 255 };
+	GLubyte ltblue[3] = {0, 0, 175 };
+	GLubyte red[3] = {255, 0, 0 };
+	GLubyte ltpink[3] = {255, 223, 227 };
 	
 	Coord temp1[3], temp2[3], temp3[3], temp4[3], temp5[3], temp6[3];
 	int i;
@@ -37,43 +37,43 @@ void tent()
 	
 	/* Draw the sides */
 	glBegin(GL_POLYGON);
-		glColor3bv(dkgrey);
+		glColor3ubv(dkgrey);
 			glVertex3fv(v0);
-		glColor3bv(ltgrey);
+		glColor3ubv(ltgrey);
 			glVertex3fv(v1);
-		glColor3bv(dkgrey);
+		glColor3ubv(dkgrey);
 			glVertex3fv(v2);
 			glVertex3fv(v3);
-		glColor3bv(ltgrey);
+		glColor3ubv(ltgrey);
 			glVertex3fv(v4);
 	glEnd();
 	
 	glBegin(GL_POLYGON);
-		glColor3bv(dkgrey);
+		glColor3ubv(dkgrey);
 			glVertex3fv(v5);
-		glColor3bv(ltgrey);
+		glColor3ubv(ltgrey);
 			glVertex3fv(v6);
-		glColor3bv(dkgrey);
+		glColor3ubv(dkgrey);
 			glVertex3fv(v7);
 			glVertex3fv(v8);
-		glColor3bv(ltgrey);
+		glColor3ubv(ltgrey);
 			glVertex3fv(v9);
 	glEnd();
 	
 	/* Draw the back */
 	glBegin(GL_POLYGON);
-		glColor3bv(ltgrey);
+		glColor3ubv(ltgrey);
 			glVertex3fv(v1);
-		glColor3bv(dkgrey);
+		glColor3ubv(dkgrey);
 			glVertex3fv(v2);
-		glColor3bv(ltgrey);
+		glColor3ubv(ltgrey);
 			glVertex3fv(v7);
-		glColor3bv(dkgrey);
+		glColor3ubv(dkgrey);
 			glVertex3fv(v6);
 	glEnd();
 	
 	/* Draw the front counter */
-	glColor3bv(blue);
+	glColor3ubv(blue);
 	glBegin(GL_POLYGON);
 		glVertex3fv(v0);
 		glVertex3fv(v10);
@@ -81,7 +81,7 @@ void tent()
 		glVertex3fv(v5);
 	glEnd();
 	
-	glColor3bv(ltblue);
+	glColor3ubv(ltblue);
 	glBegin(GL_POLYGON);
 		glVertex3fv(v10);
 		glVertex3fv(v12);
@@ -104,7 +104,7 @@ void tent()
 		temp5[0] += value;
 		temp4[0] += value;
 		
-		glColor3bv(colorIsRed ? red : ltpink);
+		glColor3ubv(colorIsRed ? red : ltpink);
 		glBegin(GL_POLYGON);
 			glVertex3fv(temp1);
 			glVertex3fv(temp2);

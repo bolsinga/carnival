@@ -14,10 +14,10 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 	Coord v7[3], v8[3], v9[3], v10[3], v11[3], v12[3];
 	Coord side1[3], side2[3];
 	
-	GLbyte dkgrey[3] = {76, 66, 102 };
-	GLbyte dkrgrey[3] = {40, 40, 40 };
-	GLbyte blue[3] = {66, 66, 230 };
-	GLbyte steel[3] = {65, 74, 82 };
+	GLubyte dkgrey[3] = {76, 66, 102 };
+	GLubyte dkrgrey[3] = {40, 40, 40 };
+	GLubyte blue[3] = {66, 66, 230 };
+	GLubyte steel[3] = {65, 74, 82 };
 	
 	/* The following sets up all the proper coordinates. */
 	
@@ -44,7 +44,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 	v3[1] = v4[1] = v9[1] = v10[1] -= 0.5;
 	v11[1] = v12[1] -= 0.7;
 	
-	glColor3bv(dkgrey);
+	glColor3ubv(dkgrey);
 	glBegin(GL_POLYGON); /* back of chair */
 		glVertex3fv(v1);
 		glVertex3fv(v2);
@@ -52,7 +52,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 		glVertex3fv(v4);
 	glEnd();
 	
-	glColor3bv(dkrgrey);
+	glColor3ubv(dkrgrey);
 	glBegin(GL_POLYGON); /* seat of chair */
 		glVertex3fv(v4);
 		glVertex3fv(v3);
@@ -60,7 +60,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 		glVertex3fv(v9);
 	glEnd();
 	
-	glColor3bv(dkgrey);
+	glColor3ubv(dkgrey);
 	glBegin(GL_POLYGON); /* foot part */
 		glVertex3fv(v11);
 		glVertex3fv(v12);
@@ -68,7 +68,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 		glVertex3fv(v9);
 	glEnd();
 	
-	glColor3bv(blue);
+	glColor3ubv(blue);
 	glBegin(GL_POLYGON); /*one side*/
 		glVertex3fv(v4);
 		glVertex3fv(v5);
@@ -83,7 +83,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 		glVertex3fv(v10);
 	glEnd();
 	
-	glColor3bv(steel);
+	glColor3ubv(steel);
 	glBegin(GL_LINE_STRIP); /*draw axels */
 		glVertex3fv(side1);
 		glVertex3fv(wheel1);
@@ -114,11 +114,11 @@ void ferris(Coord angle, Coord* sight)
 	Coord b4[3] = {-4.5, -7.0, -3.0 };
 	Coord temp1[8][3], temp2[8][3];
 	
-	GLbyte yellow[3] = {255, 255, 40 };
-	GLbyte steel[3] = {65, 74, 82 };
+	GLubyte yellow[3] = {255, 255, 40 };
+	GLubyte steel[3] = {65, 74, 82 };
 	
 	glLineWidth(2);
-	glColor3bv(yellow);
+	glColor3ubv(yellow);
 	glPushMatrix();
 		glTranslatef(0.0, 0.0, -1.5);
 		{
@@ -167,11 +167,11 @@ void ferris(Coord angle, Coord* sight)
 		glEnd();
 		
 		carriage(temp1[i], temp2[i]);
-		glColor3bv(yellow);
+		glColor3ubv(yellow);
 		angle += SPOKE;
 	}
 	
-	glColor3bv(steel);
+	glColor3ubv(steel);
 	glLineWidth(4);
 	glBegin(GL_LINE_STRIP);
 		glVertex3fv(axel1);
