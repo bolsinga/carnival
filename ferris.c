@@ -46,22 +46,22 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 	glColor3sv(dkgrey);
 	glBegin(GL_POLYGON); /* back of chair */
 	glVertex3fv(v1);glVertex3fv(v2);glVertex3fv(v3);glVertex3fv(v4);
-	glBegin(GL_POLYGON);
+	glEnd();
 	glColor3sv(dkrgrey);
 	glBegin(GL_POLYGON); /* seat of chair */
 	glVertex3fv(v4);glVertex3fv(v3);glVertex3fv(v10);glVertex3fv(v9);
-	glBegin(GL_POLYGON);
+	glEnd();
 	glColor3sv(dkgrey);
 	glBegin(GL_POLYGON); /* foot part */
 	glVertex3fv(v11);glVertex3fv(v12);glVertex3fv(v10);glVertex3fv(v9);
-	glBegin(GL_POLYGON);
+	glEnd();
 	glColor3sv(blue);
 	glBegin(GL_POLYGON); /*one side*/
 	glVertex3fv(v4);glVertex3fv(v5);glVertex3fv(v7);glVertex3fv(v9);
-	glBegin(GL_POLYGON);
+	glEnd();
 	glBegin(GL_POLYGON); /*other side*/
 	glVertex3fv(v3);glVertex3fv(v6);glVertex3fv(v8);glVertex3fv(v10);
-	glBegin(GL_POLYGON);
+	glEnd();
 	glColor3sv(steel);
 	glBegin(GL_LINE_STRIP); /*draw axels */
 	glVertex3fv(side1);glVertex3fv(wheel1);

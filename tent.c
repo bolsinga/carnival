@@ -41,13 +41,13 @@ void tent()
 	  glColor3sv(ltgrey);glVertex3fv(v1);
 	  glColor3sv(dkgrey);glVertex3fv(v2);glVertex3fv(v3);
 	  glColor3sv(ltgrey);glVertex3fv(v4);
-	glBegin(GL_POLYGON);
+	glEnd();
 	glBegin(GL_POLYGON);
 	  glColor3sv(dkgrey);glVertex3fv(v5);
 	  glColor3sv(ltgrey);glVertex3fv(v6);
 	  glColor3sv(dkgrey);glVertex3fv(v7);glVertex3fv(v8);
 	  glColor3sv(ltgrey);glVertex3fv(v9);
-	glBegin(GL_POLYGON);
+	glEnd();
 
 	/* Draw the back */
 	glBegin(GL_POLYGON);
@@ -55,17 +55,17 @@ void tent()
 	  glColor3sv(dkgrey);glVertex3fv(v2);
 	  glColor3sv(ltgrey);glVertex3fv(v7);
 	  glColor3sv(dkgrey);glVertex3fv(v6);
-	glBegin(GL_POLYGON);
+	glEnd();
 
 	/* Draw the front counter */
 	glColor3sv(blue);
 	glBegin(GL_POLYGON);
 	glVertex3fv(v0);glVertex3fv(v10);glVertex3fv(v11);glVertex3fv(v5);
-	glBegin(GL_POLYGON);
+	glEnd();
 	glColor3sv(ltblue);
 	glBegin(GL_POLYGON);
 	glVertex3fv(v10);glVertex3fv(v12);glVertex3fv(v13);glVertex3fv(v11);
-	glBegin(GL_POLYGON);
+	glEnd();
 
 	/* Draw the awning */
 	assignCoord(temp1, v4);
@@ -86,10 +86,10 @@ void tent()
 	  else glColor3sv(ltpink);
 	  glBegin(GL_POLYGON);
 	  glVertex3fv(temp1);glVertex3fv(temp2);glVertex3fv(temp5);glVertex3fv(temp6);
-	  glBegin(GL_POLYGON);
+	  glEnd();
 	  glBegin(GL_POLYGON);
 	  glVertex3fv(temp2);glVertex3fv(temp3);glVertex3fv(temp4);glVertex3fv(temp5);
-	  glBegin(GL_POLYGON);
+	  glEnd();
 	  glPushMatrix();
 	  glTranslatef(0,0,3.0);
 	  { GLUquadricObj *qobj = gluNewQuadric(); glPushMatrix(); glTranslatef(center, 2.0, 0.); gluPartialDisk( qobj, 0., temp6[0]-center, 32, 1, (1800)*.1, ((0)-(1800))*.1); glPopMatrix(); gluDeleteQuadric(qobj); }

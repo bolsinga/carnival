@@ -60,17 +60,17 @@ void mountains()
 	glBegin(GL_POLYGON);
 	  glColor3sv(brown);glVertex3fv(mnt1b1);glVertex3fv(mnt1b2);
 	  glColor3sv(snow);glVertex3fv(mnt1p);
-	glBegin(GL_POLYGON);
+	glEnd();
 
 	glBegin(GL_POLYGON);
 	  glColor3sv(brown);glVertex3fv(mnt2b1);glVertex3fv(mnt2b2);
 	  glColor3sv(snow);glVertex3fv(mnt2p);
-	glBegin(GL_POLYGON);
+	glEnd();
 
 	glBegin(GL_POLYGON);
 	  glColor3sv(brown);glVertex3fv(mnt3b1);glVertex3fv(mnt3b2);
 	  glColor3sv(snow);glVertex3fv(mnt3p);
-	glBegin(GL_POLYGON);
+	glEnd();
 }
 
 /* The folowing draws the entire scene. It takes the current rotation 	*/
@@ -95,7 +95,7 @@ void drawScene(Coord rotation, int rollPts, Coord fwv[3])
 	glColor3sv(grass);
 	glBegin(GL_POLYGON);
 	glVertex3fv(gr1);glVertex3fv(gr2);glVertex3fv(gr3);glVertex3fv(gr4);
-	glBegin(GL_POLYGON);
+	glEnd();
 
 	/* Draw some mountains */
 	mountains();
