@@ -17,7 +17,6 @@
 #include "ferris.h"
 #include "coaster.h"
 
-#define MVIEWING 1
 #define TRUE 1
 #define ID 1
 
