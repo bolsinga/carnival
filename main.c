@@ -10,6 +10,8 @@
 		<http://www.opengl.org/developers/documentation/Specs/glspec1.1/glspec.html>
 */
 
+#define ALLOW_LOOKAROUND
+
 typedef enum {
 	View_Coaster,
 	View_Ferris,
@@ -28,6 +30,8 @@ static GLdouble geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, g
 
 static GLint gThreshhold = 750;
 static GLint gCurrentIteration = 0;
+
+static GLdouble gStep = 0.1;
 
 static void dump()
 {
@@ -105,6 +109,8 @@ static void Idle()
 			gupx = 0.0;
 			gupy = 1.0;
 			gupz = 0.0;
+			
+//			dump();
 			break;
 			
 		case View_Ferris:
@@ -120,6 +126,7 @@ static void Idle()
 			break;
 			
 		case View_Point:
+		/*
 			geyex = 0;
 			geyey = 0;
 			geyez = 0;
@@ -129,6 +136,7 @@ static void Idle()
 			gupx = 0.0;
 			gupy = 1.0;
 			gupz = 0.0;
+		*/
 			break;
 	}
 	
@@ -144,6 +152,21 @@ static void SpecialKey(int key, int x, int y)
 	if (gStyle == View_Point)
 	{
 		// Rotate display in view mode
+		switch (key) {
+			case GLUT_KEY_UP:
+				geyey += gStep;
+				break;
+			case GLUT_KEY_DOWN:
+				geyey -= gStep;
+				break;
+			case GLUT_KEY_LEFT:
+				geyex -= gStep;
+				break;
+			case GLUT_KEY_RIGHT:
+				geyex += gStep;
+				break;
+		}
+		glutPostRedisplay();
 	}
 }
 
@@ -158,11 +181,27 @@ static void Key(unsigned char key, int x, int y)
 			glutIdleFunc(gAnimating ? Idle : NULL);
 		break;
 		case 't':
-			// Toggle through styles (Coaster, Ferris, Point)
-			gStyle++;
-			if (gStyle > View_Point)
+			if (gStyle != View_Point)
 			{
-				gStyle = View_Coaster;
+				// Toggle between Coaster & Ferris
+				gStyle = (gStyle == View_Coaster) ? View_Ferris : View_Coaster;
+			}
+			break;
+#ifdef ALLOW_LOOKAROUND
+		case 's':
+			gStyle = (gStyle == View_Point) ? View_Coaster : View_Point;
+			break;
+#endif
+		case 'z':
+			if (gStyle == View_Point)
+			{
+				geyez -= gStep;
+			}
+			break;
+		case 'x':
+			if (gStyle == View_Point)
+			{
+				geyez += gStep;
 			}
 			break;
 	}
