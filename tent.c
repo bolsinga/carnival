@@ -120,12 +120,12 @@ void tent()
 		glEnd();
 		
 		glPushMatrix();
-			glTranslatef(0,0,3.0);
+			glTranslatef(0, 0, 3.0);
 			{	
 				GLUquadricObj *qobj = gluNewQuadric();
 				glPushMatrix();
 					glTranslatef(center, 2.0, 0.);
-					gluPartialDisk(qobj, 0.0, temp6[0] - center, 32, 1, (1800) * 0.1, (0 - 1800) * 0.1);
+					gluPartialDisk(qobj, 0.0, temp6[0] - center, 32, 1, (2700) * 0.1, (0 - 1800) * 0.1);
 				glPopMatrix();
 				gluDeleteQuadric(qobj);
 			}
