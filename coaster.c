@@ -166,17 +166,17 @@ void coaster(int numpts) /* This is the number of pts in the roller arrays */
 	GLbyte tracks[3] = {51, 51, 51 };
 	
 	glColor3bv(tracks);
-	for(i=0;i<numpts;i++)
+	for(i = 0; i < numpts; i++)
 	{
 		glLineWidth(3);
 		glBegin(GL_LINE_STRIP);
 			glVertex3fv(rollerin[i]);
-			glVertex3fv(rollerin[i+1]);
+			glVertex3fv(rollerin[i + 1]);
 		glEnd();
 		
 		glBegin(GL_LINE_STRIP);
 			glVertex3fv(rollerout[i]);
-			glVertex3fv(rollerout[i+1]);
+			glVertex3fv(rollerout[i + 1]);
 		glEnd();
 		
 		glLineWidth(2);
