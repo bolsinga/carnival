@@ -4,37 +4,34 @@
 /* cs319 */
 /* Prof Hearn */
 
-/* compile using cc carnival.c -lgl_s -lm -o carnival */
+/* SGI: compile using cc carnival.c -lgl_s -lm -o carnival */
+/* Mac OS X: compile using */
 /* ride the roller coaster by typing 'carnival -c'    */
 /* ride the ferris wheel by typing 'carnival -w'      */
 /* look around with 'carnival -l xl yl zl xa ya za'   */
 /*   where (xl,yl,zl) is where you are, and           */
 /*         (xa,ya,za) is where you are looking at.    */
 
-#include <gl.h>
-#include <math.h>
-#include <device.h>
+#include "carnival.h"
 #include "tent.h"
 #include "ferris.h"
 #include "coaster.h"
 
-#define PI acos(-1.0)
-#define PARTITIONS 64.0
-#define INCREMENT PI / PARTITIONS
-#define WHEELROT 0.04	/* angle the wheel will turn each time drawn */
-#define TOUR 2*PI/WHEELROT  /* this in once around the ferris wheel  */ 
-#define TRIPS 3		/* this sets how many times will ride the ride */
+#define MVIEWING 1
+#define TRUE 1
+#define ID 1
 
+/*
 Matrix ID = {
-	{1,0,0,0},
-	{0,1,0,0},
-	{0,0,1,0},
-	{0,0,0,1}};
+       {1,0,0,0},
+       {0,1,0,0},
+       {0,0,1,0},
+       {0,0,0,1}};
+*/
 
 /* The following is a function that assigns one 3D coordinate to another. */
 
-void assignCoord(a, b)
-Coord a[3], b[3];
+void assignCoord(Coord a[3], Coord b[3])
 {
 	int i;
 	for(i=0;i<3;i++)
@@ -43,15 +40,12 @@ Coord a[3], b[3];
 
 /* The following calculates the average of two sets of 3D points. 	*/
 
-Coord* avgPts(a, b)
-Coord a[3], b[3];
+void avgPts(Coord a[3], Coord b[3], Coord result[3])
 {
 	int i;
-	Coord average[3];
 
 	for(i=0;i<3;i++)
-	    average[i] = (a[i] + b[i]) / 2.0;
-	return average;
+	    result[i] = (a[i] + b[i]) / 2.0;
 }
 
 /* This draws some mountains, which are very simple, so the animation	*/
@@ -92,11 +86,8 @@ void mountains()
 /* of the ferris wheel and the number of points in the roller coaster	*/
 /* arrays.  It returns the position of the ferris wheel rider.  	*/
 
-Coord* drawScene(rotation, rollPts)
-Coord rotation;
-int rollPts;
+void drawScene(Coord rotation, int rollPts, Coord fwv[3])
 {
-	Coord fwv[3]; /* ferris wheel rider position	*/
 	Coord gr1[3] = {100,-1.0,100};
 	Coord gr2[3] = {100,-1.0,-100};
 	Coord gr3[3] = {-100,-1.0,-100};
@@ -123,7 +114,7 @@ int rollPts;
 	coaster(rollPts);
 	pushmatrix();
 	  translate(-25.0,6.5,0);
-          assignCoord(fwv,ferris(rotation));
+          ferris(rotation, fwv);
 	  fwv[0] += -25.0;
 	  fwv[1] += 6.5;
 	popmatrix();
@@ -141,12 +132,10 @@ int rollPts;
 	for(i=0; i<100000; i++);
 */
 
-	return fwv;	/* return the position of the ferris wheel rider */
+	/* return the position of the ferris wheel rider */
 }
 
-main(argc, argv)
-int argc;
-char **argv;
+int main(int argc, char** argv)
 {
 	Coord xl,yl,zl,xa,ya,za;  /* these are the lookat points */
 	Coord rotation = 0.0;	/* the rotation of the ferris wheel */
@@ -200,7 +189,7 @@ char **argv;
 	    {
 	    loadmatrix(ID);
             lookat(fwv[0],fwv[1],fwv[2],fwv[0]+1.0,fwv[1],fwv[2],0);
-	    assignCoord(fwv,drawScene(rotation,rollPts));
+	    drawScene(rotation,rollPts, fwv);
 	    rotation -= WHEELROT;
 	    swapbuffers();
 	    }
@@ -208,8 +197,8 @@ char **argv;
 	  for(j=1;j<=TRIPS;j++)
 	    for(i=0;i<rollPts;i++)
 	      {
-	      assignCoord(rider, avgPts(rollerin[i], rollerout[i]));
-	      assignCoord(nextrider, avgPts(rollerin[i+1], rollerout[i+1]));
+	      avgPts(rollerin[i], rollerout[i], rider);
+	      avgPts(rollerin[i+1], rollerout[i+1], nextrider);
 	      loadmatrix(ID);
 	/* These set the tilt of the roller coaster rider to simulate */
 	/* the momentum.  They are just picked values.		      */
@@ -221,7 +210,7 @@ char **argv;
 	      else tilt = 0;
 	      lookat(rider[0],rider[1]+0.5,rider[2],nextrider[0],
 		     nextrider[1]+0.5,nextrider[2],tilt);
-	      drawScene(rotation, rollPts);
+	      drawScene(rotation, rollPts, fwv);
 	      rotation -= WHEELROT;
 	      swapbuffers();
 	      }
@@ -230,8 +219,10 @@ char **argv;
 	    {
 	    loadmatrix(ID);
 	    lookat(xl,yl,zl,xa,ya,za,0);
-	    drawScene(rotation, rollPts);
+	    drawScene(rotation, rollPts, fwv);
 	    rotation -= WHEELROT;
 	    swapbuffers();
 	    }
+		
+	return 0;
 }
