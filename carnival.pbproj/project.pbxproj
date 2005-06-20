@@ -3,23 +3,26 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 38;
+	objectVersion = 39;
 	objects = {
 		014CEA520018CE5811CA2923 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				OPTIMIZATION_CFLAGS = "-O0";
+				ZERO_LINK = YES;
 			};
 			isa = PBXBuildStyle;
 			name = Development;
 		};
 		014CEA530018CE5811CA2923 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				ZERO_LINK = NO;
 			};
 			isa = PBXBuildStyle;
 			name = Deployment;
@@ -29,27 +32,14 @@
 //012
 //013
 //014
-//030
-//031
-//032
-//033
-//034
-		034768E8FF38A79811DB9C8B = {
-			isa = PBXExecutableFileReference;
-			path = carnival;
-			refType = 3;
-		};
-//030
-//031
-//032
-//033
-//034
 //080
 //081
 //082
 //083
 //084
 		08FB7793FE84155DC02AAC07 = {
+			buildSettings = {
+			};
 			buildStyles = (
 				014CEA520018CE5811CA2923,
 				014CEA530018CE5811CA2923,
@@ -59,8 +49,8 @@
 			mainGroup = 08FB7794FE84155DC02AAC07;
 			projectDirPath = "";
 			targets = (
-				08FB779FFE84155DC02AAC07,
-				FED8269C046EF78200000102,
+				FE17130B0866740F00B0F08D,
+				FE17131D0866740F00B0F08D,
 			);
 		};
 		08FB7794FE84155DC02AAC07 = {
@@ -68,10 +58,12 @@
 				08FB7795FE84155DC02AAC07,
 				C6A0FF2B0290797F04C91782,
 				1AB674ADFE9D54B511CA2CBB,
+				FE17132D0866740F00B0F08D,
 			);
 			isa = PBXGroup;
 			name = carnival;
 			refType = 4;
+			sourceTree = "<group>";
 		};
 		08FB7795FE84155DC02AAC07 = {
 			children = (
@@ -89,71 +81,7 @@
 			isa = PBXGroup;
 			name = Source;
 			refType = 4;
-		};
-		08FB779FFE84155DC02AAC07 = {
-			buildPhases = (
-				08FB77A0FE84155DC02AAC07,
-				08FB77A1FE84155DC02AAC07,
-				08FB77A3FE84155DC02AAC07,
-				08FB77A5FE84155DC02AAC07,
-				C6A0FF2D029079AD04C91782,
-			);
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "";
-				HEADER_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-lGL -lGLU -lobjc";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = carnival;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-			};
-			dependencies = (
-			);
-			isa = PBXToolTarget;
-			name = carnival_tool;
-			productName = carnival;
-			productReference = 034768E8FF38A79811DB9C8B;
-		};
-		08FB77A0FE84155DC02AAC07 = {
-			buildActionMask = 2147483647;
-			files = (
-				FE857E390465815D00000102,
-				FE857E3B0465815D00000102,
-				FE857E3D0465815D00000102,
-				FE857E400465815D00000102,
-			);
-			isa = PBXHeadersBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		08FB77A1FE84155DC02AAC07 = {
-			buildActionMask = 2147483647;
-			files = (
-				FE857E380465815D00000102,
-				FE857E3A0465815D00000102,
-				FE857E3C0465815D00000102,
-				FE857E3E0465815D00000102,
-				FE857E3F0465815D00000102,
-			);
-			isa = PBXSourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		08FB77A3FE84155DC02AAC07 = {
-			buildActionMask = 2147483647;
-			files = (
-				FE857E420465826700000102,
-			);
-			isa = PBXFrameworksBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		08FB77A5FE84155DC02AAC07 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXRezBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
+			sourceTree = "<group>";
 		};
 //080
 //081
@@ -167,12 +95,13 @@
 //1A4
 		1AB674ADFE9D54B511CA2CBB = {
 			children = (
-				034768E8FF38A79811DB9C8B,
-				FED8269D046EF78200000102,
+				FE17131B0866740F00B0F08D,
+				FE17132E0866740F00B0F08D,
 			);
 			isa = PBXGroup;
 			name = Products;
 			refType = 4;
+			sourceTree = "<group>";
 		};
 //1A0
 //1A1
@@ -191,15 +120,7 @@
 			isa = PBXGroup;
 			name = Documentation;
 			refType = 4;
-		};
-		C6A0FF2D029079AD04C91782 = {
-			buildActionMask = 8;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			isa = PBXCopyFilesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 1;
+			sourceTree = "<group>";
 		};
 //C60
 //C61
@@ -211,183 +132,166 @@
 //FE2
 //FE3
 //FE4
-		FE857E2F0465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = carnival.c;
-			refType = 4;
-		};
-		FE857E300465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = carnival.h;
-			refType = 4;
-		};
-		FE857E310465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = coaster.c;
-			refType = 4;
-		};
-		FE857E320465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = coaster.h;
-			refType = 4;
-		};
-		FE857E330465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = ferris.c;
-			refType = 4;
-		};
-		FE857E340465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = ferris.h;
-			refType = 4;
-		};
-		FE857E350465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = main.c;
-			refType = 4;
-		};
-		FE857E360465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = tent.c;
-			refType = 4;
-		};
-		FE857E370465815D00000102 = {
-			fileEncoding = 30;
-			isa = PBXFileReference;
-			path = tent.h;
-			refType = 4;
-		};
-		FE857E380465815D00000102 = {
-			fileRef = FE857E2F0465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
+		FE17130B0866740F00B0F08D = {
+			buildPhases = (
+				FE17130C0866740F00B0F08D,
+				FE1713110866740F00B0F08D,
+				FE1713170866740F00B0F08D,
+				FE1713190866740F00B0F08D,
+				FE17131A0866740F00B0F08D,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-lGL -lGLU -lobjc";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = carnival;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
+			dependencies = (
+			);
+			isa = PBXNativeTarget;
+			name = carnival_tool;
+			productName = carnival;
+			productReference = FE17131B0866740F00B0F08D;
+			productType = "com.apple.product-type.tool";
 		};
-		FE857E390465815D00000102 = {
+		FE17130C0866740F00B0F08D = {
+			buildActionMask = 2147483647;
+			files = (
+				FE17130D0866740F00B0F08D,
+				FE17130E0866740F00B0F08D,
+				FE17130F0866740F00B0F08D,
+				FE1713100866740F00B0F08D,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE17130D0866740F00B0F08D = {
 			fileRef = FE857E300465815D00000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FE857E3A0465815D00000102 = {
-			fileRef = FE857E310465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FE857E3B0465815D00000102 = {
+		FE17130E0866740F00B0F08D = {
 			fileRef = FE857E320465815D00000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FE857E3C0465815D00000102 = {
-			fileRef = FE857E330465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FE857E3D0465815D00000102 = {
+		FE17130F0866740F00B0F08D = {
 			fileRef = FE857E340465815D00000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FE857E3E0465815D00000102 = {
-			fileRef = FE857E350465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FE857E3F0465815D00000102 = {
-			fileRef = FE857E360465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FE857E400465815D00000102 = {
+		FE1713100866740F00B0F08D = {
 			fileRef = FE857E370465815D00000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FE857E410465826700000102 = {
-			isa = PBXFrameworkReference;
-			name = GLUT.framework;
-			path = /System/Library/Frameworks/GLUT.framework;
-			refType = 0;
+		FE1713110866740F00B0F08D = {
+			buildActionMask = 2147483647;
+			files = (
+				FE1713120866740F00B0F08D,
+				FE1713130866740F00B0F08D,
+				FE1713140866740F00B0F08D,
+				FE1713150866740F00B0F08D,
+				FE1713160866740F00B0F08D,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FE857E420465826700000102 = {
+		FE1713120866740F00B0F08D = {
+			fileRef = FE857E2F0465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713130866740F00B0F08D = {
+			fileRef = FE857E310465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713140866740F00B0F08D = {
+			fileRef = FE857E330465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713150866740F00B0F08D = {
+			fileRef = FE857E350465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713160866740F00B0F08D = {
+			fileRef = FE857E360465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713170866740F00B0F08D = {
+			buildActionMask = 2147483647;
+			files = (
+				FE1713180866740F00B0F08D,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE1713180866740F00B0F08D = {
 			fileRef = FE857E410465826700000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FED82697046EF78200000102 = {
-			buildActionMask = 2147483647;
-			files = (
-				FED826A3046EFA3500000102,
-				FED826A5046EFA3500000102,
-				FED826A7046EFA3500000102,
-				FED826AA046EFA3500000102,
-			);
-			isa = PBXHeadersBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FED82698046EF78200000102 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXResourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FED82699046EF78200000102 = {
-			buildActionMask = 2147483647;
-			files = (
-				FED826A2046EFA3500000102,
-				FED826A4046EFA3500000102,
-				FED826A6046EFA3500000102,
-				FED826A8046EFA3500000102,
-				FED826A9046EFA3500000102,
-			);
-			isa = PBXSourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FED8269A046EF78200000102 = {
-			buildActionMask = 2147483647;
-			files = (
-				FED826AB046EFA4A00000102,
-			);
-			isa = PBXFrameworksBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FED8269B046EF78200000102 = {
+		FE1713190866740F00B0F08D = {
 			buildActionMask = 2147483647;
 			files = (
 			);
 			isa = PBXRezBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FED8269C046EF78200000102 = {
+		FE17131A0866740F00B0F08D = {
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		FE17131B0866740F00B0F08D = {
+			explicitFileType = "compiled.mach-o.executable";
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			name = carnival;
+			path = build/carnival;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE17131D0866740F00B0F08D = {
 			buildPhases = (
-				FED82697046EF78200000102,
-				FED82698046EF78200000102,
-				FED82699046EF78200000102,
-				FED8269A046EF78200000102,
-				FED8269B046EF78200000102,
+				FE17131E0866740F00B0F08D,
+				FE1713230866740F00B0F08D,
+				FE1713240866740F00B0F08D,
+				FE17132A0866740F00B0F08D,
+				FE17132C0866740F00B0F08D,
+			);
+			buildRules = (
 			);
 			buildSettings = {
-				DEBUGGING_SYMBOLS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				INFOPLIST_FILE = "Info-carnival__Upgraded_.plist";
 				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Libraries\"";
-				OPTIMIZATION_CFLAGS = "";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-lGL -lGLU -lobjc";
 				OTHER_REZFLAGS = "";
@@ -398,111 +302,221 @@
 			};
 			dependencies = (
 			);
-			isa = PBXApplicationTarget;
+			isa = PBXNativeTarget;
 			name = carnival;
 			productInstallPath = "$(USER_APPS_DIR)";
 			productName = carnival;
-			productReference = FED8269D046EF78200000102;
-			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>carnival</string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
-	<key>CFBundleIconFile</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string></string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string></string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string></string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>0.0.1d1</string>
-</dict>
-</plist>
-";
+			productReference = FE17132E0866740F00B0F08D;
+			productType = "com.apple.product-type.application";
 		};
-		FED8269D046EF78200000102 = {
-			isa = PBXApplicationReference;
-			path = carnival.app;
-			refType = 3;
+		FE17131E0866740F00B0F08D = {
+			buildActionMask = 2147483647;
+			files = (
+				FE17131F0866740F00B0F08D,
+				FE1713200866740F00B0F08D,
+				FE1713210866740F00B0F08D,
+				FE1713220866740F00B0F08D,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FED826A2046EFA3500000102 = {
-			fileRef = FE857E2F0465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FED826A3046EFA3500000102 = {
+		FE17131F0866740F00B0F08D = {
 			fileRef = FE857E300465815D00000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FED826A4046EFA3500000102 = {
-			fileRef = FE857E310465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FED826A5046EFA3500000102 = {
+		FE1713200866740F00B0F08D = {
 			fileRef = FE857E320465815D00000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FED826A6046EFA3500000102 = {
-			fileRef = FE857E330465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FED826A7046EFA3500000102 = {
+		FE1713210866740F00B0F08D = {
 			fileRef = FE857E340465815D00000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FED826A8046EFA3500000102 = {
-			fileRef = FE857E350465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FED826A9046EFA3500000102 = {
-			fileRef = FE857E360465815D00000102;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		FED826AA046EFA3500000102 = {
+		FE1713220866740F00B0F08D = {
 			fileRef = FE857E370465815D00000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
-		FED826AB046EFA4A00000102 = {
+		FE1713230866740F00B0F08D = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE1713240866740F00B0F08D = {
+			buildActionMask = 2147483647;
+			files = (
+				FE1713250866740F00B0F08D,
+				FE1713260866740F00B0F08D,
+				FE1713270866740F00B0F08D,
+				FE1713280866740F00B0F08D,
+				FE1713290866740F00B0F08D,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE1713250866740F00B0F08D = {
+			fileRef = FE857E2F0465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713260866740F00B0F08D = {
+			fileRef = FE857E310465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713270866740F00B0F08D = {
+			fileRef = FE857E330465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713280866740F00B0F08D = {
+			fileRef = FE857E350465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE1713290866740F00B0F08D = {
+			fileRef = FE857E360465815D00000102;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		FE17132A0866740F00B0F08D = {
+			buildActionMask = 2147483647;
+			files = (
+				FE17132B0866740F00B0F08D,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE17132B0866740F00B0F08D = {
 			fileRef = FE857E410465826700000102;
 			isa = PBXBuildFile;
 			settings = {
 			};
 		};
+		FE17132C0866740F00B0F08D = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE17132D0866740F00B0F08D = {
+			isa = PBXFileReference;
+			lastKnownFileType = text.xml;
+			path = "Info-carnival__Upgraded_.plist";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE17132E0866740F00B0F08D = {
+			explicitFileType = wrapper.application;
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			name = carnival.app;
+			path = build/carnival.app;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E2F0465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = carnival.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E300465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = carnival.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E310465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = coaster.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E320465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = coaster.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E330465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = ferris.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E340465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = ferris.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E350465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = main.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E360465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tent.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E370465815D00000102 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = tent.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		FE857E410465826700000102 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = GLUT.framework;
+			path = /System/Library/Frameworks/GLUT.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
 		FED826AC046EFBFC00000102 = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
+			lastKnownFileType = text;
 			path = Read_Me.txt;
 			refType = 4;
+			sourceTree = "<group>";
 		};
 	};
 	rootObject = 08FB7793FE84155DC02AAC07;
