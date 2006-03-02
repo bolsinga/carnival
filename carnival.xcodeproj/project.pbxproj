@@ -17,6 +17,7 @@
 		FE1713150866740F00B0F08D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E350465815D00000102 /* main.c */; };
 		FE1713160866740F00B0F08D /* tent.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E360465815D00000102 /* tent.c */; };
 		FE1713180866740F00B0F08D /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE857E410465826700000102 /* GLUT.framework */; };
+		FE5132C109B6ADCC0014189F /* Read_Me.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FED826AC046EFBFC00000102 /* Read_Me.txt */; };
 		FE61DB1E09B611CD00F26546 /* carnival.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E2F0465815D00000102 /* carnival.c */; };
 		FE61DB1F09B611CE00F26546 /* coaster.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E310465815D00000102 /* coaster.c */; };
 		FE61DB2009B611CF00F26546 /* ferris.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E330465815D00000102 /* ferris.c */; };
@@ -60,6 +61,16 @@
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 1;
+		};
+		FE5132C909B6AE0C0014189F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				FE5132C109B6ADCC0014189F /* Read_Me.txt in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -208,7 +219,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FE61DB1A09B611AE00F26546 /* Build configuration list for PBXNativeTarget "carnival" */;
 			buildPhases = (
-				FE61DB1309B611AE00F26546 /* Resources */,
+				FE5132C909B6AE0C0014189F /* CopyFiles */,
 				FE61DB1409B611AE00F26546 /* Sources */,
 				FE61DB1509B611AE00F26546 /* Frameworks */,
 			);
@@ -285,16 +296,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		FE61DB1309B611AE00F26546 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXRezBuildPhase section */
 		FE1713190866740F00B0F08D /* Rez */ = {
@@ -495,6 +496,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = carnival;
+				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
