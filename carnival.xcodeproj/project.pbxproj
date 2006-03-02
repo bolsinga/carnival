@@ -1,0 +1,563 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FE17130D0866740F00B0F08D /* carnival.h in Headers */ = {isa = PBXBuildFile; fileRef = FE857E300465815D00000102 /* carnival.h */; };
+		FE17130E0866740F00B0F08D /* coaster.h in Headers */ = {isa = PBXBuildFile; fileRef = FE857E320465815D00000102 /* coaster.h */; };
+		FE17130F0866740F00B0F08D /* ferris.h in Headers */ = {isa = PBXBuildFile; fileRef = FE857E340465815D00000102 /* ferris.h */; };
+		FE1713100866740F00B0F08D /* tent.h in Headers */ = {isa = PBXBuildFile; fileRef = FE857E370465815D00000102 /* tent.h */; };
+		FE1713120866740F00B0F08D /* carnival.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E2F0465815D00000102 /* carnival.c */; };
+		FE1713130866740F00B0F08D /* coaster.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E310465815D00000102 /* coaster.c */; };
+		FE1713140866740F00B0F08D /* ferris.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E330465815D00000102 /* ferris.c */; };
+		FE1713150866740F00B0F08D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E350465815D00000102 /* main.c */; };
+		FE1713160866740F00B0F08D /* tent.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E360465815D00000102 /* tent.c */; };
+		FE1713180866740F00B0F08D /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE857E410465826700000102 /* GLUT.framework */; };
+		FE61DB1E09B611CD00F26546 /* carnival.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E2F0465815D00000102 /* carnival.c */; };
+		FE61DB1F09B611CE00F26546 /* coaster.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E310465815D00000102 /* coaster.c */; };
+		FE61DB2009B611CF00F26546 /* ferris.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E330465815D00000102 /* ferris.c */; };
+		FE61DB2109B611D000F26546 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE857E410465826700000102 /* GLUT.framework */; };
+		FE61DB2209B611D200F26546 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E350465815D00000102 /* main.c */; };
+		FE61DB2309B611D200F26546 /* tent.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E360465815D00000102 /* tent.c */; };
+		FE61DB3509B612C500F26546 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE61DB3409B612C500F26546 /* OpenGL.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildStyle section */
+		014CEA520018CE5811CA2923 /* Development */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OPTIMIZATION_CFLAGS = "-O0";
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		014CEA530018CE5811CA2923 /* Deployment */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FE17131A0866740F00B0F08D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		FE17131B0866740F00B0F08D /* carnival */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = carnival; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE61DB1709B611AE00F26546 /* carnival.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = carnival.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE61DB1909B611AE00F26546 /* carnival-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "carnival-Info.plist"; sourceTree = "<group>"; };
+		FE61DB3409B612C500F26546 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		FE857E2F0465815D00000102 /* carnival.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = carnival.c; sourceTree = "<group>"; };
+		FE857E300465815D00000102 /* carnival.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = carnival.h; sourceTree = "<group>"; };
+		FE857E310465815D00000102 /* coaster.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = coaster.c; sourceTree = "<group>"; };
+		FE857E320465815D00000102 /* coaster.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = coaster.h; sourceTree = "<group>"; };
+		FE857E330465815D00000102 /* ferris.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ferris.c; sourceTree = "<group>"; };
+		FE857E340465815D00000102 /* ferris.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ferris.h; sourceTree = "<group>"; };
+		FE857E350465815D00000102 /* main.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		FE857E360465815D00000102 /* tent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = tent.c; sourceTree = "<group>"; };
+		FE857E370465815D00000102 /* tent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = tent.h; sourceTree = "<group>"; };
+		FE857E410465826700000102 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		FED826AC046EFBFC00000102 /* Read_Me.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Read_Me.txt; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FE1713170866740F00B0F08D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE1713180866740F00B0F08D /* GLUT.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE61DB1509B611AE00F26546 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE61DB2109B611D000F26546 /* GLUT.framework in Frameworks */,
+				FE61DB3509B612C500F26546 /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* carnival */ = {
+			isa = PBXGroup;
+			children = (
+				FE61DB3409B612C500F26546 /* OpenGL.framework */,
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+				FE61DB1909B611AE00F26546 /* carnival-Info.plist */,
+			);
+			name = carnival;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				FE857E2F0465815D00000102 /* carnival.c */,
+				FE857E300465815D00000102 /* carnival.h */,
+				FE857E310465815D00000102 /* coaster.c */,
+				FE857E320465815D00000102 /* coaster.h */,
+				FE857E330465815D00000102 /* ferris.c */,
+				FE857E340465815D00000102 /* ferris.h */,
+				FE857E350465815D00000102 /* main.c */,
+				FE857E360465815D00000102 /* tent.c */,
+				FE857E370465815D00000102 /* tent.h */,
+				FE857E410465826700000102 /* GLUT.framework */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FE17131B0866740F00B0F08D /* carnival */,
+				FE61DB1709B611AE00F26546 /* carnival.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C6A0FF2B0290797F04C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				FED826AC046EFBFC00000102 /* Read_Me.txt */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FE17130C0866740F00B0F08D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE17130D0866740F00B0F08D /* carnival.h in Headers */,
+				FE17130E0866740F00B0F08D /* coaster.h in Headers */,
+				FE17130F0866740F00B0F08D /* ferris.h in Headers */,
+				FE1713100866740F00B0F08D /* tent.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		FE17130B0866740F00B0F08D /* carnival_tool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE61DAA409B60E2000F26546 /* Build configuration list for PBXNativeTarget "carnival_tool" */;
+			buildPhases = (
+				FE17130C0866740F00B0F08D /* Headers */,
+				FE1713110866740F00B0F08D /* Sources */,
+				FE1713170866740F00B0F08D /* Frameworks */,
+				FE1713190866740F00B0F08D /* Rez */,
+				FE17131A0866740F00B0F08D /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-lGL",
+					"-lGLU",
+					"-lobjc",
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = carnival;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			dependencies = (
+			);
+			name = carnival_tool;
+			productName = carnival;
+			productReference = FE17131B0866740F00B0F08D /* carnival */;
+			productType = "com.apple.product-type.tool";
+		};
+		FE61DB1609B611AE00F26546 /* carnival */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE61DB1A09B611AE00F26546 /* Build configuration list for PBXNativeTarget "carnival" */;
+			buildPhases = (
+				FE61DB1309B611AE00F26546 /* Resources */,
+				FE61DB1409B611AE00F26546 /* Sources */,
+				FE61DB1509B611AE00F26546 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "carnival-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = carnival;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			dependencies = (
+			);
+			name = carnival;
+			productName = carnival;
+			productReference = FE61DB1709B611AE00F26546 /* carnival.app */;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yourcompany.carnival</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+</dict>
+</plist>
+";
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = FE61DAAC09B60E2000F26546 /* Build configuration list for PBXProject "carnival" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				014CEA520018CE5811CA2923 /* Development */,
+				014CEA530018CE5811CA2923 /* Deployment */,
+			);
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* carnival */;
+			projectDirPath = "";
+			targets = (
+				FE17130B0866740F00B0F08D /* carnival_tool */,
+				FE61DB1609B611AE00F26546 /* carnival */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FE61DB1309B611AE00F26546 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		FE1713190866740F00B0F08D /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FE1713110866740F00B0F08D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE1713120866740F00B0F08D /* carnival.c in Sources */,
+				FE1713130866740F00B0F08D /* coaster.c in Sources */,
+				FE1713140866740F00B0F08D /* ferris.c in Sources */,
+				FE1713150866740F00B0F08D /* main.c in Sources */,
+				FE1713160866740F00B0F08D /* tent.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE61DB1409B611AE00F26546 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE61DB1E09B611CD00F26546 /* carnival.c in Sources */,
+				FE61DB1F09B611CE00F26546 /* coaster.c in Sources */,
+				FE61DB2009B611CF00F26546 /* ferris.c in Sources */,
+				FE61DB2209B611D200F26546 /* main.c in Sources */,
+				FE61DB2309B611D200F26546 /* tent.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FE61DAA509B60E2000F26546 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-lGL",
+					"-lGLU",
+					"-lobjc",
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = carnival;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		FE61DAA609B60E2000F26546 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-lGL",
+					"-lGLU",
+					"-lobjc",
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = carnival;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		FE61DAA709B60E2000F26546 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-lGL",
+					"-lGLU",
+					"-lobjc",
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = carnival;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
+		FE61DAAD09B60E2000F26546 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+			};
+			name = Development;
+		};
+		FE61DAAE09B60E2000F26546 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+			};
+			name = Deployment;
+		};
+		FE61DAAF09B60E2000F26546 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+			};
+			name = Default;
+		};
+		FE61DB1B09B611AE00F26546 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "carnival-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = carnival;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		FE61DB1C09B611AE00F26546 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "carnival-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = carnival;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		FE61DB1D09B611AE00F26546 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_CW_ASM_SYNTAX = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_PASCAL_STRINGS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "carnival-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = carnival;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FE61DAA409B60E2000F26546 /* Build configuration list for PBXNativeTarget "carnival_tool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE61DAA509B60E2000F26546 /* Development */,
+				FE61DAA609B60E2000F26546 /* Deployment */,
+				FE61DAA709B60E2000F26546 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		FE61DAAC09B60E2000F26546 /* Build configuration list for PBXProject "carnival" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE61DAAD09B60E2000F26546 /* Development */,
+				FE61DAAE09B60E2000F26546 /* Deployment */,
+				FE61DAAF09B60E2000F26546 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		FE61DB1A09B611AE00F26546 /* Build configuration list for PBXNativeTarget "carnival" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE61DB1B09B611AE00F26546 /* Development */,
+				FE61DB1C09B611AE00F26546 /* Deployment */,
+				FE61DB1D09B611AE00F26546 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
