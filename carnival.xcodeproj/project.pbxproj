@@ -52,7 +52,7 @@
 /* Begin PBXFileReference section */
 		FE17131B0866740F00B0F08D /* carnival */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = carnival; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE61DB1709B611AE00F26546 /* carnival.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = carnival.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		FE61DB1909B611AE00F26546 /* carnival-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "carnival-Info.plist"; sourceTree = "<group>"; };
+		FE61DB1909B611AE00F26546 /* carnival-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "carnival-Info.plist"; sourceTree = "<group>"; };
 		FE61DB3409B612C500F26546 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		FE7BDA600A504113000C55E1 /* Read_Me.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = Read_Me.txt; sourceTree = "<group>"; };
 		FE857E2F0465815D00000102 /* carnival.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = carnival.c; sourceTree = "<group>"; };
@@ -192,10 +192,19 @@
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = FE61DAAC09B60E2000F26546 /* Build configuration list for PBXProject "carnival" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = en;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+				Base,
+			);
 			mainGroup = 08FB7794FE84155DC02AAC07 /* carnival */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				FE61DB1609B611AE00F26546 /* carnival */,
 				FE17130B0866740F00B0F08D /* carnival_tool */,
@@ -326,30 +335,21 @@
 		FE61DAAD09B60E2000F26546 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 			};
 			name = Development;
 		};
 		FE61DAAE09B60E2000F26546 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 			};
 			name = Deployment;
 		};
 		FE61DAAF09B60E2000F26546 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 			};
 			name = Default;
 		};
