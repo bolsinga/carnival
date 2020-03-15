@@ -24,7 +24,7 @@
 		FE61DB2209B611D200F26546 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E350465815D00000102 /* main.c */; };
 		FE61DB2309B611D200F26546 /* tent.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E360465815D00000102 /* tent.c */; };
 		FE61DB3509B612C500F26546 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE61DB3409B612C500F26546 /* OpenGL.framework */; };
-		FE7BDA6D0A5041B5000C55E1 /* Read_Me.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = FE7BDA600A504113000C55E1 /* Read_Me.txt */; };
+		FEAFFC4A241DD306008EC6AA /* README.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEAFFC49241DD2BF008EC6AA /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,11 +39,11 @@
 		};
 		FE7BDA620A504121000C55E1 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = ..;
 			dstSubfolderSpec = 1;
 			files = (
-				FE7BDA6D0A5041B5000C55E1 /* Read_Me.txt in CopyFiles */,
+				FEAFFC4A241DD306008EC6AA /* README.md in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -54,7 +54,6 @@
 		FE61DB1709B611AE00F26546 /* carnival.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = carnival.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE61DB1909B611AE00F26546 /* carnival-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "carnival-Info.plist"; sourceTree = "<group>"; };
 		FE61DB3409B612C500F26546 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
-		FE7BDA600A504113000C55E1 /* Read_Me.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = Read_Me.txt; sourceTree = "<group>"; };
 		FE857E2F0465815D00000102 /* carnival.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = carnival.c; sourceTree = "<group>"; };
 		FE857E300465815D00000102 /* carnival.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = carnival.h; sourceTree = "<group>"; };
 		FE857E310465815D00000102 /* coaster.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = coaster.c; sourceTree = "<group>"; };
@@ -65,6 +64,7 @@
 		FE857E360465815D00000102 /* tent.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = tent.c; sourceTree = "<group>"; };
 		FE857E370465815D00000102 /* tent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = tent.h; sourceTree = "<group>"; };
 		FE857E410465826700000102 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		FEAFFC49241DD2BF008EC6AA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,7 +129,7 @@
 		C6A0FF2B0290797F04C91782 /* Documentation */ = {
 			isa = PBXGroup;
 			children = (
-				FE7BDA600A504113000C55E1 /* Read_Me.txt */,
+				FEAFFC49241DD2BF008EC6AA /* README.md */,
 			);
 			name = Documentation;
 			sourceTree = "<group>";
