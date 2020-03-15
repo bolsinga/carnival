@@ -22,3 +22,5 @@ to start the animation up again.
 An interesting fact is that I had to force this program to slow down. Without a forced
 slowdown in the code (which wasn't there on the super fast SGI machines of 11 years ago),
 it would draw so fast that it is hard to tell what is going on.
+
+I put a video of the result on YouTube: https://youtu.be/4mO8TaWTE5Y.
