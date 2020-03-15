@@ -28,7 +28,7 @@ static Coord gFWV[3] = {0.0, -6.0, 0.0 };	/* initial Ferris wheel view */
 
 static GLdouble geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz;
 
-static GLint gThreshhold = 750;
+static GLint gThreshhold = 5000;
 static GLint gCurrentIteration = 0;
 
 static GLdouble gStep = 0.1;
