@@ -9,7 +9,7 @@
 /* don't have to be calculated each time it is drawn.  It returns the	*/
 /* number of points in the roller arrays.				*/
 
-int getCoasterPts()
+int getCoasterPts(void)
 {
 	int i = 0;
 	float a;

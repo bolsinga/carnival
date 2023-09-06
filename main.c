@@ -33,7 +33,7 @@ static GLint gCurrentIteration = 0;
 
 static GLdouble gStep = 0.1;
 
-static void dump()
+static void dump(void)
 {
 	fprintf(stderr, "gAnimating: %d gStyle: %d gRollPts: %d gCurrentCoaster: %d gRotation: %f\n", gAnimating, gStyle, gRollPts, gCurrentCoaster, gRotation);
 	fprintf(stderr, "Ferris View: (%f, %f, %f)\n", gFWV[0], gFWV[1], gFWV[2]);
@@ -41,7 +41,7 @@ static void dump()
 	fprintf(stderr, "**********\n");
 }
 
-static void Init()
+static void Init(void)
 {
 	gRollPts = getCoasterPts();
 
@@ -49,7 +49,7 @@ static void Init()
 	glEnable(GL_DEPTH_TEST);
 }
 
-static void Display()
+static void Display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -62,7 +62,7 @@ static void Display()
 	glutSwapBuffers();
 }
 
-static void Idle()
+static void Idle(void)
 {
 	if (++gCurrentIteration < gThreshhold)
 	{

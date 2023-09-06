@@ -40,7 +40,7 @@ void avgPts(Coord a[3], Coord b[3], Coord result[3]);
 /* This draws some mountains, which are very simple, so the animation	*/
 /* isn't slowed down.	*/
 
-void mountains();
+void mountains(void);
 
 /* The folowing draws the entire scene. It takes the current rotation 	*/
 /* of the ferris wheel and the number of points in the roller coaster	*/

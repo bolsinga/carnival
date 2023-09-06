@@ -23,7 +23,7 @@ extern Coord rollerout[350][3];        /* Coords for the outer rail */
 /* don't have to be calculated each time it is drawn.  It returns the	*/
 /* number of points in the roller arrays.				*/
 
-int getCoasterPts();
+int getCoasterPts(void);
 
 /* The following draws the struts of the roller coaster.	*/
 

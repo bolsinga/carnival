@@ -48,7 +48,7 @@ void avgPts(Coord a[3], Coord b[3], Coord result[3])
 /* This draws some mountains, which are very simple, so the animation	*/
 /* isn't slowed down.	*/
 
-void mountains()
+void mountains(void)
 {
 	Coord mnt1p[3] = {80, 50, 0 };
 	Coord mnt1b1[3] = {80, -1.0, -50 };
