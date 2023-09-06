@@ -36,4 +36,4 @@ void drawStrut(int i);
 
 void coaster(int numpts); /* This is the number of pts in the roller arrays */
 
-#endif _COASTER_
+#endif /* _COASTER_ */
