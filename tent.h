@@ -9,6 +9,6 @@
 
 #include "carnival.h"
 
-void tent();
+void tent(void);
 
 #endif /* _TENT_ */

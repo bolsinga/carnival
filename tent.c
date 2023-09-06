@@ -6,7 +6,7 @@
 
 #include "tent.h"
 
-void tent()
+void tent(void)
 {
 	Coord v0[3] = {0.0, 0.0, 3.0 };
 	Coord v1[3] = {0.0, 0.0, 0.0 };
