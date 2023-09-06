@@ -33,6 +33,7 @@ static GLint gCurrentIteration = 0;
 
 static GLdouble gStep = 0.1;
 
+#if 0
 static void dump(void)
 {
 	fprintf(stderr, "gAnimating: %d gStyle: %d gRollPts: %d gCurrentCoaster: %d gRotation: %f\n", gAnimating, gStyle, gRollPts, gCurrentCoaster, gRotation);
@@ -40,6 +41,7 @@ static void dump(void)
 	fprintf(stderr, "LookAt: eye (%f, %f, %f) center (%f, %f, %f) up (%f, %f, %f)\n", geyex, geyey, geyez, gcenterx, gcentery, gcenterz, gupx, gupy, gupz);
 	fprintf(stderr, "**********\n");
 }
+#endif
 
 static void Init(void)
 {
