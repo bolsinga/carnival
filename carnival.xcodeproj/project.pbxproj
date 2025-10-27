@@ -194,7 +194,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 2600;
 			};
 			buildConfigurationList = FE61DAAC09B60E2000F26546 /* Build configuration list for PBXProject "carnival" */;
 			compatibilityVersion = "Xcode 2.4";
@@ -264,7 +264,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
@@ -294,7 +294,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-lGL",
@@ -322,7 +322,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-lGL",
@@ -472,7 +472,7 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "carnival-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -500,7 +500,7 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "carnival-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -526,7 +526,7 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "carnival-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
