@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
-    - name: Switch to Xcode 15.4
+    - name: Switch to latest Xcode
       run: sudo xcode-select -s "/Applications/Xcode_26.0.app/Contents/Developer"
     - name: Build
       run: xcodebuild -verbose -scheme carnival
