@@ -80,10 +80,12 @@ enum Tent {
 
             // gluPartialDisk(qobj, 0, stripWidth/2, 32, 1, 270, -180) in
             // the original — a filled half-disk (inner radius 0) at the
-            // strip's midpoint, sweeping from 270° to 90° (clockwise
-            // through 180°), i.e. the half of the circle bulging toward
-            // -x. GLU has no Metal equivalent, so this walks the same
-            // angle steps by hand.
+            // strip's midpoint, sweeping from 270° to 90° through 180°,
+            // i.e. the half of the circle bulging toward -y (hanging
+            // down below the eave), per GLU's disk angle convention
+            // (angle measured from +y, sweeping toward +x — see
+            // `partialDisk` below). GLU has no Metal equivalent, so this
+            // walks the same angle steps by hand.
             polygons.append(
                 partialDisk(
                     center: SIMD3<Float>(midX, 2, 3),
@@ -103,6 +105,15 @@ enum Tent {
     /// Builds a filled circular sector as a fan (disk center first, then
     /// each boundary point in order) so it triangulates the same way any
     /// other convex polygon in `StaticScene.makeMesh` does.
+    ///
+    /// Matches GLU's disk angle convention, *not* the standard math one:
+    /// GLU measures the angle from the local +y axis, sweeping toward
+    /// +x (`x = sin(angle), y = cos(angle)`), rather than from +x
+    /// sweeping toward +y (`x = cos(angle), y = sin(angle)`). Using the
+    /// standard convention here originally produced a half-disk bulging
+    /// sideways (-x) instead of the intended downward-hanging valance
+    /// (-y) — see Mesa's `libutil` quadric.c for the reference
+    /// implementation this mirrors.
     private static func partialDisk(
         center: SIMD3<Float>,
         radius: Float,
@@ -115,7 +126,7 @@ enum Tent {
         for i in 0...slices {
             let degrees = startAngleDegrees + sweepAngleDegrees * Float(i) / Float(slices)
             let radians = degrees * .pi / 180
-            let offset = SIMD3<Float>(radius * cos(radians), radius * sin(radians), 0)
+            let offset = SIMD3<Float>(radius * sin(radians), radius * cos(radians), 0)
             points.append(Vertex(position: center + offset, color: color))
         }
         return points
