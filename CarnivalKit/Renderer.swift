@@ -54,6 +54,14 @@ private struct LineBuffers {
 /// `StaticScene`, two tent instances from `Tent`, the roller coaster
 /// track from `Coaster`, and the ferris wheel from `FerrisWheel` — all
 /// from `drawScene` in the original carnival.c.
+/// Equivalent of `View_Style`/`gStyle` in the original's main.c.
+/// `View_Point` (free look-around) isn't ported yet — it's tied to
+/// keyboard input, which doesn't exist yet either.
+private enum CameraMode {
+    case coaster
+    case ferris
+}
+
 final class Renderer: NSObject, MTKViewDelegate {
     private let device: MTLDevice
     private let commandQueue: MTLCommandQueue
@@ -97,6 +105,14 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// point-to-point jump motion, just paced by real time instead of a
     /// frame-count throttle.
     private var coasterPosition: Float = 0
+
+    /// Equivalent of `gStyle`. Defaults to `.coaster`, matching the
+    /// original's default `gStyle = View_Coaster` (and the README:
+    /// "you are first riding the roller coaster"). Nothing switches
+    /// this yet — that's tied to keyboard/touch/remote input, not
+    /// written yet — so `.ferris` is currently reachable only by
+    /// temporarily editing this default while testing.
+    private var cameraMode: CameraMode = .coaster
 
     private var aspectRatio: Float = 1
 
@@ -187,36 +203,62 @@ final class Renderer: NSObject, MTKViewDelegate {
             let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)
         else { return }
 
-        // The coaster ride-follow camera, equivalent of View_Coaster in
-        // the original's Idle: eye sits at the rider's position (the
-        // midpoint between the inner/outer rails), looking toward the
-        // next point along the track.
-        //   avgPts(rollerin[gCurrentCoaster], rollerout[gCurrentCoaster], rider);
-        //   avgPts(rollerin[gCurrentCoaster + 1], rollerout[gCurrentCoaster + 1], nextrider);
-        //   geyex = rider[0]; geyey = rider[1] + 0.5; geyez = rider[2];
-        //   gcenterx = nextrider[0]; gcentery = nextrider[1] + 0.5; gcenterz = nextrider[2];
-        //
-        // NOTE ON `tilt`: the original's Idle also computes a `tilt`
-        // variable (-15/-30/0 degrees) from gCurrentCoaster ranges, right
-        // alongside this camera code, under the comment "These set the
-        // tilt of the roller coaster rider to simulate the momentum."
-        // Per the author (recalled while porting this): the intent was to
-        // bank/tilt the camera during turns, like a real coaster leaning
-        // into a curve. But `tilt` is never actually applied to
-        // geyex/geyey/geyez or gupx/gupy/gupz anywhere — it's computed
-        // and then dropped, dead code in the original. Not reproduced
-        // here (there's no observable behavior to match), but worth
-        // implementing for real at some point — rotating `up` around the
-        // eye→center axis by `tilt` degrees during the ranges the
-        // original flagged would be the natural way to do it now.
+        // The ferris wheel's geometry (and its rider's sight position)
+        // is recomputed every frame regardless of which camera mode is
+        // active — matching the original, which always calls
+        // ferris(rotation, fwv) from drawScene every Display, keeping
+        // gFWV fresh even while View_Coaster is active and the wheel
+        // isn't being looked at.
+        let wheelTranslation = SIMD3<Float>(-25.0, 6.5, 0.0)
+        let wheelAngle = -Self.wheelAngularVelocity * elapsedTime
+        let wheelGeometry = FerrisWheel.geometry(angle: wheelAngle)
+        // drawScene: fwv[0] += -25.0; fwv[1] += 6.5; (z untouched,
+        // matching the translation's own z offset of 0).
+        let fwv = wheelGeometry.sight + SIMD3<Float>(wheelTranslation.x, wheelTranslation.y, 0)
+
         coasterPosition += Self.coasterPointsPerSecond * Float(deltaTime)
         let numPts = coasterTrack.rollerIn.count - 1  // gRollPts
         let index = Int(coasterPosition) % numPts
-        let rider = coasterTrack.riderPosition(at: index)
-        let nextRider = coasterTrack.riderPosition(at: index + 1)
-        let riderHeight = SIMD3<Float>(0, 0.5, 0)
-        let eye = rider + riderHeight
-        let center = nextRider + riderHeight
+
+        let eye: SIMD3<Float>
+        let center: SIMD3<Float>
+        switch cameraMode {
+        case .coaster:
+            // eye sits at the rider's position (the midpoint between the
+            // inner/outer rails), looking toward the next point along
+            // the track.
+            //   avgPts(rollerin[gCurrentCoaster], rollerout[gCurrentCoaster], rider);
+            //   avgPts(rollerin[gCurrentCoaster + 1], rollerout[gCurrentCoaster + 1], nextrider);
+            //   geyex = rider[0]; geyey = rider[1] + 0.5; geyez = rider[2];
+            //   gcenterx = nextrider[0]; gcentery = nextrider[1] + 0.5; gcenterz = nextrider[2];
+            //
+            // NOTE ON `tilt`: the original's Idle also computes a `tilt`
+            // variable (-15/-30/0 degrees) from gCurrentCoaster ranges,
+            // right alongside this camera code, under the comment
+            // "These set the tilt of the roller coaster rider to
+            // simulate the momentum." Per the author (recalled while
+            // porting this): the intent was to bank/tilt the camera
+            // during turns, like a real coaster leaning into a curve.
+            // But `tilt` is never actually applied to geyex/geyey/geyez
+            // or gupx/gupy/gupz anywhere — it's computed and then
+            // dropped, dead code in the original. Not reproduced here
+            // (there's no observable behavior to match), but worth
+            // implementing for real at some point — rotating `up`
+            // around the eye→center axis by `tilt` degrees during the
+            // ranges the original flagged would be the natural way to
+            // do it now.
+            let riderHeight = SIMD3<Float>(0, 0.5, 0)
+            eye = coasterTrack.riderPosition(at: index) + riderHeight
+            center = coasterTrack.riderPosition(at: index + 1) + riderHeight
+        case .ferris:
+            // eye sits at the wheel rider's position, looking a fixed
+            // +1 in x — not toward any particular point, unlike the
+            // coaster's forward-looking center.
+            //   geyex = gFWV[0]; geyey = gFWV[1]; geyez = gFWV[2];
+            //   gcenterx = gFWV[0] + 1.0; gcentery = gFWV[1]; gcenterz = gFWV[2];
+            eye = fwv
+            center = fwv + SIMD3<Float>(1, 0, 0)
+        }
         let viewMatrix = float4x4.lookAt(eye: eye, center: center, up: SIMD3<Float>(0, 1, 0))
 
         // Reshape's own gluPerspective(0.1 * 600, width/height, 0.01, 150.0)
@@ -261,11 +303,11 @@ final class Renderer: NSObject, MTKViewDelegate {
         // rather than rotating a static mesh with a matrix). Cheap
         // enough at this scene's scale — a few hundred vertices — to
         // just re-upload new buffers each frame rather than manage a
-        // persistent ring buffer.
+        // persistent ring buffer. wheelGeometry/wheelTranslation were
+        // already computed above (needed there for the ferris-view
+        // camera's fwv, regardless of whether that mode is active).
         //   glPushMatrix(); glTranslatef(-25.0, 6.5, 0.0); ferris(rotation, fwv); glPopMatrix();
-        let wheelAngle = -Self.wheelAngularVelocity * elapsedTime
-        let wheelGeometry = FerrisWheel.geometry(angle: wheelAngle)
-        let wheelModel = float4x4.translation(SIMD3<Float>(-25.0, 6.5, 0.0))
+        let wheelModel = float4x4.translation(wheelTranslation)
         if let wheelTriangles = MeshBuffers(device: device, mesh: wheelGeometry.triangles) {
             draw(
                 wheelTriangles, modelMatrix: wheelModel, viewProjectionMatrix: viewProjectionMatrix,
