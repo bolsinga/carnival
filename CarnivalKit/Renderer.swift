@@ -92,6 +92,17 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// Seconds elapsed since the previous frame.
     private(set) var deltaTime: TimeInterval = 0
 
+    /// Equivalent of `gAnimating`. When `false`, elapsed time stops
+    /// accumulating into `elapsedTime`/`coasterPosition` below, freezing
+    /// the wheel's rotation and the coaster camera's progress — but
+    /// `clock.tick()` itself keeps running every frame regardless, so
+    /// there's no big "catch up" jump when unpausing (the original
+    /// instead stops calling Display entirely via
+    /// `glutIdleFunc(gAnimating ? Idle : NULL)`, freezing the whole
+    /// screen; this still renders continuously, just with a frozen
+    /// scene, since MTKView doesn't have GLUT's "idle" concept to hook).
+    private var isAnimating = true
+
     /// Total elapsed time. Currently only drives the ferris wheel's
     /// rotation.
     private var elapsedTime: Float = 0
@@ -176,6 +187,12 @@ final class Renderer: NSObject, MTKViewDelegate {
         cameraMode = (cameraMode == .coaster) ? .ferris : .coaster
     }
 
+    /// Equivalent of the `' '` (space) case in the original's `Key`:
+    /// pauses/resumes the animation.
+    func togglePause() {
+        isAnimating.toggle()
+    }
+
     private func draw(
         _ mesh: MeshBuffers, modelMatrix: float4x4, viewProjectionMatrix: float4x4,
         encoder: MTLRenderCommandEncoder
@@ -204,7 +221,9 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     func draw(in view: MTKView) {
         deltaTime = clock.tick()
-        elapsedTime += Float(deltaTime)
+        if isAnimating {
+            elapsedTime += Float(deltaTime)
+        }
 
         guard let descriptor = view.currentRenderPassDescriptor,
             let commandBuffer = commandQueue.makeCommandBuffer(),
@@ -224,7 +243,9 @@ final class Renderer: NSObject, MTKViewDelegate {
         // matching the translation's own z offset of 0).
         let fwv = wheelGeometry.sight + SIMD3<Float>(wheelTranslation.x, wheelTranslation.y, 0)
 
-        coasterPosition += Self.coasterPointsPerSecond * Float(deltaTime)
+        if isAnimating {
+            coasterPosition += Self.coasterPointsPerSecond * Float(deltaTime)
+        }
         let numPts = coasterTrack.rollerIn.count - 1  // gRollPts
         let index = Int(coasterPosition) % numPts
 
