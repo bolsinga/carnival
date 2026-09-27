@@ -14,6 +14,8 @@ jobs:
     - uses: actions/checkout@v7
     - name: Switch to latest Xcode
       run: sudo xcode-select -s "/Applications/Xcode_27.0.app/Contents/Developer"
+    - name: Install Metal Toolchain
+      run: xcodebuild -downloadComponent MetalToolchain
     - name: Build carnival
       run: xcodebuild -verbose -scheme carnival
     - name: Build CarnivalApp
