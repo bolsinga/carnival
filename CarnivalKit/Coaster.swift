@@ -13,6 +13,13 @@ enum Coaster {
     struct Track {
         let rollerIn: [SIMD3<Float>]
         let rollerOut: [SIMD3<Float>]
+
+        /// Equivalent of `avgPts(rollerin[index], rollerout[index], result)`
+        /// — the coaster rider's actual position along the centerline, at
+        /// a given track index.
+        func riderPosition(at index: Int) -> SIMD3<Float> {
+            (rollerIn[index] + rollerOut[index]) * 0.5
+        }
     }
 
     /// Equivalent of `getCoasterPts`. Computes the coaster's inner/outer
@@ -120,9 +127,11 @@ enum Coaster {
     /// Equivalent of `coaster(numpts)` (which also calls `drawStrut`
     /// internally) — builds the flat list of line-segment vertex pairs:
     /// two segments per track index (inner rail, outer rail), plus, on
-    /// every other index, a cross-tie and the struts.
-    static func lineVertices() -> [Vertex] {
-        let track = computeTrack()
+    /// every other index, a cross-tie and the struts. Takes a
+    /// pre-computed `Track` rather than calling `computeTrack()` itself
+    /// so callers that also need the raw points (e.g. the ride-follow
+    /// camera) can compute it once and reuse it.
+    static func lineVertices(track: Track) -> [Vertex] {
         let color = SIMD4<Float>(51, 51, 51, 255) / 255
         let numPts = track.rollerIn.count - 1
 

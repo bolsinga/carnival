@@ -62,6 +62,7 @@ final class Renderer: NSObject, MTKViewDelegate {
     private let groundAndMountains: MeshBuffers
     private let tent: MeshBuffers
     private let coaster: LineBuffers
+    private let coasterTrack: Coaster.Track
 
     /// The ferris wheel's angular velocity. Unlike everything ported so
     /// far, there's no faithful "original" rate to port: the original's
@@ -72,19 +73,30 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// chosen, real-time rate (one revolution every 20 seconds) instead.
     private static let wheelAngularVelocity: Float = 2 * .pi / 20
 
+    /// How fast the camera moves along the coaster track, in points per
+    /// second. Same situation as `wheelAngularVelocity`: the original's
+    /// `gCurrentCoaster++` per idle tick had no real-world rate to
+    /// preserve, so this is a freshly chosen pace (a full 300-point lap
+    /// every 20 seconds, matching the wheel's revolution time).
+    private static let coasterPointsPerSecond: Float = 15
+
     private var clock = AnimationClock()
 
-    /// Seconds elapsed since the previous frame. Exposed now so the
-    /// coaster and ferris wheel can later advance in world-units-per-
-    /// second instead of being tied to how often `draw(in:)` happens to
-    /// be called.
+    /// Seconds elapsed since the previous frame.
     private(set) var deltaTime: TimeInterval = 0
 
-    /// Total elapsed time, used only to orbit the placeholder camera
-    /// below. Once the real coaster/ferris camera-follow logic exists
-    /// (driven by `deltaTime` directly, per `main.c`'s `Idle`), this
-    /// placeholder — and the orbit — goes away.
+    /// Total elapsed time. Currently only drives the ferris wheel's
+    /// rotation.
     private var elapsedTime: Float = 0
+
+    /// How far along the coaster track the camera currently is. Unlike
+    /// the original's integer `gCurrentCoaster`, this accumulates
+    /// continuously so it isn't tied to a fixed per-tick step — but
+    /// `Int(coasterPosition)` is still used as a plain index below (no
+    /// interpolation between points), matching the original's actual
+    /// point-to-point jump motion, just paced by real time instead of a
+    /// frame-count throttle.
+    private var coasterPosition: Float = 0
 
     private var aspectRatio: Float = 1
 
@@ -119,15 +131,18 @@ final class Renderer: NSObject, MTKViewDelegate {
         else { return nil }
         self.depthStencilState = depthStencilState
 
+        let coasterTrack = Coaster.computeTrack()
         guard
             let groundAndMountains = MeshBuffers(
                 device: device, mesh: StaticScene.groundAndMountains()),
             let tent = MeshBuffers(device: device, mesh: Tent.mesh()),
-            let coaster = LineBuffers(device: device, vertices: Coaster.lineVertices())
+            let coaster = LineBuffers(
+                device: device, vertices: Coaster.lineVertices(track: coasterTrack))
         else { return nil }
         self.groundAndMountains = groundAndMountains
         self.tent = tent
         self.coaster = coaster
+        self.coasterTrack = coasterTrack
 
         super.init()
     }
@@ -172,18 +187,48 @@ final class Renderer: NSObject, MTKViewDelegate {
             let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)
         else { return }
 
-        // Placeholder sightseeing camera: slowly orbits above the scene so
-        // the ground and all three mountains (which span roughly
-        // x/z in [-100, 100], y in [-1, 50]) are visible at once. Replaced
-        // once the real coaster/ferris ride-follow camera exists.
-        let radius: Float = 150
-        let height: Float = 60
-        let center = SIMD3<Float>(0, 10, 0)
-        let angle = elapsedTime * 0.2
-        let eye = SIMD3<Float>(radius * sin(angle), height, radius * cos(angle))
+        // The coaster ride-follow camera, equivalent of View_Coaster in
+        // the original's Idle: eye sits at the rider's position (the
+        // midpoint between the inner/outer rails), looking toward the
+        // next point along the track.
+        //   avgPts(rollerin[gCurrentCoaster], rollerout[gCurrentCoaster], rider);
+        //   avgPts(rollerin[gCurrentCoaster + 1], rollerout[gCurrentCoaster + 1], nextrider);
+        //   geyex = rider[0]; geyey = rider[1] + 0.5; geyez = rider[2];
+        //   gcenterx = nextrider[0]; gcentery = nextrider[1] + 0.5; gcenterz = nextrider[2];
+        //
+        // NOTE ON `tilt`: the original's Idle also computes a `tilt`
+        // variable (-15/-30/0 degrees) from gCurrentCoaster ranges, right
+        // alongside this camera code, under the comment "These set the
+        // tilt of the roller coaster rider to simulate the momentum."
+        // Per the author (recalled while porting this): the intent was to
+        // bank/tilt the camera during turns, like a real coaster leaning
+        // into a curve. But `tilt` is never actually applied to
+        // geyex/geyey/geyez or gupx/gupy/gupz anywhere — it's computed
+        // and then dropped, dead code in the original. Not reproduced
+        // here (there's no observable behavior to match), but worth
+        // implementing for real at some point — rotating `up` around the
+        // eye→center axis by `tilt` degrees during the ranges the
+        // original flagged would be the natural way to do it now.
+        coasterPosition += Self.coasterPointsPerSecond * Float(deltaTime)
+        let numPts = coasterTrack.rollerIn.count - 1  // gRollPts
+        let index = Int(coasterPosition) % numPts
+        let rider = coasterTrack.riderPosition(at: index)
+        let nextRider = coasterTrack.riderPosition(at: index + 1)
+        let riderHeight = SIMD3<Float>(0, 0.5, 0)
+        let eye = rider + riderHeight
+        let center = nextRider + riderHeight
         let viewMatrix = float4x4.lookAt(eye: eye, center: center, up: SIMD3<Float>(0, 1, 0))
+
+        // Reshape's own gluPerspective(0.1 * 600, width/height, 0.01, 150.0)
+        // — fovy 60°, near 0.01, far 150. Reshape's aspect ratio is
+        // actually broken in the original (integer division on the
+        // `int width, height` parameters, truncating to ~1 for nearly any
+        // real window), which this deliberately doesn't reproduce: it'd
+        // distort the image on every one of the very different aspect
+        // ratios this port actually targets, unlike the original's
+        // single fixed-size GLUT window.
         let projectionMatrix = float4x4.perspective(
-            fovyRadians: .pi / 3, aspect: aspectRatio, near: 0.1, far: 500)
+            fovyRadians: 60 * .pi / 180, aspect: aspectRatio, near: 0.01, far: 150)
         let viewProjectionMatrix = projectionMatrix * viewMatrix
 
         encoder.setRenderPipelineState(pipelineState)
