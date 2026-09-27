@@ -55,9 +55,8 @@ private struct LineBuffers {
 /// track from `Coaster`, and the ferris wheel from `FerrisWheel` — all
 /// from `drawScene` in the original carnival.c.
 /// Equivalent of `View_Style`/`gStyle` in the original's main.c.
-/// `View_Point` (free look-around) isn't ported yet — it's tied to
-/// keyboard input, which doesn't exist yet either.
-private enum CameraMode {
+/// `View_Point` (free look-around, `'s'` key) isn't ported yet.
+private enum CameraMode: Equatable {
     case coaster
     case ferris
 }
@@ -166,6 +165,15 @@ final class Renderer: NSObject, MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard size.height > 0 else { return }
         aspectRatio = Float(size.width / size.height)
+    }
+
+    /// Equivalent of the `'t'` case in the original's `Key`: toggles
+    /// between the coaster and ferris-wheel cameras. (The original also
+    /// guards this with `if (gStyle != View_Point)` — moot for now since
+    /// `View_Point` isn't ported yet, so `CameraMode` only has these two
+    /// cases.)
+    func toggleCameraMode() {
+        cameraMode = (cameraMode == .coaster) ? .ferris : .coaster
     }
 
     private func draw(
