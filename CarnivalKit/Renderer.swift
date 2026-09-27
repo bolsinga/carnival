@@ -26,25 +26,66 @@ private struct MeshBuffers {
     }
 }
 
-/// A line list's vertex buffer on the GPU, ready to draw with
-/// `.drawPrimitives(type: .line, ...)`. Unlike `MeshBuffers`, there's no
-/// index buffer — the coaster track has too much point reuse across
-/// disconnected segments (rails, cross-ties, struts) for a single index
-/// list to help, so it's just a flat list of vertex pairs.
+/// A line list's vertex/index buffers on the GPU, drawn as triangles by
+/// `carnival_thick_line_vertex` rather than an actual `.line` primitive
+/// — see `ThickLineVertex`'s doc comment for why. Takes the same flat
+/// list of segment-endpoint pairs `Coaster`/`FerrisWheel` already
+/// produce (so neither needs to know anything about the thick-line
+/// trick) and expands each pair into a 4-vertex, 2-triangle quad here.
 private struct LineBuffers {
     let vertexBuffer: MTLBuffer
-    let vertexCount: Int
+    let indexBuffer: MTLBuffer
+    let indexCount: Int
 
     init?(device: MTLDevice, vertices: [Vertex]) {
+        precondition(
+            vertices.count % 2 == 0, "LineBuffers expects a flat list of segment-endpoint pairs.")
+
+        var thickVertices: [ThickLineVertex] = []
+        var indices: [UInt16] = []
+        thickVertices.reserveCapacity(vertices.count * 2)
+        indices.reserveCapacity(vertices.count * 3)
+
+        for segmentStart in stride(from: 0, to: vertices.count, by: 2) {
+            let a = vertices[segmentStart]
+            let b = vertices[segmentStart + 1]
+            let base = UInt16(thickVertices.count)
+
+            // Two vertices per endpoint (side -1/+1), so the vertex
+            // shader can push each one sideways to form a quad.
+            thickVertices.append(
+                ThickLineVertex(
+                    position: a.position, otherEndpoint: b.position, side: -1, color: a.color))
+            thickVertices.append(
+                ThickLineVertex(
+                    position: a.position, otherEndpoint: b.position, side: 1, color: a.color))
+            thickVertices.append(
+                ThickLineVertex(
+                    position: b.position, otherEndpoint: a.position, side: -1, color: b.color))
+            thickVertices.append(
+                ThickLineVertex(
+                    position: b.position, otherEndpoint: a.position, side: 1, color: b.color))
+
+            // Two triangles covering the quad (winding doesn't matter —
+            // the pipeline has no back-face culling).
+            indices.append(contentsOf: [base, base + 1, base + 2, base + 2, base + 1, base + 3])
+        }
+
         guard
             let vertexBuffer = device.makeBuffer(
-                bytes: vertices,
-                length: MemoryLayout<Vertex>.stride * vertices.count,
+                bytes: thickVertices,
+                length: MemoryLayout<ThickLineVertex>.stride * thickVertices.count,
+                options: []
+            ),
+            let indexBuffer = device.makeBuffer(
+                bytes: indices,
+                length: MemoryLayout<UInt16>.stride * indices.count,
                 options: []
             )
         else { return nil }
         self.vertexBuffer = vertexBuffer
-        self.vertexCount = vertices.count
+        self.indexBuffer = indexBuffer
+        self.indexCount = indices.count
     }
 }
 
@@ -70,6 +111,11 @@ final class Renderer: NSObject, MTKViewDelegate {
     private let device: MTLDevice
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
+    /// Separate pipeline for `carnival_thick_line_vertex` — a distinct
+    /// vertex function (and vertex input layout, `ThickLineVertex`
+    /// rather than `Vertex`) needs its own `MTLRenderPipelineState`;
+    /// they share `depthStencilState` and the same fragment function.
+    private let linePipelineState: MTLRenderPipelineState
     private let depthStencilState: MTLDepthStencilState
     private let groundAndMountains: MeshBuffers
     private let tent: MeshBuffers
@@ -144,6 +190,19 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     private var aspectRatio: Float = 1
 
+    /// The drawable's size in pixels — `carnival_thick_line_vertex`
+    /// needs this (unlike everything else here) to convert a desired
+    /// pixel width into clip-space offsets. Updated alongside
+    /// `aspectRatio`.
+    private var viewportSize = SIMD2<Float>(1, 1)
+
+    /// How wide the coaster track and ferris wheel's rims/spokes/axle/
+    /// supports render, in pixels — the original's `glLineWidth` calls
+    /// distinguished rails/cross-ties/struts with different widths
+    /// (1px/2px/3px, per Coaster.swift's doc comment), but this just
+    /// picks one width for everything drawn as a thick line, for now.
+    private static let lineWidthInPixels: Float = 6
+
     /// Pause/look-around feature (macOS: two-finger trackpad drag; iOS:
     /// one-finger drag + pinch; tvOS: arrow presses nudge by a fixed
     /// step, there being no touch surface to pan/pinch on the remote —
@@ -179,7 +238,8 @@ final class Renderer: NSObject, MTKViewDelegate {
         // so this relies on MTKView's default of .bgra8Unorm.
         guard let library = try? device.makeDefaultLibrary(bundle: Bundle(for: Renderer.self)),
             let vertexFunction = library.makeFunction(name: "carnival_vertex"),
-            let fragmentFunction = library.makeFunction(name: "carnival_fragment")
+            let fragmentFunction = library.makeFunction(name: "carnival_fragment"),
+            let thickLineVertexFunction = library.makeFunction(name: "carnival_thick_line_vertex")
         else { return nil }
 
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
@@ -191,6 +251,20 @@ final class Renderer: NSObject, MTKViewDelegate {
         guard let pipelineState = try? device.makeRenderPipelineState(descriptor: pipelineDescriptor)
         else { return nil }
         self.pipelineState = pipelineState
+
+        // Same fragment function and attachment formats as above — just
+        // a different vertex function/input layout for thick lines.
+        let linePipelineDescriptor = MTLRenderPipelineDescriptor()
+        linePipelineDescriptor.vertexFunction = thickLineVertexFunction
+        linePipelineDescriptor.fragmentFunction = fragmentFunction
+        linePipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+        linePipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
+
+        guard
+            let linePipelineState = try? device.makeRenderPipelineState(
+                descriptor: linePipelineDescriptor)
+        else { return nil }
+        self.linePipelineState = linePipelineState
 
         // Equivalent of the original's glEnable(GL_DEPTH_TEST).
         let depthStencilDescriptor = MTLDepthStencilDescriptor()
@@ -219,6 +293,7 @@ final class Renderer: NSObject, MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard size.height > 0 else { return }
         aspectRatio = Float(size.width / size.height)
+        viewportSize = SIMD2<Float>(Float(size.width), Float(size.height))
     }
 
     /// Equivalent of the `'t'` case in the original's `Key`: toggles
@@ -271,6 +346,7 @@ final class Renderer: NSObject, MTKViewDelegate {
         _ mesh: MeshBuffers, modelMatrix: float4x4, viewProjectionMatrix: float4x4,
         encoder: MTLRenderCommandEncoder
     ) {
+        encoder.setRenderPipelineState(pipelineState)
         var uniforms = Uniforms(modelViewProjectionMatrix: viewProjectionMatrix * modelMatrix)
         encoder.setVertexBuffer(mesh.vertexBuffer, offset: 0, index: 0)
         encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
@@ -287,10 +363,20 @@ final class Renderer: NSObject, MTKViewDelegate {
         _ lines: LineBuffers, modelMatrix: float4x4, viewProjectionMatrix: float4x4,
         encoder: MTLRenderCommandEncoder
     ) {
-        var uniforms = Uniforms(modelViewProjectionMatrix: viewProjectionMatrix * modelMatrix)
+        encoder.setRenderPipelineState(linePipelineState)
+        var uniforms = ThickLineUniforms(
+            modelViewProjectionMatrix: viewProjectionMatrix * modelMatrix,
+            viewportSize: viewportSize,
+            lineWidthInPixels: Self.lineWidthInPixels)
         encoder.setVertexBuffer(lines.vertexBuffer, offset: 0, index: 0)
-        encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
-        encoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: lines.vertexCount)
+        encoder.setVertexBytes(&uniforms, length: MemoryLayout<ThickLineUniforms>.stride, index: 1)
+        encoder.drawIndexedPrimitives(
+            type: .triangle,
+            indexCount: lines.indexCount,
+            indexType: .uint16,
+            indexBuffer: lines.indexBuffer,
+            indexBufferOffset: 0
+        )
     }
 
     func draw(in view: MTKView) {
@@ -400,7 +486,9 @@ final class Renderer: NSObject, MTKViewDelegate {
             fovyRadians: Self.baseFovyRadians / zoomScale, aspect: aspectRatio, near: 0.01, far: 150)
         let viewProjectionMatrix = projectionMatrix * viewMatrix
 
-        encoder.setRenderPipelineState(pipelineState)
+        // Each draw(...) call below sets its own pipeline state (mesh vs.
+        // thick-line), since they differ; depthStencilState is the same
+        // for both, so it's set just once here.
         encoder.setDepthStencilState(depthStencilState)
 
         draw(

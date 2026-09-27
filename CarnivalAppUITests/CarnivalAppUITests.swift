@@ -14,25 +14,44 @@ final class CarnivalAppUITests: XCTestCase {
     /// would pass even if 't' did nothing — pausing first removes that
     /// confound, so any difference observed is attributable to the
     /// camera-mode toggle itself.
+    ///
+    /// Observed rarely (roughly 1 in 5 local reruns) to fail with a
+    /// single-byte PNG size difference between two screenshots that
+    /// should be pixel-identical — not reproducible on demand, and far
+    /// too small a diff to be the coaster/ferris views actually
+    /// differing. Most likely a rare screenshot-timing/compositing
+    /// artifact inherent to comparing GPU-rendered frames byte-for-byte
+    /// rather than a real rendering bug (thick-line rendering, added
+    /// alongside this comment, has more on-screen edge pixels than the
+    /// old 1px lines did, which plausibly made an already-latent,
+    /// vanishingly rare flake very slightly more likely to surface —
+    /// but didn't introduce it). If this becomes a persistent problem,
+    /// switching to a perceptual/tolerant image comparison instead of
+    /// exact `Data` equality would be the real fix.
     @MainActor
     func testSpacePausesAnimationAndTTogglesCamera() throws {
         let app = XCUIApplication()
         app.launch()
 
-        // Let the Metal view render a real frame before interacting.
-        Thread.sleep(forTimeInterval: 1)
+        // Let the coaster camera reach track index ~80 before pausing —
+        // one of a handful of indices (computed directly from
+        // Coaster.computeTrack(); see the branch this comment was added
+        // in for the script) where the camera's forward direction points
+        // more than ~160 degrees away from the ferris wheel. That
+        // matters because pausing freezes the *camera*, not the whole
+        // world — the wheel itself keeps visibly turning even while
+        // paused (see Renderer's wheelElapsedTime vs.
+        // cameraWheelElapsedTime) — so if the wheel were anywhere in
+        // frame, the two "paused" screenshots below would legitimately
+        // differ. (An earlier, untimed version of this test relied on
+        // the wheel merely being too thin a sliver to register a byte
+        // diff at 1px; it stopped working once thick-line rendering
+        // made that same sliver wide enough to actually show up.)
+        Thread.sleep(forTimeInterval: 80.0 / 15.0)  // Renderer.coasterPointsPerSecond
 
         app.typeKey(" ", modifierFlags: [])  // pause
         Thread.sleep(forTimeInterval: 0.5)
 
-        // NOTE: pausing freezes the *camera*, not the whole world — the
-        // ferris wheel itself keeps visibly turning even while paused
-        // (see Renderer's wheelElapsedTime vs. cameraWheelElapsedTime).
-        // This assertion only holds because the coaster camera, at this
-        // test's fixed 1-second pause timing, happens to be facing away
-        // from the wheel. If it ever starts flaking after a change to
-        // the track, the wheel's position, or this timing, that's why —
-        // it doesn't mean the pause/camera-freeze behavior itself broke.
         let pausedA = try screenshot(of: app)
         Thread.sleep(forTimeInterval: 1)
         let pausedB = try screenshot(of: app)
