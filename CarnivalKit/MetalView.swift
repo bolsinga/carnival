@@ -65,12 +65,13 @@ extension MetalView {
             let view = KeyHandlingMTKView()
             view.onKeyDown = { [weak renderer] event in
                 // Equivalent of the original's Key(unsigned char key, ...).
-                // Only 't' (toggle coaster/ferris camera) is ported so
-                // far; everything else (space to pause, 's'/'z'/'x' for
-                // View_Point look-around) comes with those features.
+                // 's'/'z'/'x' (View_Point look-around) come with that
+                // feature.
                 switch event.charactersIgnoringModifiers {
                 case "t":
                     renderer?.toggleCameraMode()
+                case " ":
+                    renderer?.togglePause()
                 default:
                     break
                 }
