@@ -16,6 +16,14 @@ enum FerrisWheel {
     struct Geometry {
         let triangles: StaticScene.Mesh
         let lines: [Vertex]
+
+        /// Equivalent of the `sight` (called `fwv`/`gFWV` at the call
+        /// site) the original's `ferris()` returns: the position of the
+        /// carriage-6 rider, in the wheel's local space (`Renderer` adds
+        /// the wheel's own world translation, matching `drawScene`'s
+        /// `fwv[0] += -25.0; fwv[1] += 6.5;` right after calling
+        /// `ferris`). Used by the ferris-view camera.
+        let sight: SIMD3<Float>
     }
 
     /// 8 evenly spaced spokes (2π / 8), matching `SPOKE` in ferris.h.
@@ -52,7 +60,14 @@ enum FerrisWheel {
                 center: SIMD3<Float>(0, 0, 1.5), radius: 6.0, slices: 32, color: yellow))
 
         var angle = startAngle
-        for _ in 0..<8 {
+        var bottom: Float = 0  // the angle of the "bottom"/rider spoke
+        for i in 0..<8 {
+            if i == 6 {
+                // Carriage 6 is the rider — this is where View_Ferris
+                // sits, not a rendering-only detail.
+                bottom = angle
+            }
+
             let rimFront = SIMD3<Float>(6.0 * cos(angle), 6.0 * sin(angle), 1.5)
             let rimBack = SIMD3<Float>(rimFront.x, rimFront.y, -1.5)
 
@@ -73,7 +88,9 @@ enum FerrisWheel {
         addLine(b3, axel2, color: steel)
         addLine(axel2, b4, color: steel)
 
-        return Geometry(triangles: StaticScene.makeMesh(polygons), lines: lines)
+        let sight = SIMD3<Float>(6.0 * cos(bottom - 0.1), 6.0 * sin(bottom - 0.1) + 0.5, 0.0)
+
+        return Geometry(triangles: StaticScene.makeMesh(polygons), lines: lines, sight: sight)
     }
 
     /// Equivalent of `carriage(wheel1, wheel2)`. `wheel1`/`wheel2` always
