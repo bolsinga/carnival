@@ -144,9 +144,10 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     private var aspectRatio: Float = 1
 
-    /// Pause/look-around feature (iOS: one-finger drag + pinch; tvOS:
-    /// arrow presses nudge by a fixed step, there being no touch surface
-    /// to pan/pinch on the remote — see `MetalView`): rotates the gaze
+    /// Pause/look-around feature (macOS: two-finger trackpad drag; iOS:
+    /// one-finger drag + pinch; tvOS: arrow presses nudge by a fixed
+    /// step, there being no touch surface to pan/pinch on the remote —
+    /// see `MetalView`): rotates the gaze
     /// direction and adjusts the field of view, while the eye itself
     /// stays exactly where the paused ride camera left it. The
     /// original's `View_Point` is a different feature (it translates
@@ -244,17 +245,20 @@ final class Renderer: NSObject, MTKViewDelegate {
     }
 
     /// Pause/look-around input (see `lookYaw`/`lookPitch` above). A
-    /// no-op while animating — callers (iOS's gesture delegate, tvOS's
-    /// `isAnimating` branch in `MetalView`) are expected to only forward
-    /// this while paused, but this guards against it regardless.
+    /// no-op while animating — callers (macOS's pan gesture, iOS's
+    /// gesture delegate, tvOS's `isAnimating` branch in `MetalView`)
+    /// are expected to only forward this while paused (macOS has no
+    /// gating of its own to enforce that, since it's already covered
+    /// here), but this guards against it regardless.
     func adjustLookAround(deltaYaw: Float, deltaPitch: Float) {
         guard !isAnimating else { return }
         lookYaw += deltaYaw
         lookPitch = min(max(lookPitch + deltaPitch, -Self.maxLookPitch), Self.maxLookPitch)
     }
 
-    /// Pause/look-around zoom input — iOS only (via pinch); tvOS has no
-    /// touch surface to pinch on the remote, so it has no zoom control.
+    /// Pause/look-around zoom input — iOS only (via pinch); neither
+    /// macOS's trackpad pan nor tvOS's remote has a zoom gesture wired
+    /// up, so they have no zoom control.
     /// `factor` is a multiplier on the current zoom (as
     /// `UIPinchGestureRecognizer.scale` naturally is): >1 zooms in
     /// (narrows the field of view), <1 zooms out.
