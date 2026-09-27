@@ -65,7 +65,7 @@ private final class RemoteHandlingMTKView: MTKView {
         var handled = false
         for press in presses {
             switch press.type {
-            case .leftArrow, .rightArrow, .playPause:
+            case .leftArrow, .rightArrow, .upArrow, .downArrow, .playPause:
                 onPress?(press.type)
                 handled = true
             default:
@@ -116,22 +116,52 @@ extension MetalView {
             #else
             #if os(tvOS)
             // Siri Remote equivalent of the original's 't' (toggle
-            // coaster/ferris camera) and ' ' (pause) keys. Left/right
-            // arrow presses — the remote's touch-surface swipes, or a
-            // game controller's d-pad — toggle the camera, matching
-            // iOS's "either direction toggles" design (there are only
-            // two modes, so "the other one" is unambiguous either way).
-            // The dedicated Play/Pause button pauses, rather than a
-            // tap/select click, since that's exactly what it's for.
+            // coaster/ferris camera) and ' ' (pause) keys, plus the iOS
+            // pause/look-around feature (pan rotates gaze, pinch zooms)
+            // — the remote has no touch surface to pan/pinch on here, so
+            // arrow presses (the remote's touch-surface swipes, or a
+            // game controller's d-pad) nudge yaw/pitch by a fixed step
+            // instead, mirroring the original's own View_Point, which
+            // nudged the eye by a fixed `gStep` per arrow key press
+            // (main.c's SpecialKey) rather than anything continuous.
+            // Meaning depends on whether the ride is paused, same
+            // split as iOS's swipe-vs-pan gating: while riding,
+            // left/right toggle the camera (matching iOS's "either
+            // direction toggles" design, since there are only two
+            // modes); while paused, left/right/up/down nudge the
+            // look-around yaw/pitch instead — `adjustLookAround` is a
+            // no-op while riding, so this couldn't double as a camera
+            // toggle even if it fired then. The dedicated Play/Pause
+            // button always pauses/resumes, rather than a tap/select
+            // click, since that's exactly what it's for.
             let view = RemoteHandlingMTKView()
+            let remoteLookStepRadians: Float = 5 * .pi / 180
             view.onPress = { [weak renderer] type in
-                switch type {
-                case .leftArrow, .rightArrow:
-                    renderer?.toggleCameraMode()
-                case .playPause:
-                    renderer?.togglePause()
-                default:
-                    break
+                guard let renderer else { return }
+                if renderer.isAnimating {
+                    switch type {
+                    case .leftArrow, .rightArrow:
+                        renderer.toggleCameraMode()
+                    case .playPause:
+                        renderer.togglePause()
+                    default:
+                        break
+                    }
+                } else {
+                    switch type {
+                    case .leftArrow:
+                        renderer.adjustLookAround(deltaYaw: -remoteLookStepRadians, deltaPitch: 0)
+                    case .rightArrow:
+                        renderer.adjustLookAround(deltaYaw: remoteLookStepRadians, deltaPitch: 0)
+                    case .upArrow:
+                        renderer.adjustLookAround(deltaYaw: 0, deltaPitch: remoteLookStepRadians)
+                    case .downArrow:
+                        renderer.adjustLookAround(deltaYaw: 0, deltaPitch: -remoteLookStepRadians)
+                    case .playPause:
+                        renderer.togglePause()
+                    default:
+                        break
+                    }
                 }
             }
             #else
