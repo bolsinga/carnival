@@ -113,6 +113,21 @@ extension MetalView {
                     break
                 }
             }
+
+            // Pause/look-around: the macOS equivalent of iOS/tvOS's
+            // feature (see Renderer.adjustLookAround). A two-finger
+            // trackpad drag rotates the gaze direction — the same
+            // continuous feel as iOS's pan gesture, deliberately not a
+            // literal three/four-finger "swipe" (NSEvent's
+            // `.swipe`/`swipeWithEvent(_:)`), since that gesture is
+            // commonly reassigned to Mission Control/Spaces in System
+            // Settings and isn't reliably delivered. No delegate-based
+            // gating is needed here, unlike iOS: macOS has no
+            // gesture-driven camera toggle for this to collide with
+            // ('t' is keyboard-only), and `adjustLookAround` already
+            // no-ops on its own while riding.
+            let pan = NSPanGestureRecognizer(target: self, action: #selector(handleLookPan))
+            view.addGestureRecognizer(pan)
             #else
             #if os(tvOS)
             // Siri Remote equivalent of the original's 't' (toggle
@@ -212,6 +227,29 @@ extension MetalView {
             return view
         }
 
+        // Shared by iOS's UIPanGestureRecognizer and macOS's
+        // NSPanGestureRecognizer look-around handlers below — same
+        // continuous feel on both, just sourced from each platform's
+        // own pan gesture type.
+        private func applyLookPanTranslation(_ translation: CGPoint) {
+            // Arbitrary but reasonable feel: dragging across the whole
+            // screen width/height is roughly a quarter turn.
+            let radiansPerPoint: Float = 0.005
+            renderer?.adjustLookAround(
+                deltaYaw: -Float(translation.x) * radiansPerPoint,
+                deltaPitch: -Float(translation.y) * radiansPerPoint)
+        }
+
+        #if os(macOS)
+        @objc private func handleLookPan(_ recognizer: NSPanGestureRecognizer) {
+            // Reset each call so `translation` is always just this
+            // increment, not the accumulated drag since the gesture began.
+            let translation = recognizer.translation(in: recognizer.view)
+            recognizer.setTranslation(.zero, in: recognizer.view)
+            applyLookPanTranslation(translation)
+        }
+        #endif
+
         #if os(iOS)
         @objc private func handleCameraSwipe(_ recognizer: UISwipeGestureRecognizer) {
             renderer?.toggleCameraMode()
@@ -226,13 +264,7 @@ extension MetalView {
             // increment, not the accumulated drag since the gesture began.
             let translation = recognizer.translation(in: recognizer.view)
             recognizer.setTranslation(.zero, in: recognizer.view)
-
-            // Arbitrary but reasonable feel: dragging across the whole
-            // screen width/height is roughly a quarter turn.
-            let radiansPerPoint: Float = 0.005
-            renderer?.adjustLookAround(
-                deltaYaw: -Float(translation.x) * radiansPerPoint,
-                deltaPitch: -Float(translation.y) * radiansPerPoint)
+            applyLookPanTranslation(translation)
         }
 
         @objc private func handleLookPinch(_ recognizer: UIPinchGestureRecognizer) {
