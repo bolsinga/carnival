@@ -98,19 +98,33 @@ final class Renderer: NSObject, MTKViewDelegate {
     private(set) var deltaTime: TimeInterval = 0
 
     /// Equivalent of `gAnimating`. When `false`, elapsed time stops
-    /// accumulating into `elapsedTime`/`coasterPosition` below, freezing
-    /// the wheel's rotation and the coaster camera's progress — but
-    /// `clock.tick()` itself keeps running every frame regardless, so
-    /// there's no big "catch up" jump when unpausing (the original
-    /// instead stops calling Display entirely via
-    /// `glutIdleFunc(gAnimating ? Idle : NULL)`, freezing the whole
-    /// screen; this still renders continuously, just with a frozen
-    /// scene, since MTKView doesn't have GLUT's "idle" concept to hook).
+    /// accumulating into `cameraWheelElapsedTime`/`coasterPosition`
+    /// below, freezing the coaster camera's progress and (if riding it)
+    /// the ferris camera's position — but `clock.tick()` itself keeps
+    /// running every frame regardless, so there's no big "catch up"
+    /// jump when unpausing (the original instead stops calling Display
+    /// entirely via `glutIdleFunc(gAnimating ? Idle : NULL)`, freezing
+    /// the whole screen; this still renders continuously, just with a
+    /// frozen camera, since MTKView doesn't have GLUT's "idle" concept
+    /// to hook). Notably, `wheelElapsedTime` below is deliberately
+    /// exempt from this gate: pausing freezes the camera, not the world
+    /// — the wheel itself keeps visibly turning while paused, the same
+    /// way it would if you stepped out of the ride and just watched.
     private(set) var isAnimating = true
 
-    /// Total elapsed time. Currently only drives the ferris wheel's
-    /// rotation.
-    private var elapsedTime: Float = 0
+    /// Drives the ferris wheel's own rendered rotation. Always
+    /// accumulates every frame regardless of `isAnimating` — see
+    /// `isAnimating`'s doc comment above, and `cameraWheelElapsedTime`
+    /// below.
+    private var wheelElapsedTime: Float = 0
+
+    /// Drives the ferris-view camera's position on the wheel
+    /// specifically (via `FerrisWheel.sight(angle:)`), independently of
+    /// the wheel's own rendered rotation (`wheelElapsedTime`, always
+    /// live). Only accumulates while `isAnimating`, so pausing freezes
+    /// a ferris-view camera's position even though the wheel it's
+    /// riding keeps turning underneath it.
+    private var cameraWheelElapsedTime: Float = 0
 
     /// How far along the coaster track the camera currently is. Unlike
     /// the original's integer `gCurrentCoaster`, this accumulates
@@ -277,8 +291,12 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     func draw(in view: MTKView) {
         deltaTime = clock.tick()
+        // The wheel keeps visibly spinning even while paused (see
+        // isAnimating's doc comment) — only the camera's own position
+        // freezes.
+        wheelElapsedTime += Float(deltaTime)
         if isAnimating {
-            elapsedTime += Float(deltaTime)
+            cameraWheelElapsedTime += Float(deltaTime)
         }
 
         guard let descriptor = view.currentRenderPassDescriptor,
@@ -293,11 +311,18 @@ final class Renderer: NSObject, MTKViewDelegate {
         // gFWV fresh even while View_Coaster is active and the wheel
         // isn't being looked at.
         let wheelTranslation = SIMD3<Float>(-25.0, 6.5, 0.0)
-        let wheelAngle = -Self.wheelAngularVelocity * elapsedTime
+        let wheelAngle = -Self.wheelAngularVelocity * wheelElapsedTime
         let wheelGeometry = FerrisWheel.geometry(angle: wheelAngle)
+        // The ferris-view camera's own position, computed from a
+        // separately-paced (pause-freezable) angle rather than the
+        // wheel's own live rendered angle above — see
+        // cameraWheelElapsedTime's doc comment.
         // drawScene: fwv[0] += -25.0; fwv[1] += 6.5; (z untouched,
         // matching the translation's own z offset of 0).
-        let fwv = wheelGeometry.sight + SIMD3<Float>(wheelTranslation.x, wheelTranslation.y, 0)
+        let cameraWheelAngle = -Self.wheelAngularVelocity * cameraWheelElapsedTime
+        let fwv =
+            FerrisWheel.sight(angle: cameraWheelAngle)
+            + SIMD3<Float>(wheelTranslation.x, wheelTranslation.y, 0)
 
         if isAnimating {
             coasterPosition += Self.coasterPointsPerSecond * Float(deltaTime)
