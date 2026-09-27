@@ -79,6 +79,7 @@
 		FE3C1C7A3068A74F0048B342 /* CarnivalApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarnivalApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE3C1C8B3068A7AA0048B342 /* CarnivalKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CarnivalKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE3C1D0C306962050048B342 /* CarnivalAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CarnivalAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE3C1FE23069754C0048B342 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		FE61DB1709B611AE00F26546 /* carnival.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = carnival.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE61DB1909B611AE00F26546 /* carnival-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "carnival-Info.plist"; sourceTree = "<group>"; };
 		FE61DB3409B612C500F26546 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
@@ -149,6 +150,7 @@
 		08FB7794FE84155DC02AAC07 /* carnival */ = {
 			isa = PBXGroup;
 			children = (
+				FE3C1FE23069754C0048B342 /* Config.xcconfig */,
 				FE61DB3409B612C500F26546 /* OpenGL.framework */,
 				FE857E410465826700000102 /* GLUT.framework */,
 				08FB7795FE84155DC02AAC07 /* Source */,
@@ -436,6 +438,7 @@
 /* Begin XCBuildConfiguration section */
 		FE3C1C833068A74F0048B342 /* Development configuration for PBXNativeTarget "CarnivalApp" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -473,6 +476,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "$(inherited)";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -533,6 +537,7 @@
 		};
 		FE3C1C843068A74F0048B342 /* Deployment configuration for PBXNativeTarget "CarnivalApp" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -570,6 +575,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "$(inherited)";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_PREVIEWS = YES;
@@ -622,6 +628,7 @@
 		};
 		FE3C1C853068A74F0048B342 /* Default configuration for PBXNativeTarget "CarnivalApp" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -659,6 +666,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "$(inherited)";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_PREVIEWS = YES;
@@ -711,6 +719,7 @@
 		};
 		FE3C1C943068A7AA0048B342 /* Development configuration for PBXNativeTarget "CarnivalKit" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -812,6 +821,7 @@
 		};
 		FE3C1C953068A7AA0048B342 /* Deployment configuration for PBXNativeTarget "CarnivalKit" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -905,6 +915,7 @@
 		};
 		FE3C1C963068A7AA0048B342 /* Default configuration for PBXNativeTarget "CarnivalKit" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -998,6 +1009,7 @@
 		};
 		FE3C1D13306962050048B342 /* Development configuration for PBXNativeTarget "CarnivalAppUITests" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -1077,6 +1089,7 @@
 		};
 		FE3C1D14306962050048B342 /* Deployment configuration for PBXNativeTarget "CarnivalAppUITests" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -1148,6 +1161,7 @@
 		};
 		FE3C1D15306962050048B342 /* Default configuration for PBXNativeTarget "CarnivalAppUITests" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
