@@ -50,17 +50,27 @@ private struct LineBuffers {
 
 /// `MTKViewDelegate` that clears the frame to the carnival's sky-blue
 /// background (matching the original `glClearColor(0.33, 0.67, 1.0, 1.0)`)
-/// and draws the static parts of the scene ported so far: the ground/
-/// mountains from `StaticScene`, two tent instances from `Tent`, and the
-/// roller coaster track from `Coaster` — all from `drawScene` in the
-/// original carnival.c.
+/// and draws the scene ported so far: the ground/mountains from
+/// `StaticScene`, two tent instances from `Tent`, the roller coaster
+/// track from `Coaster`, and the ferris wheel from `FerrisWheel` — all
+/// from `drawScene` in the original carnival.c.
 final class Renderer: NSObject, MTKViewDelegate {
+    private let device: MTLDevice
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
     private let depthStencilState: MTLDepthStencilState
     private let groundAndMountains: MeshBuffers
     private let tent: MeshBuffers
     private let coaster: LineBuffers
+
+    /// The ferris wheel's angular velocity. Unlike everything ported so
+    /// far, there's no faithful "original" rate to port: the original's
+    /// `gRotation -= WHEELROT` only advanced once every `gThreshhold`
+    /// (5000) raw idle callbacks, a frame-count-based throttle calibrated
+    /// to whatever the 1992 hardware's incidental callback rate happened
+    /// to be — not a real-world angular velocity. This is a freshly
+    /// chosen, real-time rate (one revolution every 20 seconds) instead.
+    private static let wheelAngularVelocity: Float = 2 * .pi / 20
 
     private var clock = AnimationClock()
 
@@ -79,6 +89,7 @@ final class Renderer: NSObject, MTKViewDelegate {
     private var aspectRatio: Float = 1
 
     init?(device: MTLDevice) {
+        self.device = device
         guard let commandQueue = device.makeCommandQueue() else { return nil }
         self.commandQueue = commandQueue
 
@@ -198,6 +209,28 @@ final class Renderer: NSObject, MTKViewDelegate {
         // coaster(rollPts) in drawScene is called bare, with no
         // glPushMatrix/glTranslatef wrapping it.
         draw(coaster, modelMatrix: float4x4(1), viewProjectionMatrix: viewProjectionMatrix, encoder: encoder)
+
+        // The ferris wheel: unlike everything else, its geometry is
+        // rebuilt fresh every frame (matching the original recomputing
+        // each carriage's position from cos/sin(angle) every draw,
+        // rather than rotating a static mesh with a matrix). Cheap
+        // enough at this scene's scale — a few hundred vertices — to
+        // just re-upload new buffers each frame rather than manage a
+        // persistent ring buffer.
+        //   glPushMatrix(); glTranslatef(-25.0, 6.5, 0.0); ferris(rotation, fwv); glPopMatrix();
+        let wheelAngle = -Self.wheelAngularVelocity * elapsedTime
+        let wheelGeometry = FerrisWheel.geometry(angle: wheelAngle)
+        let wheelModel = float4x4.translation(SIMD3<Float>(-25.0, 6.5, 0.0))
+        if let wheelTriangles = MeshBuffers(device: device, mesh: wheelGeometry.triangles) {
+            draw(
+                wheelTriangles, modelMatrix: wheelModel, viewProjectionMatrix: viewProjectionMatrix,
+                encoder: encoder)
+        }
+        if let wheelLines = LineBuffers(device: device, vertices: wheelGeometry.lines) {
+            draw(
+                wheelLines, modelMatrix: wheelModel, viewProjectionMatrix: viewProjectionMatrix,
+                encoder: encoder)
+        }
 
         encoder.endEncoding()
 
