@@ -1,5 +1,8 @@
 import SwiftUI
 import MetalKit
+#if os(iOS)
+import UIKit
+#endif
 
 /// Hosts an `MTKView` inside SwiftUI. `MTKView.delegate` is `weak`, so the
 /// `Renderer` is retained by the `Coordinator` — without that, it would be
@@ -49,7 +52,10 @@ struct MetalView: UIViewRepresentable {
 #endif
 
 extension MetalView {
-    final class Coordinator {
+    // NSObject, so it can be a UIGestureRecognizer target on iOS (the
+    // Objective-C target-action mechanism gesture recognizers use
+    // requires it).
+    final class Coordinator: NSObject {
         private var renderer: Renderer?
 
         func makeConfiguredView() -> MTKView {
@@ -78,6 +84,25 @@ extension MetalView {
             }
             #else
             let view = MTKView()
+            #if os(iOS)
+            // Touch equivalent of the original's 't' (toggle coaster/
+            // ferris camera) and ' ' (pause) keys — there's no keyboard
+            // to assume on iOS/iPadOS. A swipe in either direction
+            // toggles, same as 't' does: with exactly two camera modes,
+            // "the other one" is the same regardless of swipe direction.
+            let swipeLeft = UISwipeGestureRecognizer(
+                target: self, action: #selector(handleCameraSwipe))
+            swipeLeft.direction = .left
+            view.addGestureRecognizer(swipeLeft)
+
+            let swipeRight = UISwipeGestureRecognizer(
+                target: self, action: #selector(handleCameraSwipe))
+            swipeRight.direction = .right
+            view.addGestureRecognizer(swipeRight)
+
+            let tap = UITapGestureRecognizer(target: self, action: #selector(handlePauseTap))
+            view.addGestureRecognizer(tap)
+            #endif
             #endif
             view.device = device
             view.delegate = renderer
@@ -85,5 +110,15 @@ extension MetalView {
             view.depthStencilPixelFormat = .depth32Float
             return view
         }
+
+        #if os(iOS)
+        @objc private func handleCameraSwipe(_ recognizer: UISwipeGestureRecognizer) {
+            renderer?.toggleCameraMode()
+        }
+
+        @objc private func handlePauseTap(_ recognizer: UITapGestureRecognizer) {
+            renderer?.togglePause()
+        }
+        #endif
     }
 }
