@@ -55,7 +55,12 @@ private struct LineBuffers {
 /// track from `Coaster`, and the ferris wheel from `FerrisWheel` — all
 /// from `drawScene` in the original carnival.c.
 /// Equivalent of `View_Style`/`gStyle` in the original's main.c.
-/// `View_Point` (free look-around, `'s'` key) isn't ported yet.
+/// `View_Point` itself (a third `gStyle`, entered/exited with `'s'`,
+/// translating the eye with arrow keys) isn't ported as a `CameraMode`
+/// case — the iOS-only pause/look-around feature (`lookYaw`/`lookPitch`/
+/// `zoomScale` below) covers the same "pause and look around" idea with
+/// touch-first input instead, layered on top of whichever of these two
+/// modes is active rather than being a third mode of its own.
 private enum CameraMode: Equatable {
     case coaster
     case ferris
@@ -101,7 +106,7 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// `glutIdleFunc(gAnimating ? Idle : NULL)`, freezing the whole
     /// screen; this still renders continuously, just with a frozen
     /// scene, since MTKView doesn't have GLUT's "idle" concept to hook).
-    private var isAnimating = true
+    private(set) var isAnimating = true
 
     /// Total elapsed time. Currently only drives the ferris wheel's
     /// rotation.
@@ -125,6 +130,28 @@ final class Renderer: NSObject, MTKViewDelegate {
     private var cameraMode: CameraMode = .coaster
 
     private var aspectRatio: Float = 1
+
+    /// iOS-only pause/look-around feature: a one-finger drag rotates the
+    /// gaze direction and a pinch adjusts the field of view, while the
+    /// eye itself stays exactly where the paused ride camera left it.
+    /// The original's `View_Point` is a different feature (it translates
+    /// the *eye* with arrow keys, and freezes `center`/`up` at whatever
+    /// the previous camera had); this is a fresh touch-first take on the
+    /// same underlying idea ("pause and look around"), not a literal
+    /// port. Both only ever have an effect while paused: `togglePause()`
+    /// resets them to their identity values the moment animation
+    /// resumes, so unpausing always returns cleanly to the normal ride
+    /// camera.
+    private var lookYaw: Float = 0
+    private var lookPitch: Float = 0
+    private var zoomScale: Float = 1
+
+    /// Keeps `lookPitch` well short of vertical, so the look-around
+    /// right vector (`cross(gazeDirection, up)`) never degenerates.
+    private static let maxLookPitch: Float = 80 * .pi / 180
+    private static let minZoomScale: Float = 0.5
+    private static let maxZoomScale: Float = 3.0
+    private static let baseFovyRadians: Float = 60 * .pi / 180
 
     init?(device: MTLDevice) {
         self.device = device
@@ -180,9 +207,11 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     /// Equivalent of the `'t'` case in the original's `Key`: toggles
     /// between the coaster and ferris-wheel cameras. (The original also
-    /// guards this with `if (gStyle != View_Point)` — moot for now since
-    /// `View_Point` isn't ported yet, so `CameraMode` only has these two
-    /// cases.)
+    /// guards this with `if (gStyle != View_Point)`; `CameraMode` has no
+    /// equivalent guard here since it only has these two cases, but
+    /// `MetalView`'s iOS gesture delegate applies the analogous guard at
+    /// the input layer instead, disabling the camera-toggle swipe while
+    /// paused so it doesn't fight with the pause/look-around gestures.)
     func toggleCameraMode() {
         cameraMode = (cameraMode == .coaster) ? .ferris : .coaster
     }
@@ -191,6 +220,30 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// pauses/resumes the animation.
     func togglePause() {
         isAnimating.toggle()
+        if isAnimating {
+            // Resuming always returns to a clean, unmodified ride camera.
+            lookYaw = 0
+            lookPitch = 0
+            zoomScale = 1
+        }
+    }
+
+    /// iOS-only pause/look-around input (see `lookYaw`/`lookPitch` above).
+    /// A no-op while animating — the caller (`MetalView`'s gesture
+    /// delegate) is expected to only forward this while paused, but this
+    /// guards against it regardless.
+    func adjustLookAround(deltaYaw: Float, deltaPitch: Float) {
+        guard !isAnimating else { return }
+        lookYaw += deltaYaw
+        lookPitch = min(max(lookPitch + deltaPitch, -Self.maxLookPitch), Self.maxLookPitch)
+    }
+
+    /// iOS-only pause/look-around input. `factor` is a multiplier on the
+    /// current zoom (as `UIPinchGestureRecognizer.scale` naturally is):
+    /// >1 zooms in (narrows the field of view), <1 zooms out.
+    func adjustZoom(byFactor factor: Float) {
+        guard !isAnimating else { return }
+        zoomScale = min(max(zoomScale * factor, Self.minZoomScale), Self.maxZoomScale)
     }
 
     private func draw(
@@ -288,7 +341,15 @@ final class Renderer: NSObject, MTKViewDelegate {
             eye = fwv
             center = fwv + SIMD3<Float>(1, 0, 0)
         }
-        let viewMatrix = float4x4.lookAt(eye: eye, center: center, up: SIMD3<Float>(0, 1, 0))
+        // Pause/look-around (iOS only): rotate the gaze direction by
+        // lookYaw/lookPitch, keeping eye and the eye->center distance
+        // fixed. Both are 0 whenever not paused (see togglePause()), so
+        // this is a no-op on every other platform/state.
+        let baseDistance = distance(eye, center)
+        let lookDirection = normalize(center - eye)
+            .rotatedForLookAround(yaw: lookYaw, pitch: lookPitch)
+        let adjustedCenter = eye + lookDirection * baseDistance
+        let viewMatrix = float4x4.lookAt(eye: eye, center: adjustedCenter, up: SIMD3<Float>(0, 1, 0))
 
         // Reshape's own gluPerspective(0.1 * 600, width/height, 0.01, 150.0)
         // — fovy 60°, near 0.01, far 150. Reshape's aspect ratio is
@@ -298,8 +359,12 @@ final class Renderer: NSObject, MTKViewDelegate {
         // distort the image on every one of the very different aspect
         // ratios this port actually targets, unlike the original's
         // single fixed-size GLUT window.
+        // zoomScale (also iOS pause/look-around only, otherwise 1)
+        // narrows/widens this fovy rather than moving the eye, so it
+        // can't clip through geometry at whatever frozen vantage point
+        // the ride camera was paused at.
         let projectionMatrix = float4x4.perspective(
-            fovyRadians: 60 * .pi / 180, aspect: aspectRatio, near: 0.01, far: 150)
+            fovyRadians: Self.baseFovyRadians / zoomScale, aspect: aspectRatio, near: 0.01, far: 150)
         let viewProjectionMatrix = projectionMatrix * viewMatrix
 
         encoder.setRenderPipelineState(pipelineState)
