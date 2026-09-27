@@ -123,22 +123,23 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     /// Equivalent of `gStyle`. Defaults to `.coaster`, matching the
     /// original's default `gStyle = View_Coaster` (and the README:
-    /// "you are first riding the roller coaster"). Nothing switches
-    /// this yet — that's tied to keyboard/touch/remote input, not
-    /// written yet — so `.ferris` is currently reachable only by
-    /// temporarily editing this default while testing.
+    /// "you are first riding the roller coaster"). `toggleCameraMode()`
+    /// switches it, wired to `'t'` on macOS, a swipe on iOS, and
+    /// left/right arrow presses on tvOS.
     private var cameraMode: CameraMode = .coaster
 
     private var aspectRatio: Float = 1
 
-    /// iOS-only pause/look-around feature: a one-finger drag rotates the
-    /// gaze direction and a pinch adjusts the field of view, while the
-    /// eye itself stays exactly where the paused ride camera left it.
-    /// The original's `View_Point` is a different feature (it translates
+    /// Pause/look-around feature (iOS: one-finger drag + pinch; tvOS:
+    /// arrow presses nudge by a fixed step, there being no touch surface
+    /// to pan/pinch on the remote — see `MetalView`): rotates the gaze
+    /// direction and adjusts the field of view, while the eye itself
+    /// stays exactly where the paused ride camera left it. The
+    /// original's `View_Point` is a different feature (it translates
     /// the *eye* with arrow keys, and freezes `center`/`up` at whatever
-    /// the previous camera had); this is a fresh touch-first take on the
-    /// same underlying idea ("pause and look around"), not a literal
-    /// port. Both only ever have an effect while paused: `togglePause()`
+    /// the previous camera had); this is a fresh take on the same
+    /// underlying idea ("pause and look around"), not a literal port.
+    /// Both only ever have an effect while paused: `togglePause()`
     /// resets them to their identity values the moment animation
     /// resumes, so unpausing always returns cleanly to the normal ride
     /// camera.
@@ -228,19 +229,21 @@ final class Renderer: NSObject, MTKViewDelegate {
         }
     }
 
-    /// iOS-only pause/look-around input (see `lookYaw`/`lookPitch` above).
-    /// A no-op while animating — the caller (`MetalView`'s gesture
-    /// delegate) is expected to only forward this while paused, but this
-    /// guards against it regardless.
+    /// Pause/look-around input (see `lookYaw`/`lookPitch` above). A
+    /// no-op while animating — callers (iOS's gesture delegate, tvOS's
+    /// `isAnimating` branch in `MetalView`) are expected to only forward
+    /// this while paused, but this guards against it regardless.
     func adjustLookAround(deltaYaw: Float, deltaPitch: Float) {
         guard !isAnimating else { return }
         lookYaw += deltaYaw
         lookPitch = min(max(lookPitch + deltaPitch, -Self.maxLookPitch), Self.maxLookPitch)
     }
 
-    /// iOS-only pause/look-around input. `factor` is a multiplier on the
-    /// current zoom (as `UIPinchGestureRecognizer.scale` naturally is):
-    /// >1 zooms in (narrows the field of view), <1 zooms out.
+    /// Pause/look-around zoom input — iOS only (via pinch); tvOS has no
+    /// touch surface to pinch on the remote, so it has no zoom control.
+    /// `factor` is a multiplier on the current zoom (as
+    /// `UIPinchGestureRecognizer.scale` naturally is): >1 zooms in
+    /// (narrows the field of view), <1 zooms out.
     func adjustZoom(byFactor factor: Float) {
         guard !isAnimating else { return }
         zoomScale = min(max(zoomScale * factor, Self.minZoomScale), Self.maxZoomScale)
@@ -341,10 +344,11 @@ final class Renderer: NSObject, MTKViewDelegate {
             eye = fwv
             center = fwv + SIMD3<Float>(1, 0, 0)
         }
-        // Pause/look-around (iOS only): rotate the gaze direction by
+        // Pause/look-around (iOS and tvOS): rotate the gaze direction by
         // lookYaw/lookPitch, keeping eye and the eye->center distance
         // fixed. Both are 0 whenever not paused (see togglePause()), so
-        // this is a no-op on every other platform/state.
+        // this is a no-op on macOS (no input ever changes them there)
+        // and while riding on any platform.
         let baseDistance = distance(eye, center)
         let lookDirection = normalize(center - eye)
             .rotatedForLookAround(yaw: lookYaw, pitch: lookPitch)
