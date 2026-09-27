@@ -16,6 +16,24 @@ struct MetalView: NSViewRepresentable {
 
     func updateNSView(_ nsView: MTKView, context: Context) {}
 }
+
+/// `MTKView` subclass so macOS can receive key events — plain `MTKView`
+/// doesn't accept first responder by default. Equivalent of the
+/// original's `glutKeyboardFunc(Key)`.
+private final class KeyHandlingMTKView: MTKView {
+    var onKeyDown: ((NSEvent) -> Void)?
+
+    override var acceptsFirstResponder: Bool { true }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        window?.makeFirstResponder(self)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        onKeyDown?(event)
+    }
+}
 #else
 struct MetalView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
@@ -43,7 +61,23 @@ extension MetalView {
             }
             self.renderer = renderer
 
+            #if os(macOS)
+            let view = KeyHandlingMTKView()
+            view.onKeyDown = { [weak renderer] event in
+                // Equivalent of the original's Key(unsigned char key, ...).
+                // Only 't' (toggle coaster/ferris camera) is ported so
+                // far; everything else (space to pause, 's'/'z'/'x' for
+                // View_Point look-around) comes with those features.
+                switch event.charactersIgnoringModifiers {
+                case "t":
+                    renderer?.toggleCameraMode()
+                default:
+                    break
+                }
+            }
+            #else
             let view = MTKView()
+            #endif
             view.device = device
             view.delegate = renderer
             view.clearColor = MTLClearColor(red: 0.33, green: 0.67, blue: 1.0, alpha: 1.0)
