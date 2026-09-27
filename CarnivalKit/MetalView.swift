@@ -1,6 +1,6 @@
 import SwiftUI
 import MetalKit
-#if os(iOS)
+#if os(iOS) || os(tvOS)
 import UIKit
 #endif
 
@@ -49,6 +49,37 @@ struct MetalView: UIViewRepresentable {
 
     func updateUIView(_ uiView: MTKView, context: Context) {}
 }
+
+#if os(tvOS)
+/// `MTKView` subclass so tvOS can receive Siri Remote presses — a plain
+/// `MTKView` isn't part of the focus engine (`canBecomeFocused` defaults
+/// to `false`), so it would never receive `pressesBegan`. There's only
+/// this one focusable view in the whole app, so it's focused
+/// automatically without any extra focus-engine plumbing.
+private final class RemoteHandlingMTKView: MTKView {
+    var onPress: ((UIPress.PressType) -> Void)?
+
+    override var canBecomeFocused: Bool { true }
+
+    override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+        var handled = false
+        for press in presses {
+            switch press.type {
+            case .leftArrow, .rightArrow, .playPause:
+                onPress?(press.type)
+                handled = true
+            default:
+                break
+            }
+        }
+        // Anything not handled (e.g. Menu) still needs to reach `super`
+        // so the system's own behavior (like backgrounding the app) works.
+        if !handled {
+            super.pressesBegan(presses, with: event)
+        }
+    }
+}
+#endif
 #endif
 
 extension MetalView {
@@ -83,6 +114,27 @@ extension MetalView {
                 }
             }
             #else
+            #if os(tvOS)
+            // Siri Remote equivalent of the original's 't' (toggle
+            // coaster/ferris camera) and ' ' (pause) keys. Left/right
+            // arrow presses — the remote's touch-surface swipes, or a
+            // game controller's d-pad — toggle the camera, matching
+            // iOS's "either direction toggles" design (there are only
+            // two modes, so "the other one" is unambiguous either way).
+            // The dedicated Play/Pause button pauses, rather than a
+            // tap/select click, since that's exactly what it's for.
+            let view = RemoteHandlingMTKView()
+            view.onPress = { [weak renderer] type in
+                switch type {
+                case .leftArrow, .rightArrow:
+                    renderer?.toggleCameraMode()
+                case .playPause:
+                    renderer?.togglePause()
+                default:
+                    break
+                }
+            }
+            #else
             let view = MTKView()
             #if os(iOS)
             // Touch equivalent of the original's 't' (toggle coaster/
@@ -102,6 +154,7 @@ extension MetalView {
 
             let tap = UITapGestureRecognizer(target: self, action: #selector(handlePauseTap))
             view.addGestureRecognizer(tap)
+            #endif
             #endif
             #endif
             view.device = device
