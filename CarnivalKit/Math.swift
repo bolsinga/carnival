@@ -61,3 +61,19 @@ extension float4x4 {
         )
     }
 }
+
+extension SIMD3 where Scalar == Float {
+    /// Rotates a (unit-length) direction by `yaw` around `up`, then by
+    /// `pitch` around the resulting right vector — standard FPS-style
+    /// look-around math, used by the iOS pause/look-around feature to
+    /// rotate the frozen ride camera's gaze direction from touch input.
+    /// Verified against `simd_quatf` directly (rotating (0,0,1) by +90°
+    /// around (0,1,0) gives (1,0,0)) before adopting it here.
+    func rotatedForLookAround(yaw: Float, pitch: Float, up: SIMD3<Float> = SIMD3<Float>(0, 1, 0))
+        -> SIMD3<Float>
+    {
+        let yawed = simd_quatf(angle: yaw, axis: up).act(self)
+        let right = normalize(cross(yawed, up))
+        return simd_quatf(angle: pitch, axis: right).act(yawed)
+    }
+}

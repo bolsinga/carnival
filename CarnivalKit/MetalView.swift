@@ -142,18 +142,36 @@ extension MetalView {
             // to assume on iOS/iPadOS. A swipe in either direction
             // toggles, same as 't' does: with exactly two camera modes,
             // "the other one" is the same regardless of swipe direction.
+            // Gated (via `self` as delegate, below) to only fire while
+            // not paused — mirrors the original's own
+            // `if (gStyle != View_Point)` guard on 't'.
             let swipeLeft = UISwipeGestureRecognizer(
                 target: self, action: #selector(handleCameraSwipe))
             swipeLeft.direction = .left
+            swipeLeft.delegate = self
             view.addGestureRecognizer(swipeLeft)
 
             let swipeRight = UISwipeGestureRecognizer(
                 target: self, action: #selector(handleCameraSwipe))
             swipeRight.direction = .right
+            swipeRight.delegate = self
             view.addGestureRecognizer(swipeRight)
 
             let tap = UITapGestureRecognizer(target: self, action: #selector(handlePauseTap))
             view.addGestureRecognizer(tap)
+
+            // Pause/look-around: only meaningful while paused (gated via
+            // `self` as delegate, below), since that's when the ride
+            // camera holds still. A one-finger drag rotates the gaze
+            // direction; a pinch narrows/widens the field of view. See
+            // `Renderer.adjustLookAround`/`adjustZoom`.
+            let pan = UIPanGestureRecognizer(target: self, action: #selector(handleLookPan))
+            pan.delegate = self
+            view.addGestureRecognizer(pan)
+
+            let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handleLookPinch))
+            pinch.delegate = self
+            view.addGestureRecognizer(pinch)
             #endif
             #endif
             #endif
@@ -172,6 +190,59 @@ extension MetalView {
         @objc private func handlePauseTap(_ recognizer: UITapGestureRecognizer) {
             renderer?.togglePause()
         }
+
+        @objc private func handleLookPan(_ recognizer: UIPanGestureRecognizer) {
+            // Reset each call so `translation` is always just this
+            // increment, not the accumulated drag since the gesture began.
+            let translation = recognizer.translation(in: recognizer.view)
+            recognizer.setTranslation(.zero, in: recognizer.view)
+
+            // Arbitrary but reasonable feel: dragging across the whole
+            // screen width/height is roughly a quarter turn.
+            let radiansPerPoint: Float = 0.005
+            renderer?.adjustLookAround(
+                deltaYaw: -Float(translation.x) * radiansPerPoint,
+                deltaPitch: -Float(translation.y) * radiansPerPoint)
+        }
+
+        @objc private func handleLookPinch(_ recognizer: UIPinchGestureRecognizer) {
+            renderer?.adjustZoom(byFactor: Float(recognizer.scale))
+            // Reset each call for the same reason as handleLookPan's
+            // setTranslation(.zero...) — `scale` is otherwise cumulative
+            // since the gesture began, not just this increment.
+            recognizer.scale = 1
+        }
         #endif
     }
 }
+
+#if os(iOS)
+extension MetalView.Coordinator: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        // Swipe (camera toggle) only while riding; pan/pinch
+        // (look-around/zoom) only while paused — see togglePause()'s
+        // doc comment for why these two input modes don't mix. The tap
+        // (pause toggle itself) has no delegate set, so it isn't gated.
+        guard let isAnimating = renderer?.isAnimating else { return true }
+        switch gestureRecognizer {
+        case is UISwipeGestureRecognizer:
+            return isAnimating
+        case is UIPanGestureRecognizer, is UIPinchGestureRecognizer:
+            return !isAnimating
+        default:
+            return true
+        }
+    }
+
+    // Lets a drag and a pinch drive the look-around/zoom together, like
+    // Photos/Maps' simultaneous pan-and-zoom.
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        (gestureRecognizer is UIPanGestureRecognizer || gestureRecognizer is UIPinchGestureRecognizer)
+            && (otherGestureRecognizer is UIPanGestureRecognizer
+                || otherGestureRecognizer is UIPinchGestureRecognizer)
+    }
+}
+#endif
