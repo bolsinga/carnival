@@ -25,6 +25,14 @@ final class CarnivalAppUITests: XCTestCase {
         app.typeKey(" ", modifierFlags: [])  // pause
         Thread.sleep(forTimeInterval: 0.5)
 
+        // NOTE: pausing freezes the *camera*, not the whole world — the
+        // ferris wheel itself keeps visibly turning even while paused
+        // (see Renderer's wheelElapsedTime vs. cameraWheelElapsedTime).
+        // This assertion only holds because the coaster camera, at this
+        // test's fixed 1-second pause timing, happens to be facing away
+        // from the wheel. If it ever starts flaking after a change to
+        // the track, the wheel's position, or this timing, that's why —
+        // it doesn't mean the pause/camera-freeze behavior itself broke.
         let pausedA = try screenshot(of: app)
         Thread.sleep(forTimeInterval: 1)
         let pausedB = try screenshot(of: app)

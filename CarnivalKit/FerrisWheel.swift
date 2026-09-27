@@ -60,14 +60,7 @@ enum FerrisWheel {
                 center: SIMD3<Float>(0, 0, 1.5), radius: 6.0, slices: 32, color: yellow))
 
         var angle = startAngle
-        var bottom: Float = 0  // the angle of the "bottom"/rider spoke
-        for i in 0..<8 {
-            if i == 6 {
-                // Carriage 6 is the rider — this is where View_Ferris
-                // sits, not a rendering-only detail.
-                bottom = angle
-            }
-
+        for _ in 0..<8 {
             let rimFront = SIMD3<Float>(6.0 * cos(angle), 6.0 * sin(angle), 1.5)
             let rimBack = SIMD3<Float>(rimFront.x, rimFront.y, -1.5)
 
@@ -88,9 +81,22 @@ enum FerrisWheel {
         addLine(b3, axel2, color: steel)
         addLine(axel2, b4, color: steel)
 
-        let sight = SIMD3<Float>(6.0 * cos(bottom - 0.1), 6.0 * sin(bottom - 0.1) + 0.5, 0.0)
+        return Geometry(triangles: StaticScene.makeMesh(polygons), lines: lines, sight: sight(angle: startAngle))
+    }
 
-        return Geometry(triangles: StaticScene.makeMesh(polygons), lines: lines, sight: sight)
+    /// The rider-sight position on its own, without building the rest
+    /// of the wheel's geometry — lets `Renderer` track the ferris-view
+    /// camera's position from a different, independently-paced angle
+    /// than the one driving the wheel's own (possibly still-spinning)
+    /// rendered rotation, without paying for two full mesh rebuilds a
+    /// frame. Carriage 6 is the rider — this is where `View_Ferris`
+    /// sits, not a rendering-only detail — and since each carriage is
+    /// `spoke` apart, its angle is always `startAngle + 6 * spoke`
+    /// regardless of anything the rendering loop in `geometry(angle:)`
+    /// does, so this needs none of that loop to compute it.
+    static func sight(angle startAngle: Float) -> SIMD3<Float> {
+        let bottom = startAngle + 6 * spoke
+        return SIMD3<Float>(6.0 * cos(bottom - 0.1), 6.0 * sin(bottom - 0.1) + 0.5, 0.0)
     }
 
     /// Equivalent of `carriage(wheel1, wheel2)`. `wheel1`/`wheel2` always
