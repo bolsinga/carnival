@@ -3,14 +3,15 @@ import simd
 
 /// `MTKViewDelegate` that clears the frame to the carnival's sky-blue
 /// background (matching the original `glClearColor(0.33, 0.67, 1.0, 1.0)`)
-/// and draws a single hardcoded triangle to prove the camera/projection
-/// math (`float4x4.lookAt`/`float4x4.perspective`, replacing `gluLookAt`/
-/// `gluPerspective`) end-to-end, before any real scene geometry exists.
+/// and draws the static ground/mountains mesh from `StaticScene`, ported
+/// from `drawScene`/`mountains` in the original carnival.c.
 final class Renderer: NSObject, MTKViewDelegate {
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
     private let depthStencilState: MTLDepthStencilState
     private let vertexBuffer: MTLBuffer
+    private let indexBuffer: MTLBuffer
+    private let indexCount: Int
 
     private var clock = AnimationClock()
 
@@ -58,19 +59,22 @@ final class Renderer: NSObject, MTKViewDelegate {
         else { return nil }
         self.depthStencilState = depthStencilState
 
-        let triangle = [
-            Vertex(position: SIMD3<Float>(0, 0.5, 0), color: SIMD4<Float>(1, 0, 0, 1)),
-            Vertex(position: SIMD3<Float>(-0.5, -0.5, 0), color: SIMD4<Float>(0, 1, 0, 1)),
-            Vertex(position: SIMD3<Float>(0.5, -0.5, 0), color: SIMD4<Float>(0, 0, 1, 1)),
-        ]
+        let mesh = StaticScene.groundAndMountains()
         guard
             let vertexBuffer = device.makeBuffer(
-                bytes: triangle,
-                length: MemoryLayout<Vertex>.stride * triangle.count,
+                bytes: mesh.vertices,
+                length: MemoryLayout<Vertex>.stride * mesh.vertices.count,
+                options: []
+            ),
+            let indexBuffer = device.makeBuffer(
+                bytes: mesh.indices,
+                length: MemoryLayout<UInt16>.stride * mesh.indices.count,
                 options: []
             )
         else { return nil }
         self.vertexBuffer = vertexBuffer
+        self.indexBuffer = indexBuffer
+        self.indexCount = mesh.indices.count
 
         super.init()
     }
@@ -89,13 +93,18 @@ final class Renderer: NSObject, MTKViewDelegate {
             let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)
         else { return }
 
-        // Placeholder camera: orbits a fixed point so the lookAt/
-        // perspective math is visibly live, not just a static screenshot.
-        let radius: Float = 3
-        let eye = SIMD3<Float>(radius * sin(elapsedTime), 0, radius * cos(elapsedTime))
-        let viewMatrix = float4x4.lookAt(eye: eye, center: .zero, up: SIMD3<Float>(0, 1, 0))
+        // Placeholder sightseeing camera: slowly orbits above the scene so
+        // the ground and all three mountains (which span roughly
+        // x/z in [-100, 100], y in [-1, 50]) are visible at once. Replaced
+        // once the real coaster/ferris ride-follow camera exists.
+        let radius: Float = 150
+        let height: Float = 60
+        let center = SIMD3<Float>(0, 10, 0)
+        let angle = elapsedTime * 0.2
+        let eye = SIMD3<Float>(radius * sin(angle), height, radius * cos(angle))
+        let viewMatrix = float4x4.lookAt(eye: eye, center: center, up: SIMD3<Float>(0, 1, 0))
         let projectionMatrix = float4x4.perspective(
-            fovyRadians: .pi / 3, aspect: aspectRatio, near: 0.1, far: 100)
+            fovyRadians: .pi / 3, aspect: aspectRatio, near: 0.1, far: 500)
 
         var uniforms = Uniforms(modelViewProjectionMatrix: projectionMatrix * viewMatrix)
 
@@ -103,7 +112,13 @@ final class Renderer: NSObject, MTKViewDelegate {
         encoder.setDepthStencilState(depthStencilState)
         encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
         encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
-        encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+        encoder.drawIndexedPrimitives(
+            type: .triangle,
+            indexCount: indexCount,
+            indexType: .uint16,
+            indexBuffer: indexBuffer,
+            indexBufferOffset: 0
+        )
 
         encoder.endEncoding()
 
