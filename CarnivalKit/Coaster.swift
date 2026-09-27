@@ -6,9 +6,13 @@ import simd
 /// `coaster()` sets `glColor3ubv(tracks)` once and never changes it,
 /// even inside `drawStrut`.
 ///
-/// Metal has no line-width control (unlike `glLineWidth`), so the
-/// original's 1px/2px/3px distinctions between rails, cross-ties, and
-/// struts aren't reproduced — everything here draws as a plain 1px line.
+/// This produces a flat list of segment-endpoint pairs; the actual
+/// "thick line" rendering (Metal has no `glLineWidth` equivalent, so it
+/// has to be faked with real geometry) happens downstream in
+/// `Renderer`/`ThickLineVertex` — this file doesn't need to know
+/// anything about that. The original's 1px/2px/3px distinctions
+/// between rails, cross-ties, and struts aren't reproduced either way;
+/// everything here renders at one uniform width.
 enum Coaster {
     struct Track {
         let rollerIn: [SIMD3<Float>]
