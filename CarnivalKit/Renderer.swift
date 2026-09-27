@@ -26,17 +26,41 @@ private struct MeshBuffers {
     }
 }
 
+/// A line list's vertex buffer on the GPU, ready to draw with
+/// `.drawPrimitives(type: .line, ...)`. Unlike `MeshBuffers`, there's no
+/// index buffer — the coaster track has too much point reuse across
+/// disconnected segments (rails, cross-ties, struts) for a single index
+/// list to help, so it's just a flat list of vertex pairs.
+private struct LineBuffers {
+    let vertexBuffer: MTLBuffer
+    let vertexCount: Int
+
+    init?(device: MTLDevice, vertices: [Vertex]) {
+        guard
+            let vertexBuffer = device.makeBuffer(
+                bytes: vertices,
+                length: MemoryLayout<Vertex>.stride * vertices.count,
+                options: []
+            )
+        else { return nil }
+        self.vertexBuffer = vertexBuffer
+        self.vertexCount = vertices.count
+    }
+}
+
 /// `MTKViewDelegate` that clears the frame to the carnival's sky-blue
 /// background (matching the original `glClearColor(0.33, 0.67, 1.0, 1.0)`)
 /// and draws the static parts of the scene ported so far: the ground/
-/// mountains from `StaticScene`, and two tent instances from `Tent` —
-/// all from `drawScene` in the original carnival.c.
+/// mountains from `StaticScene`, two tent instances from `Tent`, and the
+/// roller coaster track from `Coaster` — all from `drawScene` in the
+/// original carnival.c.
 final class Renderer: NSObject, MTKViewDelegate {
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
     private let depthStencilState: MTLDepthStencilState
     private let groundAndMountains: MeshBuffers
     private let tent: MeshBuffers
+    private let coaster: LineBuffers
 
     private var clock = AnimationClock()
 
@@ -87,10 +111,12 @@ final class Renderer: NSObject, MTKViewDelegate {
         guard
             let groundAndMountains = MeshBuffers(
                 device: device, mesh: StaticScene.groundAndMountains()),
-            let tent = MeshBuffers(device: device, mesh: Tent.mesh())
+            let tent = MeshBuffers(device: device, mesh: Tent.mesh()),
+            let coaster = LineBuffers(device: device, vertices: Coaster.lineVertices())
         else { return nil }
         self.groundAndMountains = groundAndMountains
         self.tent = tent
+        self.coaster = coaster
 
         super.init()
     }
@@ -114,6 +140,16 @@ final class Renderer: NSObject, MTKViewDelegate {
             indexBuffer: mesh.indexBuffer,
             indexBufferOffset: 0
         )
+    }
+
+    private func draw(
+        _ lines: LineBuffers, modelMatrix: float4x4, viewProjectionMatrix: float4x4,
+        encoder: MTLRenderCommandEncoder
+    ) {
+        var uniforms = Uniforms(modelViewProjectionMatrix: viewProjectionMatrix * modelMatrix)
+        encoder.setVertexBuffer(lines.vertexBuffer, offset: 0, index: 0)
+        encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
+        encoder.drawPrimitives(type: .line, vertexStart: 0, vertexCount: lines.vertexCount)
     }
 
     func draw(in view: MTKView) {
@@ -158,6 +194,10 @@ final class Renderer: NSObject, MTKViewDelegate {
 
         let tent2Model = float4x4.translation(SIMD3<Float>(-22, -1, -11))
         draw(tent, modelMatrix: tent2Model, viewProjectionMatrix: viewProjectionMatrix, encoder: encoder)
+
+        // coaster(rollPts) in drawScene is called bare, with no
+        // glPushMatrix/glTranslatef wrapping it.
+        draw(coaster, modelMatrix: float4x4(1), viewProjectionMatrix: viewProjectionMatrix, encoder: encoder)
 
         encoder.endEncoding()
 
