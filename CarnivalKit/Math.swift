@@ -37,9 +37,8 @@ extension float4x4 {
         )
     }
 
-    /// Equivalent of `glRotatef(radians, 0, 1, 0)` — used once for the tent
-    /// placement in `drawScene`, and here for the placeholder camera orbit
-    /// below.
+    /// Equivalent of `glRotatef(radians, 0, 1, 0)` — used for one of the
+    /// two tent placements in `drawScene`.
     static func rotationY(radians: Float) -> float4x4 {
         let c = cos(radians)
         let s = sin(radians)
@@ -49,6 +48,16 @@ extension float4x4 {
             SIMD4<Float>(0, 1, 0, 0),
             SIMD4<Float>(s, 0, c, 0),
             SIMD4<Float>(0, 0, 0, 1)
+        )
+    }
+
+    /// Equivalent of `glTranslatef`.
+    static func translation(_ t: SIMD3<Float>) -> float4x4 {
+        float4x4(
+            SIMD4<Float>(1, 0, 0, 0),
+            SIMD4<Float>(0, 1, 0, 0),
+            SIMD4<Float>(0, 0, 1, 0),
+            SIMD4<Float>(t.x, t.y, t.z, 1)
         )
     }
 }

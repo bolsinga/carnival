@@ -14,8 +14,9 @@ enum StaticScene {
     /// Builds one mesh's worth of vertices/indices, fanning each convex
     /// polygon from its first vertex — matching the original's
     /// `glBegin(GL_POLYGON)`/`glVertex3fv` calls, which are always convex
-    /// 3-4 vertex shapes here.
-    private static func makeMesh(_ polygons: [[Vertex]]) -> Mesh {
+    /// shapes here (3-5 sided, or a `gluPartialDisk`-style fan with the
+    /// disk's center as the first vertex — see `Tent`).
+    static func makeMesh(_ polygons: [[Vertex]]) -> Mesh {
         var vertices: [Vertex] = []
         var indices: [UInt16] = []
 

@@ -1,17 +1,42 @@
 import MetalKit
 import simd
 
+/// A mesh's vertex/index buffers on the GPU, ready to draw.
+private struct MeshBuffers {
+    let vertexBuffer: MTLBuffer
+    let indexBuffer: MTLBuffer
+    let indexCount: Int
+
+    init?(device: MTLDevice, mesh: StaticScene.Mesh) {
+        guard
+            let vertexBuffer = device.makeBuffer(
+                bytes: mesh.vertices,
+                length: MemoryLayout<Vertex>.stride * mesh.vertices.count,
+                options: []
+            ),
+            let indexBuffer = device.makeBuffer(
+                bytes: mesh.indices,
+                length: MemoryLayout<UInt16>.stride * mesh.indices.count,
+                options: []
+            )
+        else { return nil }
+        self.vertexBuffer = vertexBuffer
+        self.indexBuffer = indexBuffer
+        self.indexCount = mesh.indices.count
+    }
+}
+
 /// `MTKViewDelegate` that clears the frame to the carnival's sky-blue
 /// background (matching the original `glClearColor(0.33, 0.67, 1.0, 1.0)`)
-/// and draws the static ground/mountains mesh from `StaticScene`, ported
-/// from `drawScene`/`mountains` in the original carnival.c.
+/// and draws the static parts of the scene ported so far: the ground/
+/// mountains from `StaticScene`, and two tent instances from `Tent` —
+/// all from `drawScene` in the original carnival.c.
 final class Renderer: NSObject, MTKViewDelegate {
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
     private let depthStencilState: MTLDepthStencilState
-    private let vertexBuffer: MTLBuffer
-    private let indexBuffer: MTLBuffer
-    private let indexCount: Int
+    private let groundAndMountains: MeshBuffers
+    private let tent: MeshBuffers
 
     private var clock = AnimationClock()
 
@@ -59,22 +84,13 @@ final class Renderer: NSObject, MTKViewDelegate {
         else { return nil }
         self.depthStencilState = depthStencilState
 
-        let mesh = StaticScene.groundAndMountains()
         guard
-            let vertexBuffer = device.makeBuffer(
-                bytes: mesh.vertices,
-                length: MemoryLayout<Vertex>.stride * mesh.vertices.count,
-                options: []
-            ),
-            let indexBuffer = device.makeBuffer(
-                bytes: mesh.indices,
-                length: MemoryLayout<UInt16>.stride * mesh.indices.count,
-                options: []
-            )
+            let groundAndMountains = MeshBuffers(
+                device: device, mesh: StaticScene.groundAndMountains()),
+            let tent = MeshBuffers(device: device, mesh: Tent.mesh())
         else { return nil }
-        self.vertexBuffer = vertexBuffer
-        self.indexBuffer = indexBuffer
-        self.indexCount = mesh.indices.count
+        self.groundAndMountains = groundAndMountains
+        self.tent = tent
 
         super.init()
     }
@@ -82,6 +98,22 @@ final class Renderer: NSObject, MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard size.height > 0 else { return }
         aspectRatio = Float(size.width / size.height)
+    }
+
+    private func draw(
+        _ mesh: MeshBuffers, modelMatrix: float4x4, viewProjectionMatrix: float4x4,
+        encoder: MTLRenderCommandEncoder
+    ) {
+        var uniforms = Uniforms(modelViewProjectionMatrix: viewProjectionMatrix * modelMatrix)
+        encoder.setVertexBuffer(mesh.vertexBuffer, offset: 0, index: 0)
+        encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
+        encoder.drawIndexedPrimitives(
+            type: .triangle,
+            indexCount: mesh.indexCount,
+            indexType: .uint16,
+            indexBuffer: mesh.indexBuffer,
+            indexBufferOffset: 0
+        )
     }
 
     func draw(in view: MTKView) {
@@ -105,20 +137,27 @@ final class Renderer: NSObject, MTKViewDelegate {
         let viewMatrix = float4x4.lookAt(eye: eye, center: center, up: SIMD3<Float>(0, 1, 0))
         let projectionMatrix = float4x4.perspective(
             fovyRadians: .pi / 3, aspect: aspectRatio, near: 0.1, far: 500)
-
-        var uniforms = Uniforms(modelViewProjectionMatrix: projectionMatrix * viewMatrix)
+        let viewProjectionMatrix = projectionMatrix * viewMatrix
 
         encoder.setRenderPipelineState(pipelineState)
         encoder.setDepthStencilState(depthStencilState)
-        encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-        encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
-        encoder.drawIndexedPrimitives(
-            type: .triangle,
-            indexCount: indexCount,
-            indexType: .uint16,
-            indexBuffer: indexBuffer,
-            indexBufferOffset: 0
-        )
+
+        draw(
+            groundAndMountains, modelMatrix: float4x4(1), viewProjectionMatrix: viewProjectionMatrix,
+            encoder: encoder)
+
+        // The two tent placements from drawScene:
+        //   glPushMatrix(); glTranslatef(17, -1.0, -8); glRotatef(-90, 0, 1, 0); tent(); glPopMatrix();
+        //   glPushMatrix(); glTranslatef(-22, -1, -11); tent(); glPopMatrix();
+        // OpenGL post-multiplies each new matrix, so the rotation (applied
+        // second) affects the tent's own local vertices first, then the
+        // translation moves the already-rotated tent into place.
+        let tent1Model =
+            float4x4.translation(SIMD3<Float>(17, -1.0, -8)) * float4x4.rotationY(radians: -.pi / 2)
+        draw(tent, modelMatrix: tent1Model, viewProjectionMatrix: viewProjectionMatrix, encoder: encoder)
+
+        let tent2Model = float4x4.translation(SIMD3<Float>(-22, -1, -11))
+        draw(tent, modelMatrix: tent2Model, viewProjectionMatrix: viewProjectionMatrix, encoder: encoder)
 
         encoder.endEncoding()
 
