@@ -28,10 +28,10 @@ struct CarnivalAppApp: App {
             // disagrees), which already has its own Siri Remote input
             // anyway.
             CommandGroup(after: .toolbar) {
-                Button("Toggle Camera") {
+                Button("Toggle Ride") {
                     NotificationCenter.default.post(name: .carnivalToggleCamera, object: nil)
                 }
-                .keyboardShortcut("t", modifiers: [])
+                .keyboardShortcut("t")  // defaults to the Command modifier: ⌘T
             }
         }
         #endif
