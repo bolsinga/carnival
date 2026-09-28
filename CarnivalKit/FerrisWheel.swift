@@ -10,12 +10,12 @@ import simd
 ///
 /// The wheel mixes filled polygons (the carriages) with lines (rims,
 /// spokes, axle, supports), so it returns both a `StaticScene.Mesh` and
-/// a flat line-vertex list, the same two shapes `StaticScene`/`Tent` and
+/// a list of `TubePath`s — the same two shapes `StaticScene`/`Tent` and
 /// `Coaster` produce respectively.
 enum FerrisWheel {
     struct Geometry {
         let triangles: StaticScene.Mesh
-        let lines: [Vertex]
+        let linePaths: [TubePath]
 
         /// Equivalent of the `sight` (called `fwv`/`gFWV` at the call
         /// site) the original's `ferris()` returns: the position of the
@@ -43,21 +43,18 @@ enum FerrisWheel {
         let b4 = SIMD3<Float>(-4.5, -7.0, -3.0)
 
         var polygons: [[Vertex]] = []
-        var lines: [Vertex] = []
+        var linePaths: [TubePath] = []
         func addLine(_ a: SIMD3<Float>, _ b: SIMD3<Float>, color: SIMD4<Float>) {
-            lines.append(Vertex(position: a, color: color))
-            lines.append(Vertex(position: b, color: color))
+            linePaths.append(TubePath(points: [a, b], color: color))
         }
 
         // The wheel's two rims. gluDisk(..., GLU_SILHOUETTE) suppresses
         // the radial spoke lines a plain disk would tessellate, leaving
         // only the outer boundary circle.
-        lines.append(
-            contentsOf: circleOutline(
-                center: SIMD3<Float>(0, 0, -1.5), radius: 6.0, slices: 32, color: yellow))
-        lines.append(
-            contentsOf: circleOutline(
-                center: SIMD3<Float>(0, 0, 1.5), radius: 6.0, slices: 32, color: yellow))
+        linePaths.append(
+            circleOutline(center: SIMD3<Float>(0, 0, -1.5), radius: 6.0, slices: 32, color: yellow))
+        linePaths.append(
+            circleOutline(center: SIMD3<Float>(0, 0, 1.5), radius: 6.0, slices: 32, color: yellow))
 
         var angle = startAngle
         for _ in 0..<8 {
@@ -69,7 +66,7 @@ enum FerrisWheel {
 
             let carriage = carriage(wheel1: rimFront, wheel2: rimBack)
             polygons.append(contentsOf: carriage.quads)
-            lines.append(contentsOf: carriage.lines)
+            linePaths.append(contentsOf: carriage.linePaths)
 
             angle += spoke
         }
@@ -81,7 +78,9 @@ enum FerrisWheel {
         addLine(b3, axel2, color: steel)
         addLine(axel2, b4, color: steel)
 
-        return Geometry(triangles: StaticScene.makeMesh(polygons), lines: lines, sight: sight(angle: startAngle))
+        return Geometry(
+            triangles: StaticScene.makeMesh(polygons), linePaths: linePaths,
+            sight: sight(angle: startAngle))
     }
 
     /// The rider-sight (eye) position, without building the rest of the
@@ -149,7 +148,7 @@ enum FerrisWheel {
     /// here as plain per-vertex arithmetic instead.
     private static func carriage(
         wheel1: SIMD3<Float>, wheel2: SIMD3<Float>
-    ) -> (quads: [[Vertex]], lines: [Vertex]) {
+    ) -> (quads: [[Vertex]], linePaths: [TubePath]) {
         let dkgrey = SIMD4<Float>(76, 66, 102, 255) / 255
         let dkrgrey = SIMD4<Float>(40, 40, 40, 255) / 255
         let blue = SIMD4<Float>(66, 66, 230, 255) / 255
@@ -183,31 +182,26 @@ enum FerrisWheel {
 
         // Short stub lines filling the gap between the carriage (z =
         // ±1.25) and the rim itself (z = ±1.5).
-        var lines: [Vertex] = []
-        lines.append(Vertex(position: side1, color: steel))
-        lines.append(Vertex(position: wheel1, color: steel))
-        lines.append(Vertex(position: side2, color: steel))
-        lines.append(Vertex(position: wheel2, color: steel))
+        let linePaths = [
+            TubePath(points: [side1, wheel1], color: steel),
+            TubePath(points: [side2, wheel2], color: steel),
+        ]
 
-        return (quads, lines)
+        return (quads, linePaths)
     }
 
     /// Equivalent of a `gluDisk` drawn with `GLU_SILHOUETTE` style: just
-    /// the outer boundary circle, no radial spokes and no fill.
+    /// the outer boundary circle, no radial spokes and no fill — a
+    /// closed `TubePath` (see its doc comment), unlike everything else
+    /// here.
     private static func circleOutline(
         center: SIMD3<Float>, radius: Float, slices: Int, color: SIMD4<Float>
-    ) -> [Vertex] {
+    ) -> TubePath {
         var points: [SIMD3<Float>] = []
         for i in 0..<slices {
             let theta = 2 * Float.pi * Float(i) / Float(slices)
             points.append(center + SIMD3<Float>(radius * cos(theta), radius * sin(theta), 0))
         }
-
-        var lines: [Vertex] = []
-        for i in 0..<slices {
-            lines.append(Vertex(position: points[i], color: color))
-            lines.append(Vertex(position: points[(i + 1) % slices], color: color))
-        }
-        return lines
+        return TubePath(points: points, color: color, closed: true)
     }
 }

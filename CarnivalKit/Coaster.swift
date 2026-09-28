@@ -6,13 +6,15 @@ import simd
 /// `coaster()` sets `glColor3ubv(tracks)` once and never changes it,
 /// even inside `drawStrut`.
 ///
-/// This produces a flat list of segment-endpoint pairs; the actual
-/// "thick line" rendering (Metal has no `glLineWidth` equivalent, so it
-/// has to be faked with real geometry) happens downstream in
-/// `Renderer`/`ThickLineVertex` — this file doesn't need to know
-/// anything about that. The original's 1px/2px/3px distinctions
-/// between rails, cross-ties, and struts aren't reproduced either way;
-/// everything here renders at one uniform width.
+/// This produces a list of `TubePath`s (the actual "thick line"
+/// rendering — Metal has no `glLineWidth` equivalent, so it has to be
+/// faked with real geometry — happens downstream in `Renderer`/
+/// `TubeMesh`, which this file doesn't need to know anything about):
+/// the two rails as one long connected path each, plus one short
+/// independent path per cross-tie and strut. The original's
+/// 1px/2px/3px `glLineWidth` distinctions between rails, cross-ties,
+/// and struts aren't reproduced; everything here renders at one
+/// uniform width.
 enum Coaster {
     struct Track {
         let rollerIn: [SIMD3<Float>]
@@ -128,46 +130,46 @@ enum Coaster {
         return nil
     }
 
+    static let trackColor = SIMD4<Float>(51, 51, 51, 255) / 255
+
     /// Equivalent of `coaster(numpts)` (which also calls `drawStrut`
-    /// internally) — builds the flat list of line-segment vertex pairs:
-    /// two segments per track index (inner rail, outer rail), plus, on
-    /// every other index, a cross-tie and the struts. Takes a
+    /// internally) — builds the list of tube paths: the two rails as
+    /// one long connected path each, plus, on every other index, a
+    /// short independent path for a cross-tie and any struts. Takes a
     /// pre-computed `Track` rather than calling `computeTrack()` itself
     /// so callers that also need the raw points (e.g. the ride-follow
     /// camera) can compute it once and reuse it.
-    static func lineVertices(track: Track) -> [Vertex] {
-        let color = SIMD4<Float>(51, 51, 51, 255) / 255
+    static func tubePaths(track: Track) -> [TubePath] {
         let numPts = track.rollerIn.count - 1
 
-        var vertices: [Vertex] = []
-        func addLine(_ a: SIMD3<Float>, _ b: SIMD3<Float>) {
-            vertices.append(Vertex(position: a, color: color))
-            vertices.append(Vertex(position: b, color: color))
-        }
+        var paths: [TubePath] = [
+            TubePath(points: track.rollerIn, color: trackColor),
+            TubePath(points: track.rollerOut, color: trackColor),
+        ]
 
+        // Alternating the beams "so that motion is better simulated"
+        // (the original's comment).
         var alternate = false
         for i in 0..<numPts {
-            addLine(track.rollerIn[i], track.rollerIn[i + 1])
-            addLine(track.rollerOut[i], track.rollerOut[i + 1])
-
-            // Alternating the beams "so that motion is better simulated"
-            // (the original's comment).
             if alternate {
-                addLine(track.rollerIn[i], track.rollerOut[i])
+                paths.append(
+                    TubePath(points: [track.rollerIn[i], track.rollerOut[i]], color: trackColor))
 
                 if let (strutIndex, height) = strut(at: i, rollerIn: track.rollerIn) {
                     var innerSupport = track.rollerIn[strutIndex]
                     innerSupport.y = height
-                    addLine(track.rollerIn[i], innerSupport)
+                    paths.append(
+                        TubePath(points: [track.rollerIn[i], innerSupport], color: trackColor))
 
                     var outerSupport = track.rollerOut[strutIndex]
                     outerSupport.y = height
-                    addLine(track.rollerOut[i], outerSupport)
+                    paths.append(
+                        TubePath(points: [track.rollerOut[i], outerSupport], color: trackColor))
                 }
             }
             alternate.toggle()
         }
 
-        return vertices
+        return paths
     }
 }
