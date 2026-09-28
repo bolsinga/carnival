@@ -21,6 +21,14 @@ struct VertexOut {
 // (set via glColor3ubv before each glVertex3fv call) is the only shading
 // the fixed-function pipeline did, and Metal's rasterizer interpolates
 // `color` across each triangle the same way OpenGL's Gouraud shading did.
+//
+// This is also what draws the coaster track and ferris wheel's
+// rims/spokes/axle/supports — see TubeMesh.swift for why those are
+// plain triangle meshes (round "tubes") rather than actual `.line`
+// primitives (Metal has no `glLineWidth` equivalent) or the two
+// hand-rolled thick-line vertex-shader techniques tried and abandoned
+// before settling on tubes (each had its own real visual bug — see
+// that file's history if curious).
 vertex VertexOut carnival_vertex(uint vertexID [[vertex_id]],
                                   constant Vertex *vertices [[buffer(0)]],
                                   constant Uniforms &uniforms [[buffer(1)]]) {
@@ -32,115 +40,4 @@ vertex VertexOut carnival_vertex(uint vertexID [[vertex_id]],
 
 fragment float4 carnival_fragment(VertexOut in [[stage_in]]) {
     return in.color;
-}
-
-// Mirrors the `ThickLineVertex` struct in Vertex.swift — keep the two
-// in sync.
-struct ThickLineVertex {
-    float3 position;
-    float3 otherEndpoint;
-    float side;
-    float4 color;
-};
-
-// Mirrors the `ThickLineUniforms` struct in Vertex.swift — keep the
-// two in sync.
-struct ThickLineUniforms {
-    float4x4 modelViewProjectionMatrix;
-    float lineWidthInWorldUnits;
-};
-
-// Fakes a "thick line" the way Metal (unlike OpenGL's now-removed
-// glLineWidth) requires: expand each 2-vertex segment into a quad,
-// entirely here in the vertex shader, rather than drawing an actual
-// .line primitive (always ~1px regardless of glLineWidth-style
-// requests). `vertices` holds 4 entries per segment (this vertex's own
-// endpoint repeated twice with side = -1/+1, plus the other endpoint
-// carried along in `otherEndpoint` so this shader can compute the
-// segment's direction) — see how `LineBuffers` builds this in
-// Renderer.swift.
-//
-// An earlier version of this computed the "sideways" direction from
-// each segment's on-screen (2D, post-projection) direction, rotated 90
-// degrees — a standard technique (mirrors e.g. three.js's Line2/
-// LineMaterial vertex shader) that keeps a constant width in screen
-// pixels regardless of distance. It broke down for the coaster camera
-// specifically: it always looks along the track, i.e. along the very
-// segments right in front of it, which is exactly the degenerate case
-// for that technique (a segment's on-screen projected length shrinks
-// toward zero the more directly it points at/away from the camera, so
-// the "direction" computed from it becomes tiny and numerically
-// unstable) — the rails visibly collapsed to hairline-thin and jittered
-// right where the camera was looking, instead of just staying thick.
-//
-// This computes the sideways direction in world space instead, via a
-// cross product with a fixed reference axis (world up) — a direction
-// that has nothing to do with where the camera is looking, so it can't
-// degenerate that way. The trade-off: width is now in world units, not
-// screen pixels, so (like a real 3D guardrail) it looks slightly
-// thinner from farther away rather than staying a fixed screen size —
-// a reasonable exchange for actually staying straight.
-//
-// Each segment is still an independent quad, though — there's no
-// shared "joint" computation between adjacent segments (`LineBuffers`
-// has no idea which segments are even adjacent; it just sees a flat
-// list of unrelated pairs). Two segments meeting at a shared point
-// each compute their own perpendicular independently, and for any real
-// curve those two perpendiculars don't quite agree, so the two
-// quads' edges cross or gap right at the joint — visible, once lines
-// are wide enough, as a sharp pinch-to-a-point at every joint along a
-// curve (most of the coaster track, since it's built from many short
-// segments approximating gentle curves) rather than a smooth
-// continuous ribbon.
-//
-// Extending each vertex slightly *past* its own endpoint, away from
-// the other endpoint, is the standard low-effort mitigation (proper
-// miter/round joints need adjacency info this data doesn't carry):
-// for a gentle curve, it makes each segment's quad overlap into its
-// neighbor's territory at the joint instead of butting exactly at a
-// single point, which hides the seam rather than leaving a visible
-// pinch. It has no real effect on sharp corners (rare in this track)
-// and makes every segment — including ones with no neighbor to hide a
-// seam from, like the cross-ties and struts — very slightly longer
-// than its true endpoints; both are acceptable trade-offs for a
-// continuous-looking curve.
-vertex VertexOut carnival_thick_line_vertex(uint vertexID [[vertex_id]],
-                                             constant ThickLineVertex *vertices [[buffer(0)]],
-                                             constant ThickLineUniforms &uniforms [[buffer(1)]]) {
-    ThickLineVertex v = vertices[vertexID];
-
-    float3 direction = v.otherEndpoint - v.position;
-    float directionLength = length(direction);
-    float3 unitDirection = directionLength > 1e-5 ? direction / directionLength : float3(1, 0, 0);
-
-    float halfWidth = uniforms.lineWidthInWorldUnits * 0.5;
-
-    // Push this endpoint backward, away from the other endpoint, so
-    // adjacent segments overlap at their shared joint — see the
-    // function's doc comment above.
-    float3 extendedPosition = v.position - unitDirection * halfWidth;
-
-    // Perpendicular to the segment, in the horizontal plane (assuming
-    // "up" is +Y, matching every camera's up vector elsewhere in this
-    // project). Degenerates only when the segment itself is vertical
-    // (parallel to world up) -- falls back to a different reference
-    // axis for just that case, rather than the "camera is looking
-    // along the segment" case, which is the common one here.
-    float3 worldUp = float3(0, 1, 0);
-    float3 perpendicular = cross(unitDirection, worldUp);
-    float perpendicularLength = length(perpendicular);
-    if (perpendicularLength < 1e-4) {
-        perpendicular = cross(unitDirection, float3(0, 0, 1));
-        perpendicularLength = length(perpendicular);
-    }
-    float3 unitPerpendicular = perpendicularLength > 1e-5
-        ? perpendicular / perpendicularLength
-        : float3(1, 0, 0);
-
-    float3 offset = unitPerpendicular * halfWidth * v.side;
-
-    VertexOut out;
-    out.position = uniforms.modelViewProjectionMatrix * float4(extendedPosition + offset, 1.0);
-    out.color = v.color;
-    return out;
 }

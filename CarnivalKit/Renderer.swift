@@ -26,69 +26,6 @@ private struct MeshBuffers {
     }
 }
 
-/// A line list's vertex/index buffers on the GPU, drawn as triangles by
-/// `carnival_thick_line_vertex` rather than an actual `.line` primitive
-/// — see `ThickLineVertex`'s doc comment for why. Takes the same flat
-/// list of segment-endpoint pairs `Coaster`/`FerrisWheel` already
-/// produce (so neither needs to know anything about the thick-line
-/// trick) and expands each pair into a 4-vertex, 2-triangle quad here.
-private struct LineBuffers {
-    let vertexBuffer: MTLBuffer
-    let indexBuffer: MTLBuffer
-    let indexCount: Int
-
-    init?(device: MTLDevice, vertices: [Vertex]) {
-        precondition(
-            vertices.count % 2 == 0, "LineBuffers expects a flat list of segment-endpoint pairs.")
-
-        var thickVertices: [ThickLineVertex] = []
-        var indices: [UInt16] = []
-        thickVertices.reserveCapacity(vertices.count * 2)
-        indices.reserveCapacity(vertices.count * 3)
-
-        for segmentStart in stride(from: 0, to: vertices.count, by: 2) {
-            let a = vertices[segmentStart]
-            let b = vertices[segmentStart + 1]
-            let base = UInt16(thickVertices.count)
-
-            // Two vertices per endpoint (side -1/+1), so the vertex
-            // shader can push each one sideways to form a quad.
-            thickVertices.append(
-                ThickLineVertex(
-                    position: a.position, otherEndpoint: b.position, side: -1, color: a.color))
-            thickVertices.append(
-                ThickLineVertex(
-                    position: a.position, otherEndpoint: b.position, side: 1, color: a.color))
-            thickVertices.append(
-                ThickLineVertex(
-                    position: b.position, otherEndpoint: a.position, side: -1, color: b.color))
-            thickVertices.append(
-                ThickLineVertex(
-                    position: b.position, otherEndpoint: a.position, side: 1, color: b.color))
-
-            // Two triangles covering the quad (winding doesn't matter —
-            // the pipeline has no back-face culling).
-            indices.append(contentsOf: [base, base + 1, base + 2, base + 2, base + 1, base + 3])
-        }
-
-        guard
-            let vertexBuffer = device.makeBuffer(
-                bytes: thickVertices,
-                length: MemoryLayout<ThickLineVertex>.stride * thickVertices.count,
-                options: []
-            ),
-            let indexBuffer = device.makeBuffer(
-                bytes: indices,
-                length: MemoryLayout<UInt16>.stride * indices.count,
-                options: []
-            )
-        else { return nil }
-        self.vertexBuffer = vertexBuffer
-        self.indexBuffer = indexBuffer
-        self.indexCount = indices.count
-    }
-}
-
 /// `MTKViewDelegate` that clears the frame to the carnival's sky-blue
 /// background (matching the original `glClearColor(0.33, 0.67, 1.0, 1.0)`)
 /// and draws the scene ported so far: the ground/mountains from
@@ -111,15 +48,10 @@ final class Renderer: NSObject, MTKViewDelegate {
     private let device: MTLDevice
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
-    /// Separate pipeline for `carnival_thick_line_vertex` — a distinct
-    /// vertex function (and vertex input layout, `ThickLineVertex`
-    /// rather than `Vertex`) needs its own `MTLRenderPipelineState`;
-    /// they share `depthStencilState` and the same fragment function.
-    private let linePipelineState: MTLRenderPipelineState
     private let depthStencilState: MTLDepthStencilState
     private let groundAndMountains: MeshBuffers
     private let tent: MeshBuffers
-    private let coaster: LineBuffers
+    private let coaster: MeshBuffers
     private let coasterTrack: Coaster.Track
 
     /// The ferris wheel's angular velocity. Unlike everything ported so
@@ -209,17 +141,16 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     private var aspectRatio: Float = 1
 
-    /// How wide the coaster track and ferris wheel's rims/spokes/axle/
-    /// supports render, in world units — the original's `glLineWidth`
-    /// calls distinguished rails/cross-ties/struts with different
-    /// widths (1px/2px/3px, per Coaster.swift's doc comment), but this
-    /// just picks one width for everything drawn as a thick line, for
-    /// now. World units rather than a fixed pixel count — see
-    /// `carnival_thick_line_vertex`'s doc comment for why: a screen-
-    /// pixel-constant width computed from each segment's on-screen
-    /// direction breaks down for the coaster camera, which always
-    /// looks along the track (the degenerate case for that technique).
-    private static let lineWidthInWorldUnits: Float = 0.1
+    /// How thick the coaster track and ferris wheel's rims/spokes/axle/
+    /// supports render — see `TubeMesh` for why they're round tubes at
+    /// all rather than actual `.line` primitives. The original's
+    /// `glLineWidth` calls distinguished rails/cross-ties/struts with
+    /// different widths (1px/2px/3px, per Coaster.swift's doc comment),
+    /// but this just picks one radius for every tube, for now.
+    private static let tubeRadius: Float = 0.025
+    /// Sides per tube's cross-section — enough for a reasonably round
+    /// look at this thinness without excessive vertex count.
+    private static let tubeSides = 8
 
     /// Pause/look-around feature (macOS: two-finger trackpad drag; iOS:
     /// one-finger drag + pinch; tvOS: arrow presses nudge by a fixed
@@ -256,8 +187,7 @@ final class Renderer: NSObject, MTKViewDelegate {
         // so this relies on MTKView's default of .bgra8Unorm.
         guard let library = try? device.makeDefaultLibrary(bundle: Bundle(for: Renderer.self)),
             let vertexFunction = library.makeFunction(name: "carnival_vertex"),
-            let fragmentFunction = library.makeFunction(name: "carnival_fragment"),
-            let thickLineVertexFunction = library.makeFunction(name: "carnival_thick_line_vertex")
+            let fragmentFunction = library.makeFunction(name: "carnival_fragment")
         else { return nil }
 
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
@@ -270,20 +200,6 @@ final class Renderer: NSObject, MTKViewDelegate {
         else { return nil }
         self.pipelineState = pipelineState
 
-        // Same fragment function and attachment formats as above — just
-        // a different vertex function/input layout for thick lines.
-        let linePipelineDescriptor = MTLRenderPipelineDescriptor()
-        linePipelineDescriptor.vertexFunction = thickLineVertexFunction
-        linePipelineDescriptor.fragmentFunction = fragmentFunction
-        linePipelineDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
-        linePipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
-
-        guard
-            let linePipelineState = try? device.makeRenderPipelineState(
-                descriptor: linePipelineDescriptor)
-        else { return nil }
-        self.linePipelineState = linePipelineState
-
         // Equivalent of the original's glEnable(GL_DEPTH_TEST).
         let depthStencilDescriptor = MTLDepthStencilDescriptor()
         depthStencilDescriptor.depthCompareFunction = .less
@@ -293,12 +209,14 @@ final class Renderer: NSObject, MTKViewDelegate {
         self.depthStencilState = depthStencilState
 
         let coasterTrack = Coaster.computeTrack()
+        let coasterMesh = TubeMesh.make(
+            paths: Coaster.tubePaths(track: coasterTrack), radius: Self.tubeRadius,
+            sides: Self.tubeSides)
         guard
             let groundAndMountains = MeshBuffers(
                 device: device, mesh: StaticScene.groundAndMountains()),
             let tent = MeshBuffers(device: device, mesh: Tent.mesh()),
-            let coaster = LineBuffers(
-                device: device, vertices: Coaster.lineVertices(track: coasterTrack))
+            let coaster = MeshBuffers(device: device, mesh: coasterMesh)
         else { return nil }
         self.groundAndMountains = groundAndMountains
         self.tent = tent
@@ -385,24 +303,6 @@ final class Renderer: NSObject, MTKViewDelegate {
         )
     }
 
-    private func draw(
-        _ lines: LineBuffers, modelMatrix: float4x4, viewProjectionMatrix: float4x4,
-        encoder: MTLRenderCommandEncoder
-    ) {
-        encoder.setRenderPipelineState(linePipelineState)
-        var uniforms = ThickLineUniforms(
-            modelViewProjectionMatrix: viewProjectionMatrix * modelMatrix,
-            lineWidthInWorldUnits: Self.lineWidthInWorldUnits)
-        encoder.setVertexBuffer(lines.vertexBuffer, offset: 0, index: 0)
-        encoder.setVertexBytes(&uniforms, length: MemoryLayout<ThickLineUniforms>.stride, index: 1)
-        encoder.drawIndexedPrimitives(
-            type: .triangle,
-            indexCount: lines.indexCount,
-            indexType: .uint16,
-            indexBuffer: lines.indexBuffer,
-            indexBufferOffset: 0
-        )
-    }
 
     func draw(in view: MTKView) {
         deltaTime = clock.tick()
@@ -511,9 +411,6 @@ final class Renderer: NSObject, MTKViewDelegate {
             fovyRadians: Self.baseFovyRadians / zoomScale, aspect: aspectRatio, near: 0.01, far: 150)
         let viewProjectionMatrix = projectionMatrix * viewMatrix
 
-        // Each draw(...) call below sets its own pipeline state (mesh vs.
-        // thick-line), since they differ; depthStencilState is the same
-        // for both, so it's set just once here.
         encoder.setDepthStencilState(depthStencilState)
 
         draw(
@@ -553,7 +450,9 @@ final class Renderer: NSObject, MTKViewDelegate {
                 wheelTriangles, modelMatrix: wheelModel, viewProjectionMatrix: viewProjectionMatrix,
                 encoder: encoder)
         }
-        if let wheelLines = LineBuffers(device: device, vertices: wheelGeometry.lines) {
+        let wheelLineMesh = TubeMesh.make(
+            paths: wheelGeometry.linePaths, radius: Self.tubeRadius, sides: Self.tubeSides)
+        if let wheelLines = MeshBuffers(device: device, mesh: wheelLineMesh) {
             draw(
                 wheelLines, modelMatrix: wheelModel, viewProjectionMatrix: viewProjectionMatrix,
                 encoder: encoder)

@@ -12,30 +12,3 @@ struct Vertex {
 struct Uniforms {
     var modelViewProjectionMatrix: float4x4
 }
-
-/// Vertex format for "thick" lines (the coaster track and the ferris
-/// wheel's rims/spokes/axle/supports) — see `carnival_thick_line_vertex`
-/// in Shaders.metal for why a plain `.line` primitive can't do this:
-/// Metal has no `glLineWidth` equivalent (confirmed against Apple's own
-/// `MTLPrimitiveType` docs — no width parameter exists anywhere), so
-/// `.line`/`.lineStrip` always rasterize at a fixed ~1px width,
-/// regardless of what the original's `glLineWidth` calls asked for.
-/// Each line segment becomes a quad: 4 of these vertices (2 per
-/// endpoint, `side` flipped between them), expanded sideways by a
-/// world-space offset entirely in the vertex shader (not a
-/// camera-facing/screen-space offset — see `carnival_thick_line_vertex`
-/// for why that first approach didn't hold up). Mirrors the
-/// `ThickLineVertex` struct in Shaders.metal — keep the two in sync.
-struct ThickLineVertex {
-    var position: SIMD3<Float>
-    var otherEndpoint: SIMD3<Float>
-    var side: Float
-    var color: SIMD4<Float>
-}
-
-/// Mirrors the `ThickLineUniforms` struct in Shaders.metal — keep the
-/// two in sync.
-struct ThickLineUniforms {
-    var modelViewProjectionMatrix: float4x4
-    var lineWidthInWorldUnits: Float
-}
