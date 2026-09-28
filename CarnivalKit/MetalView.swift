@@ -89,6 +89,12 @@ extension MetalView {
     final class Coordinator: NSObject {
         private var renderer: Renderer?
 
+        #if os(macOS) || os(iOS)
+        deinit {
+            NotificationCenter.default.removeObserver(self)
+        }
+        #endif
+
         func makeConfiguredView() -> MTKView {
             guard let device = MTLCreateSystemDefaultDevice() else {
                 fatalError("Metal is not supported on this device.")
@@ -97,6 +103,17 @@ extension MetalView {
                 fatalError("Failed to create the Carnival renderer.")
             }
             self.renderer = renderer
+
+            #if os(macOS) || os(iOS)
+            // Lets a host app's own macOS menu command or iPadOS
+            // keyboard shortcut (declared via SwiftUI's `.commands`,
+            // which can't reach this Renderer directly) trigger the
+            // same camera toggle 't'/swipe do. See
+            // Notification.Name.carnivalToggleCamera's doc comment.
+            NotificationCenter.default.addObserver(
+                self, selector: #selector(handleToggleCameraNotification),
+                name: .carnivalToggleCamera, object: nil)
+            #endif
 
             #if os(macOS)
             let view = KeyHandlingMTKView()
@@ -226,6 +243,12 @@ extension MetalView {
             view.depthStencilPixelFormat = .depth32Float
             return view
         }
+
+        #if os(macOS) || os(iOS)
+        @objc private func handleToggleCameraNotification(_ notification: Notification) {
+            renderer?.toggleCameraMode()
+        }
+        #endif
 
         // Shared by iOS's UIPanGestureRecognizer and macOS's
         // NSPanGestureRecognizer look-around handlers below — same
