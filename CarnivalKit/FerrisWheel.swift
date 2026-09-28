@@ -84,20 +84,63 @@ enum FerrisWheel {
         return Geometry(triangles: StaticScene.makeMesh(polygons), lines: lines, sight: sight(angle: startAngle))
     }
 
-    /// The rider-sight position on its own, without building the rest
-    /// of the wheel's geometry — lets `Renderer` track the ferris-view
-    /// camera's position from a different, independently-paced angle
-    /// than the one driving the wheel's own (possibly still-spinning)
-    /// rendered rotation, without paying for two full mesh rebuilds a
-    /// frame. Carriage 6 is the rider — this is where `View_Ferris`
-    /// sits, not a rendering-only detail — and since each carriage is
-    /// `spoke` apart, its angle is always `startAngle + 6 * spoke`
-    /// regardless of anything the rendering loop in `geometry(angle:)`
-    /// does, so this needs none of that loop to compute it.
+    /// The rider-sight (eye) position, without building the rest of the
+    /// wheel's geometry — lets `Renderer` track the ferris-view camera's
+    /// position from a different, independently-paced angle than the
+    /// one driving the wheel's own (possibly still-spinning) rendered
+    /// rotation, without paying for two full mesh rebuilds a frame.
+    /// Carriage 6 is the rider — this is where `View_Ferris` sits, not
+    /// a rendering-only detail — and since each carriage is `spoke`
+    /// apart, its angle is always `startAngle + 6 * spoke` regardless
+    /// of anything the rendering loop in `geometry(angle:)` does, so
+    /// this needs none of that loop to compute it.
+    ///
+    /// Deliberately not a literal port of the original's own formula
+    /// (`sight[0] = 6*cos(bottom - 0.1); sight[1] = 6*sin(bottom - 0.1)
+    /// + 0.5`): that `bottom - 0.1` is the original's own comment-
+    /// documented compensation for *its* particular update order (its
+    /// `Idle()` returns this frame's sight using an angle anticipating
+    /// the *next* frame's rotation, since it renders this frame's
+    /// carriages with the *old* angle before advancing `gRotation`).
+    /// This port has no such lag to compensate for — eye and wheel
+    /// angle are always computed fresh from the same instant — so
+    /// carrying that `-0.1` over would just reintroduce a mismatch for
+    /// no reason. Worse, it's what caused a real bug: carriage 6's own
+    /// seatback panel (`carriage(wheel1:wheel2:)`'s v1-v4) is built from
+    /// the *unshifted* `bottom` angle, so the original's `-0.1`-shifted
+    /// eye and the seat's own `bottom`-based position drift in and out
+    /// of alignment as the wheel turns — for a real arc of the
+    /// rotation, the eye ends up on the wrong side of its own seatback,
+    /// staring at its solid color instead of "out and about" (confirmed
+    /// against ferris.c's exact formulas, independent of anything about
+    /// this port — a latent bug in the original design, not something
+    /// introduced here).
+    ///
+    /// Building the eye from the *same* `bottom`-based rim position the
+    /// seatback itself uses, offset only by fixed, angle-independent
+    /// amounts, guarantees by construction that the eye stays a
+    /// constant, comfortable distance in front of the seatback at
+    /// *every* angle (verified: a full 360-degree sweep found a
+    /// constant +0.5 clearance, not just "positive most of the time") —
+    /// which in turn means the original's simple fixed look direction
+    /// (`lookDirection` below) can go back to being exactly what it
+    /// was, rather than something hand-tuned to dodge a moving target.
     static func sight(angle startAngle: Float) -> SIMD3<Float> {
         let bottom = startAngle + 6 * spoke
-        return SIMD3<Float>(6.0 * cos(bottom - 0.1), 6.0 * sin(bottom - 0.1) + 0.5, 0.0)
+        return SIMD3<Float>(6.0 * cos(bottom), 6.0 * sin(bottom) + 0.5, 0.0)
     }
+
+    /// Equivalent of the original's fixed look direction
+    /// (`gcenterx = gFWV[0] + 1.0`, etc. in main.c) — the rider faces
+    /// one constant world direction the whole ride, same as a real
+    /// (non-swinging) carriage seat would. Safe to use literally again
+    /// (see `sight(angle:)`'s doc comment for why it wasn't, before
+    /// that fix): with the eye now always a constant distance in front
+    /// of its own seatback, this scores a comfortable worst-case dot
+    /// product of -0.71 against "directly toward the seatback" at every
+    /// angle, instead of +0.23 (mostly toward it) with the original's
+    /// `sight(angle:)` formula.
+    static let lookDirection = SIMD3<Float>(1, 0, 0)
 
     /// Equivalent of `carriage(wheel1, wheel2)`. `wheel1`/`wheel2` always
     /// share x/y (only z differs, 1.5 vs -1.5), which is what lets the

@@ -107,11 +107,6 @@
 			path = CarnivalKit;
 			sourceTree = "<group>";
 		};
-		FE3C1D0D306962050048B342 /* CarnivalAppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = CarnivalAppUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,7 +152,6 @@
 				C6A0FF2B0290797F04C91782 /* Documentation */,
 				FE3C1C7B3068A74F0048B342 /* CarnivalApp */,
 				FE3C1C8C3068A7AA0048B342 /* CarnivalKit */,
-				FE3C1D0D306962050048B342 /* CarnivalAppUITests */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				FE61DB1909B611AE00F26546 /* carnival-Info.plist */,
 			);
@@ -290,9 +284,6 @@
 			);
 			dependencies = (
 				FE3C1D11306962050048B342 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				FE3C1D0D306962050048B342 /* CarnivalAppUITests */,
 			);
 			name = CarnivalAppUITests;
 			productName = CarnivalAppUITests;

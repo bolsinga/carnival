@@ -144,9 +144,10 @@ final class Renderer: NSObject, MTKViewDelegate {
     private(set) var deltaTime: TimeInterval = 0
 
     /// Equivalent of `gAnimating`. When `false`, elapsed time stops
-    /// accumulating into `cameraWheelElapsedTime`/`coasterPosition`
-    /// below, freezing the coaster camera's progress and (if riding it)
-    /// the ferris camera's position — but `clock.tick()` itself keeps
+    /// accumulating into `coasterPosition` below, freezing the coaster
+    /// camera's progress, and `togglePause()` freezes the ferris
+    /// camera's angle too (if riding it) — see
+    /// `frozenCameraWheelAngle`. `clock.tick()` itself keeps
     /// running every frame regardless, so there's no big "catch up"
     /// jump when unpausing (the original instead stops calling Display
     /// entirely via `glutIdleFunc(gAnimating ? Idle : NULL)`, freezing
@@ -160,17 +161,35 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     /// Drives the ferris wheel's own rendered rotation. Always
     /// accumulates every frame regardless of `isAnimating` — see
-    /// `isAnimating`'s doc comment above, and `cameraWheelElapsedTime`
+    /// `isAnimating`'s doc comment above, and `frozenCameraWheelAngle`
     /// below.
     private var wheelElapsedTime: Float = 0
 
-    /// Drives the ferris-view camera's position on the wheel
-    /// specifically (via `FerrisWheel.sight(angle:)`), independently of
-    /// the wheel's own rendered rotation (`wheelElapsedTime`, always
-    /// live). Only accumulates while `isAnimating`, so pausing freezes
-    /// a ferris-view camera's position even though the wheel it's
-    /// riding keeps turning underneath it.
-    private var cameraWheelElapsedTime: Float = 0
+    /// While paused, the ferris-view camera's angle on the wheel — the
+    /// angle passed to `FerrisWheel.sight(angle:)` for `fwv` — freezes
+    /// at whatever the wheel's own live angle was the instant pausing
+    /// began, captured here by `togglePause()`. `nil` while animating,
+    /// meaning the camera should just track the wheel's current live
+    /// angle directly instead.
+    ///
+    /// This used to be its own independently-accumulating elapsed-time
+    /// counter (paced like `wheelElapsedTime` but gated on
+    /// `isAnimating`), which seemed reasonable but had a real bug: it
+    /// only stayed in sync with `wheelElapsedTime` by coincidence,
+    /// before the first ever pause. After any pause/resume, no matter
+    /// how brief, it permanently fell behind by exactly the paused
+    /// duration, since it stopped accumulating while paused but
+    /// `wheelElapsedTime` didn't. Even a fraction of a second of
+    /// accumulated pause time was enough angular drift to flip the
+    /// ferris-view eye from sitting in front of carriage 6's seatback
+    /// to sitting behind it — most noticeably right around the top of
+    /// the wheel's rotation, where the geometry's own front/back margin
+    /// is already the thinnest. Storing an explicit "frozen or not"
+    /// angle instead of a second clock makes it structurally
+    /// impossible to drift: while animating, the camera's angle is
+    /// always *exactly* the wheel's current angle, not a separately
+    /// accumulated approximation of it.
+    private var frozenCameraWheelAngle: Float?
 
     /// How far along the coaster track the camera currently is. Unlike
     /// the original's integer `gCurrentCoaster`, this accumulates
@@ -312,10 +331,19 @@ final class Renderer: NSObject, MTKViewDelegate {
     func togglePause() {
         isAnimating.toggle()
         if isAnimating {
-            // Resuming always returns to a clean, unmodified ride camera.
+            // Resuming: go back to live-tracking the wheel's angle, and
+            // return to a clean, unmodified ride camera otherwise.
+            frozenCameraWheelAngle = nil
             lookYaw = 0
             lookPitch = 0
             zoomScale = 1
+        } else {
+            // Pausing: freeze the ferris-view camera's angle at
+            // whatever the wheel's angle is right now, so it doesn't
+            // drift out of sync with the wheel's own rotation, which
+            // keeps going while paused — see frozenCameraWheelAngle's
+            // doc comment.
+            frozenCameraWheelAngle = -Self.wheelAngularVelocity * wheelElapsedTime
         }
     }
 
@@ -385,9 +413,6 @@ final class Renderer: NSObject, MTKViewDelegate {
         // isAnimating's doc comment) — only the camera's own position
         // freezes.
         wheelElapsedTime += Float(deltaTime)
-        if isAnimating {
-            cameraWheelElapsedTime += Float(deltaTime)
-        }
 
         guard let descriptor = view.currentRenderPassDescriptor,
             let commandBuffer = commandQueue.makeCommandBuffer(),
@@ -403,13 +428,14 @@ final class Renderer: NSObject, MTKViewDelegate {
         let wheelTranslation = SIMD3<Float>(-25.0, 6.5, 0.0)
         let wheelAngle = -Self.wheelAngularVelocity * wheelElapsedTime
         let wheelGeometry = FerrisWheel.geometry(angle: wheelAngle)
-        // The ferris-view camera's own position, computed from a
-        // separately-paced (pause-freezable) angle rather than the
-        // wheel's own live rendered angle above — see
-        // cameraWheelElapsedTime's doc comment.
+        // The ferris-view camera's own position — tracks the wheel's
+        // live angle exactly while animating (so the eye always stays
+        // correctly placed relative to carriage 6's seat geometry), or
+        // holds at whatever angle was frozen when pausing began — see
+        // frozenCameraWheelAngle's doc comment.
         // drawScene: fwv[0] += -25.0; fwv[1] += 6.5; (z untouched,
         // matching the translation's own z offset of 0).
-        let cameraWheelAngle = -Self.wheelAngularVelocity * cameraWheelElapsedTime
+        let cameraWheelAngle = frozenCameraWheelAngle ?? wheelAngle
         let fwv =
             FerrisWheel.sight(angle: cameraWheelAngle)
             + SIMD3<Float>(wheelTranslation.x, wheelTranslation.y, 0)
@@ -452,12 +478,14 @@ final class Renderer: NSObject, MTKViewDelegate {
             center = coasterTrack.riderPosition(at: index + 1) + riderHeight
         case .ferris:
             // eye sits at the wheel rider's position, looking a fixed
-            // +1 in x — not toward any particular point, unlike the
-            // coaster's forward-looking center.
+            // direction the whole ride, matching the original exactly
+            // (gcenterx = gFWV[0] + 1.0, etc.) — see FerrisWheel.sight's
+            // doc comment for why that fixed direction only became safe
+            // to use literally again after fixing the eye position
+            // itself, which is where the real bug was.
             //   geyex = gFWV[0]; geyey = gFWV[1]; geyez = gFWV[2];
-            //   gcenterx = gFWV[0] + 1.0; gcentery = gFWV[1]; gcenterz = gFWV[2];
             eye = fwv
-            center = fwv + SIMD3<Float>(1, 0, 0)
+            center = fwv + FerrisWheel.lookDirection
         }
         // Pause/look-around (iOS and tvOS): rotate the gaze direction by
         // lookYaw/lookPitch, keeping eye and the eye->center distance
