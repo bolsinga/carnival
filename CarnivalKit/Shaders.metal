@@ -80,6 +80,30 @@ struct ThickLineUniforms {
 // screen pixels, so (like a real 3D guardrail) it looks slightly
 // thinner from farther away rather than staying a fixed screen size —
 // a reasonable exchange for actually staying straight.
+//
+// Each segment is still an independent quad, though — there's no
+// shared "joint" computation between adjacent segments (`LineBuffers`
+// has no idea which segments are even adjacent; it just sees a flat
+// list of unrelated pairs). Two segments meeting at a shared point
+// each compute their own perpendicular independently, and for any real
+// curve those two perpendiculars don't quite agree, so the two
+// quads' edges cross or gap right at the joint — visible, once lines
+// are wide enough, as a sharp pinch-to-a-point at every joint along a
+// curve (most of the coaster track, since it's built from many short
+// segments approximating gentle curves) rather than a smooth
+// continuous ribbon.
+//
+// Extending each vertex slightly *past* its own endpoint, away from
+// the other endpoint, is the standard low-effort mitigation (proper
+// miter/round joints need adjacency info this data doesn't carry):
+// for a gentle curve, it makes each segment's quad overlap into its
+// neighbor's territory at the joint instead of butting exactly at a
+// single point, which hides the seam rather than leaving a visible
+// pinch. It has no real effect on sharp corners (rare in this track)
+// and makes every segment — including ones with no neighbor to hide a
+// seam from, like the cross-ties and struts — very slightly longer
+// than its true endpoints; both are acceptable trade-offs for a
+// continuous-looking curve.
 vertex VertexOut carnival_thick_line_vertex(uint vertexID [[vertex_id]],
                                              constant ThickLineVertex *vertices [[buffer(0)]],
                                              constant ThickLineUniforms &uniforms [[buffer(1)]]) {
@@ -88,6 +112,13 @@ vertex VertexOut carnival_thick_line_vertex(uint vertexID [[vertex_id]],
     float3 direction = v.otherEndpoint - v.position;
     float directionLength = length(direction);
     float3 unitDirection = directionLength > 1e-5 ? direction / directionLength : float3(1, 0, 0);
+
+    float halfWidth = uniforms.lineWidthInWorldUnits * 0.5;
+
+    // Push this endpoint backward, away from the other endpoint, so
+    // adjacent segments overlap at their shared joint — see the
+    // function's doc comment above.
+    float3 extendedPosition = v.position - unitDirection * halfWidth;
 
     // Perpendicular to the segment, in the horizontal plane (assuming
     // "up" is +Y, matching every camera's up vector elsewhere in this
@@ -106,10 +137,10 @@ vertex VertexOut carnival_thick_line_vertex(uint vertexID [[vertex_id]],
         ? perpendicular / perpendicularLength
         : float3(1, 0, 0);
 
-    float3 offset = unitPerpendicular * (uniforms.lineWidthInWorldUnits * 0.5) * v.side;
+    float3 offset = unitPerpendicular * halfWidth * v.side;
 
     VertexOut out;
-    out.position = uniforms.modelViewProjectionMatrix * float4(v.position + offset, 1.0);
+    out.position = uniforms.modelViewProjectionMatrix * float4(extendedPosition + offset, 1.0);
     out.color = v.color;
     return out;
 }
