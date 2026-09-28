@@ -147,7 +147,7 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// `glLineWidth` calls distinguished rails/cross-ties/struts with
     /// different widths (1px/2px/3px, per Coaster.swift's doc comment),
     /// but this just picks one radius for every tube, for now.
-    private static let tubeRadius: Float = 0.025
+    private static let tubeRadius: Float = 0.0125
     /// Sides per tube's cross-section — enough for a reasonably round
     /// look at this thinness without excessive vertex count.
     private static let tubeSides = 8
