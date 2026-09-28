@@ -21,8 +21,10 @@ struct Uniforms {
 /// `.line`/`.lineStrip` always rasterize at a fixed ~1px width,
 /// regardless of what the original's `glLineWidth` calls asked for.
 /// Each line segment becomes a quad: 4 of these vertices (2 per
-/// endpoint, `side` flipped between them), expanded into a
-/// camera-facing ribbon entirely in the vertex shader. Mirrors the
+/// endpoint, `side` flipped between them), expanded sideways by a
+/// world-space offset entirely in the vertex shader (not a
+/// camera-facing/screen-space offset — see `carnival_thick_line_vertex`
+/// for why that first approach didn't hold up). Mirrors the
 /// `ThickLineVertex` struct in Shaders.metal — keep the two in sync.
 struct ThickLineVertex {
     var position: SIMD3<Float>
@@ -35,6 +37,5 @@ struct ThickLineVertex {
 /// two in sync.
 struct ThickLineUniforms {
     var modelViewProjectionMatrix: float4x4
-    var viewportSize: SIMD2<Float>
-    var lineWidthInPixels: Float
+    var lineWidthInWorldUnits: Float
 }

@@ -209,18 +209,17 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     private var aspectRatio: Float = 1
 
-    /// The drawable's size in pixels — `carnival_thick_line_vertex`
-    /// needs this (unlike everything else here) to convert a desired
-    /// pixel width into clip-space offsets. Updated alongside
-    /// `aspectRatio`.
-    private var viewportSize = SIMD2<Float>(1, 1)
-
     /// How wide the coaster track and ferris wheel's rims/spokes/axle/
-    /// supports render, in pixels — the original's `glLineWidth` calls
-    /// distinguished rails/cross-ties/struts with different widths
-    /// (1px/2px/3px, per Coaster.swift's doc comment), but this just
-    /// picks one width for everything drawn as a thick line, for now.
-    private static let lineWidthInPixels: Float = 6
+    /// supports render, in world units — the original's `glLineWidth`
+    /// calls distinguished rails/cross-ties/struts with different
+    /// widths (1px/2px/3px, per Coaster.swift's doc comment), but this
+    /// just picks one width for everything drawn as a thick line, for
+    /// now. World units rather than a fixed pixel count — see
+    /// `carnival_thick_line_vertex`'s doc comment for why: a screen-
+    /// pixel-constant width computed from each segment's on-screen
+    /// direction breaks down for the coaster camera, which always
+    /// looks along the track (the degenerate case for that technique).
+    private static let lineWidthInWorldUnits: Float = 0.1
 
     /// Pause/look-around feature (macOS: two-finger trackpad drag; iOS:
     /// one-finger drag + pinch; tvOS: arrow presses nudge by a fixed
@@ -312,7 +311,6 @@ final class Renderer: NSObject, MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard size.height > 0 else { return }
         aspectRatio = Float(size.width / size.height)
-        viewportSize = SIMD2<Float>(Float(size.width), Float(size.height))
     }
 
     /// Equivalent of the `'t'` case in the original's `Key`: toggles
@@ -394,8 +392,7 @@ final class Renderer: NSObject, MTKViewDelegate {
         encoder.setRenderPipelineState(linePipelineState)
         var uniforms = ThickLineUniforms(
             modelViewProjectionMatrix: viewProjectionMatrix * modelMatrix,
-            viewportSize: viewportSize,
-            lineWidthInPixels: Self.lineWidthInPixels)
+            lineWidthInWorldUnits: Self.lineWidthInWorldUnits)
         encoder.setVertexBuffer(lines.vertexBuffer, offset: 0, index: 0)
         encoder.setVertexBytes(&uniforms, length: MemoryLayout<ThickLineUniforms>.stride, index: 1)
         encoder.drawIndexedPrimitives(
