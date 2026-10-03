@@ -10,9 +10,11 @@ import SwiftUI
 
 @main
 struct CarnivalAppApp: App {
+    @State private var carnival = Carnival()
+
     var body: some Scene {
         WindowGroup {
-          CarnivalView()
+            CarnivalView(carnival: carnival)
         }
         #if os(macOS) || os(iOS)
         .commands {
@@ -29,7 +31,7 @@ struct CarnivalAppApp: App {
             // anyway.
             CommandGroup(after: .toolbar) {
                 Button("Toggle Ride") {
-                    NotificationCenter.default.post(name: .carnivalToggleCamera, object: nil)
+                    carnival.camera = carnival.camera == .coaster ? .ferris : .coaster
                 }
                 .keyboardShortcut("t")  // defaults to the Command modifier: ⌘T
             }

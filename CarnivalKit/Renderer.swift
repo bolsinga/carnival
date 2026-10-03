@@ -32,20 +32,23 @@ private struct MeshBuffers {
 /// `StaticScene`, two tent instances from `Tent`, the roller coaster
 /// track from `Coaster`, and the ferris wheel from `FerrisWheel` — all
 /// from `drawScene` in the original carnival.c.
-/// Equivalent of `View_Style`/`gStyle` in the original's main.c.
-/// `View_Point` itself (a third `gStyle`, entered/exited with `'s'`,
-/// translating the eye with arrow keys) isn't ported as a `CameraMode`
-/// case — the iOS-only pause/look-around feature (`lookYaw`/`lookPitch`/
-/// `zoomScale` below) covers the same "pause and look around" idea with
-/// touch-first input instead, layered on top of whichever of these two
-/// modes is active rather than being a third mode of its own.
-private enum CameraMode: Equatable {
-    case coaster
-    case ferris
-}
-
+/// Equivalent of `View_Style`/`gStyle` in the original's main.c, now
+/// exposed publicly as `CameraMode` on the `Carnival` model this holds
+/// a reference to, rather than private state of its own — see
+/// `Carnival.swift`. `View_Point` itself (a third `gStyle`, entered/
+/// exited with `'s'`, translating the eye with arrow keys) isn't
+/// ported as a `CameraMode` case — the iOS-only pause/look-around
+/// feature (`lookYaw`/`lookPitch`/`zoomScale` below) covers the same
+/// "pause and look around" idea with touch-first input instead, layered
+/// on top of whichever of these two modes is active rather than being a
+/// third mode of its own.
 final class Renderer: NSObject, MTKViewDelegate {
     private let device: MTLDevice
+    /// The single source of truth for which camera is showing —
+    /// `carnival.camera` replaces what used to be this class's own
+    /// private `cameraMode` state, so a host app can read or set it
+    /// directly instead of only through `toggleCameraMode()`.
+    private let carnival: Carnival
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
     private let depthStencilState: MTLDepthStencilState
@@ -132,13 +135,6 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// frame-count throttle.
     private var coasterPosition: Float = 0
 
-    /// Equivalent of `gStyle`. Defaults to `.coaster`, matching the
-    /// original's default `gStyle = View_Coaster` (and the README:
-    /// "you are first riding the roller coaster"). `toggleCameraMode()`
-    /// switches it, wired to `'t'` on macOS, a swipe on iOS, and
-    /// left/right arrow presses on tvOS.
-    private var cameraMode: CameraMode = .coaster
-
     private var aspectRatio: Float = 1
 
     /// How thick the coaster track and ferris wheel's rims/spokes/axle/
@@ -177,8 +173,9 @@ final class Renderer: NSObject, MTKViewDelegate {
     private static let maxZoomScale: Float = 3.0
     private static let baseFovyRadians: Float = 60 * .pi / 180
 
-    init?(device: MTLDevice) {
+    init?(device: MTLDevice, carnival: Carnival) {
         self.device = device
+        self.carnival = carnival
         guard let commandQueue = device.makeCommandQueue() else { return nil }
         self.commandQueue = commandQueue
 
@@ -239,7 +236,7 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// the input layer instead, disabling the camera-toggle swipe while
     /// paused so it doesn't fight with the pause/look-around gestures.)
     func toggleCameraMode() {
-        cameraMode = (cameraMode == .coaster) ? .ferris : .coaster
+        carnival.camera = (carnival.camera == .coaster) ? .ferris : .coaster
     }
 
     /// Equivalent of the `' '` (space) case in the original's `Key`:
@@ -345,7 +342,7 @@ final class Renderer: NSObject, MTKViewDelegate {
 
         let eye: SIMD3<Float>
         let center: SIMD3<Float>
-        switch cameraMode {
+        switch carnival.camera {
         case .coaster:
             // eye sits at the rider's position (the midpoint between the
             // inner/outer rails), looking toward the next point along
