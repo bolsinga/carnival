@@ -12,7 +12,7 @@ import SwiftUI
 struct CarnivalAppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+          CarnivalView()
         }
         #if os(macOS) || os(iOS)
         .commands {
