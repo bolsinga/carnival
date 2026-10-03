@@ -19,3 +19,11 @@ public struct CarnivalView: View {
             .ignoresSafeArea()
     }
 }
+
+#Preview("Coaster") {
+  CarnivalView(carnival: Carnival(camera: .coaster, state: .paused))
+}
+
+#Preview("Ferris") {
+  CarnivalView(carnival: Carnival(camera: .ferris, state: .paused))
+}
