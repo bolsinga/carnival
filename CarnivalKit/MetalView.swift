@@ -9,12 +9,14 @@ import UIKit
 /// deallocated immediately after `make*View` returns and nothing would draw.
 #if os(macOS)
 struct MetalView: NSViewRepresentable {
+    let carnival: Carnival
+
     func makeCoordinator() -> Coordinator {
         Coordinator()
     }
 
     func makeNSView(context: Context) -> MTKView {
-        context.coordinator.makeConfiguredView()
+        context.coordinator.makeConfiguredView(carnival: carnival)
     }
 
     func updateNSView(_ nsView: MTKView, context: Context) {}
@@ -39,12 +41,14 @@ private final class KeyHandlingMTKView: MTKView {
 }
 #else
 struct MetalView: UIViewRepresentable {
+    let carnival: Carnival
+
     func makeCoordinator() -> Coordinator {
         Coordinator()
     }
 
     func makeUIView(context: Context) -> MTKView {
-        context.coordinator.makeConfiguredView()
+        context.coordinator.makeConfiguredView(carnival: carnival)
     }
 
     func updateUIView(_ uiView: MTKView, context: Context) {}
@@ -88,42 +92,30 @@ extension MetalView {
     // requires it).
     final class Coordinator: NSObject {
         private var renderer: Renderer?
+        // Stored (not just captured locally in makeConfiguredView) so
+        // the @objc selector-based gesture handlers below — which have
+        // no capture list, only `self` — can reach it too.
+        private var carnival: Carnival?
 
-        #if os(macOS) || os(iOS)
-        deinit {
-            NotificationCenter.default.removeObserver(self)
-        }
-        #endif
-
-        func makeConfiguredView() -> MTKView {
+        func makeConfiguredView(carnival: Carnival) -> MTKView {
             guard let device = MTLCreateSystemDefaultDevice() else {
                 fatalError("Metal is not supported on this device.")
             }
-            guard let renderer = Renderer(device: device) else {
+            guard let renderer = Renderer(device: device, carnival: carnival) else {
                 fatalError("Failed to create the Carnival renderer.")
             }
             self.renderer = renderer
-
-            #if os(macOS) || os(iOS)
-            // Lets a host app's own macOS menu command or iPadOS
-            // keyboard shortcut (declared via SwiftUI's `.commands`,
-            // which can't reach this Renderer directly) trigger the
-            // same camera toggle 't'/swipe do. See
-            // Notification.Name.carnivalToggleCamera's doc comment.
-            NotificationCenter.default.addObserver(
-                self, selector: #selector(handleToggleCameraNotification),
-                name: .carnivalToggleCamera, object: nil)
-            #endif
+            self.carnival = carnival
 
             #if os(macOS)
             let view = KeyHandlingMTKView()
-            view.onKeyDown = { [weak renderer] event in
+            view.onKeyDown = { [weak renderer, carnival] event in
                 // Equivalent of the original's Key(unsigned char key, ...).
                 // 's'/'z'/'x' (View_Point look-around) come with that
                 // feature.
                 switch event.charactersIgnoringModifiers {
                 case "t":
-                    renderer?.toggleCameraMode()
+                    carnival.toggleCamera()
                 case " ":
                     renderer?.togglePause()
                 default:
@@ -168,12 +160,12 @@ extension MetalView {
             // click, since that's exactly what it's for.
             let view = RemoteHandlingMTKView()
             let remoteLookStepRadians: Float = 5 * .pi / 180
-            view.onPress = { [weak renderer] type in
+            view.onPress = { [weak renderer, carnival] type in
                 guard let renderer else { return }
                 if renderer.isAnimating {
                     switch type {
                     case .leftArrow, .rightArrow:
-                        renderer.toggleCameraMode()
+                        carnival.toggleCamera()
                     case .playPause:
                         renderer.togglePause()
                     default:
@@ -244,12 +236,6 @@ extension MetalView {
             return view
         }
 
-        #if os(macOS) || os(iOS)
-        @objc private func handleToggleCameraNotification(_ notification: Notification) {
-            renderer?.toggleCameraMode()
-        }
-        #endif
-
         // Shared by iOS's UIPanGestureRecognizer and macOS's
         // NSPanGestureRecognizer look-around handlers below — same
         // continuous feel on both, just sourced from each platform's
@@ -275,7 +261,7 @@ extension MetalView {
 
         #if os(iOS)
         @objc private func handleCameraSwipe(_ recognizer: UISwipeGestureRecognizer) {
-            renderer?.toggleCameraMode()
+            carnival?.toggleCamera()
         }
 
         @objc private func handlePauseTap(_ recognizer: UITapGestureRecognizer) {
