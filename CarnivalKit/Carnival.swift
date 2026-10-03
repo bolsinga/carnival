@@ -23,4 +23,14 @@ public final class Carnival {
     public init(camera: CameraMode = .coaster) {
         self.camera = camera
     }
+
+    /// Switches `camera` to whichever of the two modes it isn't
+    /// currently showing. The same logic `Renderer.toggleCameraMode()`
+    /// uses internally for `'t'`/swipe/remote input, exposed here too so
+    /// a client wanting the same "switch to the other ride" behavior
+    /// (a button, a menu command) doesn't need to spell out the
+    /// coaster/ferris cases itself.
+    public func toggleCamera() {
+        camera = (camera == .coaster) ? .ferris : .coaster
+    }
 }

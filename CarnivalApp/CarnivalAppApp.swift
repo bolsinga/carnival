@@ -31,7 +31,7 @@ struct CarnivalAppApp: App {
             // anyway.
             CommandGroup(after: .toolbar) {
                 Button("Toggle Ride") {
-                    carnival.camera = carnival.camera == .coaster ? .ferris : .coaster
+                    carnival.toggleCamera()
                 }
                 .keyboardShortcut("t")  // defaults to the Command modifier: ⌘T
             }

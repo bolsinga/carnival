@@ -236,7 +236,7 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// the input layer instead, disabling the camera-toggle swipe while
     /// paused so it doesn't fight with the pause/look-around gestures.)
     func toggleCameraMode() {
-        carnival.camera = (carnival.camera == .coaster) ? .ferris : .coaster
+        carnival.toggleCamera()
     }
 
     /// Equivalent of the `' '` (space) case in the original's `Key`:
