@@ -88,8 +88,8 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// When `false`, elapsed time stops accumulating into
     /// `coasterPosition` below, freezing the coaster camera's progress;
     /// `draw(in:)`'s own pause/resume transition handling (see
-    /// `previousCarnivalState`) freezes the ferris camera's angle too
-    /// (if riding it) — see `frozenCameraWheelAngle`. `clock.tick()`
+    /// `Carnival.checkAndClearStateTransition()`) freezes the ferris
+    /// camera's angle too (if riding it) — see `frozenCameraWheelAngle`. `clock.tick()`
     /// itself keeps running every frame regardless, so there's no big
     /// "catch up" jump when unpausing (the original instead stops
     /// calling Display entirely via `glutIdleFunc(gAnimating ? Idle :
@@ -101,11 +101,6 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// while paused, the same way it would if you stepped out of the
     /// ride and just watched.
     private var isAnimating: Bool { carnival.state == .animating }
-
-    /// `draw(in:)` compares `carnival.state` against this every frame to
-    /// detect pause/resume transitions and run their one-time side
-    /// effects — see there.
-    private var previousCarnivalState: State
 
     /// Drives the ferris wheel's own rendered rotation. Always
     /// accumulates every frame regardless of `isAnimating` — see
@@ -191,7 +186,6 @@ final class Renderer: NSObject, MTKViewDelegate {
     init?(device: MTLDevice, carnival: Carnival) {
         self.device = device
         self.carnival = carnival
-        self.previousCarnivalState = carnival.state
         guard let commandQueue = device.makeCommandQueue() else { return nil }
         self.commandQueue = commandQueue
 
@@ -292,7 +286,7 @@ final class Renderer: NSObject, MTKViewDelegate {
         // freezes.
         wheelElapsedTime += Float(deltaTime)
 
-        if carnival.state != previousCarnivalState {
+        if carnival.checkAndClearStateTransition() {
             switch carnival.state {
             case .animating:
                 // Resuming: go back to live-tracking the wheel's angle,
@@ -309,7 +303,6 @@ final class Renderer: NSObject, MTKViewDelegate {
                 // doc comment.
                 frozenCameraWheelAngle = -Self.wheelAngularVelocity * wheelElapsedTime
             }
-            previousCarnivalState = carnival.state
         }
 
         guard let descriptor = view.currentRenderPassDescriptor,

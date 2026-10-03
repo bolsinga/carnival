@@ -30,9 +30,16 @@ public final class Carnival {
     public var camera: CameraMode
     public var state: State
 
+    /// `state`'s value as of the last `consumeStateTransition()` call.
+    /// `@ObservationIgnored` since this is pure bookkeeping for that
+    /// method, never read by a View.
+    @ObservationIgnored
+    private var previousState: State
+
     public init(camera: CameraMode = .coaster, state: State = .animating) {
         self.camera = camera
         self.state = state
+        self.previousState = state
     }
 
     /// Switches `camera` to whichever of the two modes it isn't
@@ -51,5 +58,20 @@ public final class Carnival {
     /// same reason.
     public func togglePause() {
         state = (state == .animating) ? .paused : .animating
+    }
+
+    /// Reports whether `state` has changed since the last call to this
+    /// method, regardless of however it changed (`togglePause()`, a
+    /// direct `state = ...` assignment, etc), then clears that pending
+    /// change so the next call returns `false` until `state` changes
+    /// again. Intended to be polled once per frame by
+    /// `Renderer.draw(in:)`, which needs to detect pause/resume
+    /// transitions at frame boundaries to run their one-time side
+    /// effects -- not part of the public model surface, since no other
+    /// caller has a reason to poll for this.
+    func checkAndClearStateTransition() -> Bool {
+        guard state != previousState else { return false }
+        previousState = state
+        return true
     }
 }
