@@ -109,7 +109,7 @@ extension MetalView {
 
             #if os(macOS)
             let view = KeyHandlingMTKView()
-            view.onKeyDown = { [weak renderer, carnival] event in
+            view.onKeyDown = { [carnival] event in
                 // Equivalent of the original's Key(unsigned char key, ...).
                 // 's'/'z'/'x' (View_Point look-around) come with that
                 // feature.
@@ -117,7 +117,7 @@ extension MetalView {
                 case "t":
                     carnival.toggleCamera()
                 case " ":
-                    renderer?.togglePause()
+                    carnival.togglePause()
                 default:
                     break
                 }
@@ -162,12 +162,12 @@ extension MetalView {
             let remoteLookStepRadians: Float = 5 * .pi / 180
             view.onPress = { [weak renderer, carnival] type in
                 guard let renderer else { return }
-                if renderer.isAnimating {
+                if carnival.state == .animating {
                     switch type {
                     case .leftArrow, .rightArrow:
                         carnival.toggleCamera()
                     case .playPause:
-                        renderer.togglePause()
+                        carnival.togglePause()
                     default:
                         break
                     }
@@ -182,7 +182,7 @@ extension MetalView {
                     case .downArrow:
                         renderer.adjustLookAround(deltaYaw: 0, deltaPitch: -remoteLookStepRadians)
                     case .playPause:
-                        renderer.togglePause()
+                        carnival.togglePause()
                     default:
                         break
                     }
@@ -265,7 +265,7 @@ extension MetalView {
         }
 
         @objc private func handlePauseTap(_ recognizer: UITapGestureRecognizer) {
-            renderer?.togglePause()
+            carnival?.togglePause()
         }
 
         @objc private func handleLookPan(_ recognizer: UIPanGestureRecognizer) {
@@ -291,10 +291,10 @@ extension MetalView {
 extension MetalView.Coordinator: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         // Swipe (camera toggle) only while riding; pan/pinch
-        // (look-around/zoom) only while paused — see togglePause()'s
-        // doc comment for why these two input modes don't mix. The tap
+        // (look-around/zoom) only while paused — see
+        // `Renderer.adjustLookAround`'s doc comment for why. The tap
         // (pause toggle itself) has no delegate set, so it isn't gated.
-        guard let isAnimating = renderer?.isAnimating else { return true }
+        guard let isAnimating = carnival.map({ $0.state == .animating }) else { return true }
         switch gestureRecognizer {
         case is UISwipeGestureRecognizer:
             return isAnimating
