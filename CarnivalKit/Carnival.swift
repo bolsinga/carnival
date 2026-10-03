@@ -25,11 +25,11 @@ public final class Carnival {
     }
 
     /// Switches `camera` to whichever of the two modes it isn't
-    /// currently showing. The same logic `Renderer.toggleCameraMode()`
-    /// uses internally for `'t'`/swipe/remote input, exposed here too so
-    /// a client wanting the same "switch to the other ride" behavior
-    /// (a button, a menu command) doesn't need to spell out the
-    /// coaster/ferris cases itself.
+    /// currently showing. `MetalView`'s `'t'`/swipe/remote input
+    /// handlers call this directly; exposed publicly too so a client
+    /// wanting the same "switch to the other ride" behavior (a button,
+    /// a menu command) doesn't need to spell out the coaster/ferris
+    /// cases itself.
     public func toggleCamera() {
         camera = (camera == .coaster) ? .ferris : .coaster
     }

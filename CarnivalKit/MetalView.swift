@@ -92,6 +92,10 @@ extension MetalView {
     // requires it).
     final class Coordinator: NSObject {
         private var renderer: Renderer?
+        // Stored (not just captured locally in makeConfiguredView) so
+        // the @objc selector-based gesture handlers below — which have
+        // no capture list, only `self` — can reach it too.
+        private var carnival: Carnival?
 
         func makeConfiguredView(carnival: Carnival) -> MTKView {
             guard let device = MTLCreateSystemDefaultDevice() else {
@@ -101,16 +105,17 @@ extension MetalView {
                 fatalError("Failed to create the Carnival renderer.")
             }
             self.renderer = renderer
+            self.carnival = carnival
 
             #if os(macOS)
             let view = KeyHandlingMTKView()
-            view.onKeyDown = { [weak renderer] event in
+            view.onKeyDown = { [weak renderer, carnival] event in
                 // Equivalent of the original's Key(unsigned char key, ...).
                 // 's'/'z'/'x' (View_Point look-around) come with that
                 // feature.
                 switch event.charactersIgnoringModifiers {
                 case "t":
-                    renderer?.toggleCameraMode()
+                    carnival.toggleCamera()
                 case " ":
                     renderer?.togglePause()
                 default:
@@ -155,12 +160,12 @@ extension MetalView {
             // click, since that's exactly what it's for.
             let view = RemoteHandlingMTKView()
             let remoteLookStepRadians: Float = 5 * .pi / 180
-            view.onPress = { [weak renderer] type in
+            view.onPress = { [weak renderer, carnival] type in
                 guard let renderer else { return }
                 if renderer.isAnimating {
                     switch type {
                     case .leftArrow, .rightArrow:
-                        renderer.toggleCameraMode()
+                        carnival.toggleCamera()
                     case .playPause:
                         renderer.togglePause()
                     default:
@@ -256,7 +261,7 @@ extension MetalView {
 
         #if os(iOS)
         @objc private func handleCameraSwipe(_ recognizer: UISwipeGestureRecognizer) {
-            renderer?.toggleCameraMode()
+            carnival?.toggleCamera()
         }
 
         @objc private func handlePauseTap(_ recognizer: UITapGestureRecognizer) {

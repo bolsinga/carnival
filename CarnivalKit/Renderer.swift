@@ -46,8 +46,9 @@ final class Renderer: NSObject, MTKViewDelegate {
     private let device: MTLDevice
     /// The single source of truth for which camera is showing —
     /// `carnival.camera` replaces what used to be this class's own
-    /// private `cameraMode` state, so a host app can read or set it
-    /// directly instead of only through `toggleCameraMode()`.
+    /// private `cameraMode` state, read here but written only by
+    /// `Carnival.toggleCamera()` (called directly by `MetalView`'s
+    /// input handlers now, not proxied through a `Renderer` method).
     private let carnival: Carnival
     private let commandQueue: MTLCommandQueue
     private let pipelineState: MTLRenderPipelineState
@@ -226,17 +227,6 @@ final class Renderer: NSObject, MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard size.height > 0 else { return }
         aspectRatio = Float(size.width / size.height)
-    }
-
-    /// Equivalent of the `'t'` case in the original's `Key`: toggles
-    /// between the coaster and ferris-wheel cameras. (The original also
-    /// guards this with `if (gStyle != View_Point)`; `CameraMode` has no
-    /// equivalent guard here since it only has these two cases, but
-    /// `MetalView`'s iOS gesture delegate applies the analogous guard at
-    /// the input layer instead, disabling the camera-toggle swipe while
-    /// paused so it doesn't fight with the pause/look-around gestures.)
-    func toggleCameraMode() {
-        carnival.toggleCamera()
     }
 
     /// Equivalent of the `' '` (space) case in the original's `Key`:
