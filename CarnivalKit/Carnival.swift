@@ -8,20 +8,31 @@ public enum CameraMode: Equatable, Sendable {
     case ferris
 }
 
+/// Whether `CarnivalView`'s ride is animating or paused, independent of
+/// `CameraMode`: every camera/state combination is valid, and pausing
+/// means the same thing regardless of which camera is active. Equivalent
+/// of the original's `gAnimating`.
+public enum State: Equatable, Sendable {
+    case animating
+    case paused
+}
+
 /// The model backing a `CarnivalView`. Own one, pass it to
 /// `CarnivalView(carnival:)`, and it's the single source of truth for
-/// the ride: set `camera` to switch views from outside the view
+/// the ride: set `camera`/`state` to control it from outside the view
 /// hierarchy entirely — a SwiftUI menu command or button, for instance
 /// — the same way `CarnivalView`'s own built-in keyboard/touch/remote
-/// input does internally. Reading `camera` back also reflects whichever
-/// of those the person last used, since they all go through this same
-/// property rather than some separate, view-private state.
+/// input does internally. Reading them back also reflects whichever of
+/// those the person last used, since they all go through these same
+/// properties rather than some separate, view-private state.
 @Observable
 public final class Carnival {
     public var camera: CameraMode
+    public var state: State
 
-    public init(camera: CameraMode = .coaster) {
+    public init(camera: CameraMode = .coaster, state: State = .animating) {
         self.camera = camera
+        self.state = state
     }
 
     /// Switches `camera` to whichever of the two modes it isn't
@@ -32,5 +43,13 @@ public final class Carnival {
     /// cases itself.
     public func toggleCamera() {
         camera = (camera == .coaster) ? .ferris : .coaster
+    }
+
+    /// Switches `state` between animating and paused. Same reasoning as
+    /// `toggleCamera()`: `MetalView`'s `' '`/tap/Play-Pause input
+    /// handlers call this directly, and it's exposed publicly for the
+    /// same reason.
+    public func togglePause() {
+        state = (state == .animating) ? .paused : .animating
     }
 }

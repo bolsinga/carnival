@@ -79,21 +79,33 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// Seconds elapsed since the previous frame.
     private(set) var deltaTime: TimeInterval = 0
 
-    /// Equivalent of `gAnimating`. When `false`, elapsed time stops
-    /// accumulating into `coasterPosition` below, freezing the coaster
-    /// camera's progress, and `togglePause()` freezes the ferris
-    /// camera's angle too (if riding it) — see
-    /// `frozenCameraWheelAngle`. `clock.tick()` itself keeps
-    /// running every frame regardless, so there's no big "catch up"
-    /// jump when unpausing (the original instead stops calling Display
-    /// entirely via `glutIdleFunc(gAnimating ? Idle : NULL)`, freezing
-    /// the whole screen; this still renders continuously, just with a
-    /// frozen camera, since MTKView doesn't have GLUT's "idle" concept
-    /// to hook). Notably, `wheelElapsedTime` below is deliberately
-    /// exempt from this gate: pausing freezes the camera, not the world
-    /// — the wheel itself keeps visibly turning while paused, the same
-    /// way it would if you stepped out of the ride and just watched.
-    private(set) var isAnimating = true
+    /// Convenience accessor over `carnival.state`, written only by
+    /// `Carnival.togglePause()` (called directly by `MetalView`'s input
+    /// handlers, not proxied through a `Renderer` method) — this just
+    /// saves spelling out `carnival.state == .animating` at every call
+    /// site below.
+    ///
+    /// When `false`, elapsed time stops accumulating into
+    /// `coasterPosition` below, freezing the coaster camera's progress;
+    /// `draw(in:)`'s own pause/resume transition handling (see
+    /// `previousCarnivalState`) freezes the ferris camera's angle too
+    /// (if riding it) — see `frozenCameraWheelAngle`. `clock.tick()`
+    /// itself keeps running every frame regardless, so there's no big
+    /// "catch up" jump when unpausing (the original instead stops
+    /// calling Display entirely via `glutIdleFunc(gAnimating ? Idle :
+    /// NULL)`, freezing the whole screen; this still renders
+    /// continuously, just with a frozen camera, since MTKView doesn't
+    /// have GLUT's "idle" concept to hook). Notably, `wheelElapsedTime`
+    /// below is deliberately exempt from this gate: pausing freezes the
+    /// camera, not the world — the wheel itself keeps visibly turning
+    /// while paused, the same way it would if you stepped out of the
+    /// ride and just watched.
+    private var isAnimating: Bool { carnival.state == .animating }
+
+    /// `draw(in:)` compares `carnival.state` against this every frame to
+    /// detect pause/resume transitions and run their one-time side
+    /// effects — see there.
+    private var previousCarnivalState: State
 
     /// Drives the ferris wheel's own rendered rotation. Always
     /// accumulates every frame regardless of `isAnimating` — see
@@ -104,7 +116,8 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// While paused, the ferris-view camera's angle on the wheel — the
     /// angle passed to `FerrisWheel.sight(angle:)` for `fwv` — freezes
     /// at whatever the wheel's own live angle was the instant pausing
-    /// began, captured here by `togglePause()`. `nil` while animating,
+    /// began, captured in `draw(in:)`'s pause/resume transition
+    /// handling. `nil` while animating,
     /// meaning the camera should just track the wheel's current live
     /// angle directly instead.
     ///
@@ -159,9 +172,10 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// the *eye* with arrow keys, and freezes `center`/`up` at whatever
     /// the previous camera had); this is a fresh take on the same
     /// underlying idea ("pause and look around"), not a literal port.
-    /// Both only ever have an effect while paused: `togglePause()`
-    /// resets them to their identity values the moment animation
-    /// resumes, so unpausing always returns cleanly to the normal ride
+    /// Both only ever have an effect while paused: `draw(in:)`'s
+    /// pause/resume transition handling resets them to their identity
+    /// values the moment animation resumes, so unpausing always returns
+    /// cleanly to the normal ride
     /// camera.
     private var lookYaw: Float = 0
     private var lookPitch: Float = 0
@@ -177,6 +191,7 @@ final class Renderer: NSObject, MTKViewDelegate {
     init?(device: MTLDevice, carnival: Carnival) {
         self.device = device
         self.carnival = carnival
+        self.previousCarnivalState = carnival.state
         guard let commandQueue = device.makeCommandQueue() else { return nil }
         self.commandQueue = commandQueue
 
@@ -229,27 +244,6 @@ final class Renderer: NSObject, MTKViewDelegate {
         aspectRatio = Float(size.width / size.height)
     }
 
-    /// Equivalent of the `' '` (space) case in the original's `Key`:
-    /// pauses/resumes the animation.
-    func togglePause() {
-        isAnimating.toggle()
-        if isAnimating {
-            // Resuming: go back to live-tracking the wheel's angle, and
-            // return to a clean, unmodified ride camera otherwise.
-            frozenCameraWheelAngle = nil
-            lookYaw = 0
-            lookPitch = 0
-            zoomScale = 1
-        } else {
-            // Pausing: freeze the ferris-view camera's angle at
-            // whatever the wheel's angle is right now, so it doesn't
-            // drift out of sync with the wheel's own rotation, which
-            // keeps going while paused — see frozenCameraWheelAngle's
-            // doc comment.
-            frozenCameraWheelAngle = -Self.wheelAngularVelocity * wheelElapsedTime
-        }
-    }
-
     /// Pause/look-around input (see `lookYaw`/`lookPitch` above). A
     /// no-op while animating — callers (macOS's pan gesture, iOS's
     /// gesture delegate, tvOS's `isAnimating` branch in `MetalView`)
@@ -297,6 +291,26 @@ final class Renderer: NSObject, MTKViewDelegate {
         // isAnimating's doc comment) — only the camera's own position
         // freezes.
         wheelElapsedTime += Float(deltaTime)
+
+        if carnival.state != previousCarnivalState {
+            switch carnival.state {
+            case .animating:
+                // Resuming: go back to live-tracking the wheel's angle,
+                // and return to a clean, unmodified ride camera otherwise.
+                frozenCameraWheelAngle = nil
+                lookYaw = 0
+                lookPitch = 0
+                zoomScale = 1
+            case .paused:
+                // Pausing: freeze the ferris-view camera's angle at
+                // whatever the wheel's angle is right now, so it doesn't
+                // drift out of sync with the wheel's own rotation, which
+                // keeps going while paused — see frozenCameraWheelAngle's
+                // doc comment.
+                frozenCameraWheelAngle = -Self.wheelAngularVelocity * wheelElapsedTime
+            }
+            previousCarnivalState = carnival.state
+        }
 
         guard let descriptor = view.currentRenderPassDescriptor,
             let commandBuffer = commandQueue.makeCommandBuffer(),
@@ -373,7 +387,7 @@ final class Renderer: NSObject, MTKViewDelegate {
         }
         // Pause/look-around (iOS and tvOS): rotate the gaze direction by
         // lookYaw/lookPitch, keeping eye and the eye->center distance
-        // fixed. Both are 0 whenever not paused (see togglePause()), so
+        // fixed. Both are 0 whenever not paused (see above), so
         // this is a no-op on macOS (no input ever changes them there)
         // and while riding on any platform.
         let baseDistance = distance(eye, center)
