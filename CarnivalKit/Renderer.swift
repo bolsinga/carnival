@@ -124,11 +124,6 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// look at this thinness without excessive vertex count.
     private static let tubeSides = 8
 
-    /// Keeps look-around `pitch` well short of vertical, so the
-    /// right vector (`cross(gazeDirection, up)`) never degenerates.
-    private static let maxLookPitch: Float = 80 * .pi / 180
-    private static let minZoomScale: Float = 0.5
-    private static let maxZoomScale: Float = 3.0
     private static let baseFovyRadians: Float = 60 * .pi / 180
 
     init?(device: MTLDevice, carnival: Carnival) {
@@ -184,33 +179,6 @@ final class Renderer: NSObject, MTKViewDelegate {
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         guard size.height > 0 else { return }
         aspectRatio = Float(size.width / size.height)
-    }
-
-    /// Pause/look-around input (see `Carnival.lookAround`). A no-op
-    /// while `carnival.lookAround` is `nil` (i.e. while animating) —
-    /// callers (macOS's pan gesture, iOS's gesture delegate, tvOS's
-    /// `isAnimating` branch in `MetalView`) are expected to only
-    /// forward this while paused (macOS has no gating of its own to
-    /// enforce that, since it's already covered here), but this guards
-    /// against it regardless.
-    func adjustLookAround(deltaYaw: Float, deltaPitch: Float) {
-        guard var lookAround = carnival.lookAround else { return }
-        lookAround.yaw += deltaYaw
-        lookAround.pitch = min(
-            max(lookAround.pitch + deltaPitch, -Self.maxLookPitch), Self.maxLookPitch)
-        carnival.lookAround = lookAround
-    }
-
-    /// Pause/look-around zoom input — iOS only (via pinch); neither
-    /// macOS's trackpad pan nor tvOS's remote has a zoom gesture wired
-    /// up, so they have no zoom control.
-    /// `factor` is a multiplier on the current zoom (as
-    /// `UIPinchGestureRecognizer.scale` naturally is): >1 zooms in
-    /// (narrows the field of view), <1 zooms out.
-    func adjustZoom(byFactor factor: Float) {
-        guard var lookAround = carnival.lookAround else { return }
-        lookAround.zoom = min(max(lookAround.zoom * factor, Self.minZoomScale), Self.maxZoomScale)
-        carnival.lookAround = lookAround
     }
 
     private func draw(

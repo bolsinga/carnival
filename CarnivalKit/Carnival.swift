@@ -33,6 +33,13 @@ public struct LookAround: Equatable, Sendable {
         self.pitch = pitch
         self.zoom = zoom
     }
+
+    /// Keeps `pitch` well short of vertical, so the look-around right
+    /// vector (`cross(gazeDirection, up)`) never degenerates.
+    static let maxPitch: Float = 80 * .pi / 180
+
+    static let minZoom: Float = 0.5
+    static let maxZoom: Float = 3.0
 }
 
 /// The model backing a `CarnivalView`. Own one, pass it to
@@ -90,6 +97,34 @@ public final class Carnival {
     /// same reason.
     public func togglePause() {
         state = (state == .animating) ? .paused : .animating
+    }
+
+    /// Pause/look-around input (see `lookAround`): rotates the gaze
+    /// direction by `deltaYaw`/`deltaPitch`, clamping `pitch` well short
+    /// of vertical. A no-op while `lookAround` is `nil` (i.e. while
+    /// animating) — callers (macOS's pan gesture, iOS's gesture
+    /// delegate, tvOS's non-animating branch in `MetalView`) are
+    /// expected to only call this while paused, but this guards against
+    /// it regardless.
+    public func adjustLookAround(deltaYaw: Float, deltaPitch: Float) {
+        guard var lookAround = lookAround else { return }
+        lookAround.yaw += deltaYaw
+        lookAround.pitch = min(
+            max(lookAround.pitch + deltaPitch, -LookAround.maxPitch), LookAround.maxPitch)
+        self.lookAround = lookAround
+    }
+
+    /// Pause/look-around zoom input (see `lookAround`) — iOS only (via
+    /// pinch); neither macOS's trackpad pan nor tvOS's remote has a
+    /// zoom gesture wired up, so they have no zoom control. `factor` is
+    /// a multiplier on the current zoom (as
+    /// `UIPinchGestureRecognizer.scale` naturally is): >1 zooms in
+    /// (narrows the field of view), <1 zooms out. A no-op while
+    /// `lookAround` is `nil`, same as `adjustLookAround`.
+    public func adjustZoom(byFactor factor: Float) {
+        guard var lookAround = lookAround else { return }
+        lookAround.zoom = min(max(lookAround.zoom * factor, LookAround.minZoom), LookAround.maxZoom)
+        self.lookAround = lookAround
     }
 
     /// Whether the ferris wheel itself should keep turning: true unless

@@ -124,7 +124,7 @@ extension MetalView {
             }
 
             // Pause/look-around: the macOS equivalent of iOS/tvOS's
-            // feature (see Renderer.adjustLookAround). A two-finger
+            // feature (see Carnival.adjustLookAround). A two-finger
             // trackpad drag rotates the gaze direction — the same
             // continuous feel as iOS's pan gesture, deliberately not a
             // literal three/four-finger "swipe" (NSEvent's
@@ -153,15 +153,14 @@ extension MetalView {
             // left/right toggle the camera (matching iOS's "either
             // direction toggles" design, since there are only two
             // modes); while paused, left/right/up/down nudge the
-            // look-around yaw/pitch instead — `adjustLookAround` is a
-            // no-op while riding, so this couldn't double as a camera
-            // toggle even if it fired then. The dedicated Play/Pause
+            // look-around yaw/pitch instead — `Carnival.adjustLookAround`
+            // is a no-op while riding, so this couldn't double as a
+            // camera toggle even if it fired then. The dedicated Play/Pause
             // button always pauses/resumes, rather than a tap/select
             // click, since that's exactly what it's for.
             let view = RemoteHandlingMTKView()
             let remoteLookStepRadians: Float = 5 * .pi / 180
-            view.onPress = { [weak renderer, carnival] type in
-                guard let renderer else { return }
+            view.onPress = { [carnival] type in
                 if carnival.state == .animating {
                     switch type {
                     case .leftArrow, .rightArrow:
@@ -174,13 +173,13 @@ extension MetalView {
                 } else {
                     switch type {
                     case .leftArrow:
-                        renderer.adjustLookAround(deltaYaw: -remoteLookStepRadians, deltaPitch: 0)
+                        carnival.adjustLookAround(deltaYaw: -remoteLookStepRadians, deltaPitch: 0)
                     case .rightArrow:
-                        renderer.adjustLookAround(deltaYaw: remoteLookStepRadians, deltaPitch: 0)
+                        carnival.adjustLookAround(deltaYaw: remoteLookStepRadians, deltaPitch: 0)
                     case .upArrow:
-                        renderer.adjustLookAround(deltaYaw: 0, deltaPitch: remoteLookStepRadians)
+                        carnival.adjustLookAround(deltaYaw: 0, deltaPitch: remoteLookStepRadians)
                     case .downArrow:
-                        renderer.adjustLookAround(deltaYaw: 0, deltaPitch: -remoteLookStepRadians)
+                        carnival.adjustLookAround(deltaYaw: 0, deltaPitch: -remoteLookStepRadians)
                     case .playPause:
                         carnival.togglePause()
                     default:
@@ -218,7 +217,7 @@ extension MetalView {
             // `self` as delegate, below), since that's when the ride
             // camera holds still. A one-finger drag rotates the gaze
             // direction; a pinch narrows/widens the field of view. See
-            // `Renderer.adjustLookAround`/`adjustZoom`.
+            // `Carnival.adjustLookAround`/`adjustZoom`.
             let pan = UIPanGestureRecognizer(target: self, action: #selector(handleLookPan))
             pan.delegate = self
             view.addGestureRecognizer(pan)
@@ -244,7 +243,7 @@ extension MetalView {
             // Arbitrary but reasonable feel: dragging across the whole
             // screen width/height is roughly a quarter turn.
             let radiansPerPoint: Float = 0.005
-            renderer?.adjustLookAround(
+            carnival?.adjustLookAround(
                 deltaYaw: -Float(translation.x) * radiansPerPoint,
                 deltaPitch: -Float(translation.y) * radiansPerPoint)
         }
@@ -277,7 +276,7 @@ extension MetalView {
         }
 
         @objc private func handleLookPinch(_ recognizer: UIPinchGestureRecognizer) {
-            renderer?.adjustZoom(byFactor: Float(recognizer.scale))
+            carnival?.adjustZoom(byFactor: Float(recognizer.scale))
             // Reset each call for the same reason as handleLookPan's
             // setTranslation(.zero...) — `scale` is otherwise cumulative
             // since the gesture began, not just this increment.
@@ -292,7 +291,7 @@ extension MetalView.Coordinator: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         // Swipe (camera toggle) only while riding; pan/pinch
         // (look-around/zoom) only while paused — see
-        // `Renderer.adjustLookAround`'s doc comment for why. The tap
+        // `Carnival.adjustLookAround`'s doc comment for why. The tap
         // (pause toggle itself) has no delegate set, so it isn't gated.
         guard let isAnimating = carnival.map({ $0.state == .animating }) else { return true }
         switch gestureRecognizer {
