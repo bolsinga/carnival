@@ -30,9 +30,9 @@ public final class Carnival {
     public var camera: CameraMode
     public var state: State
 
-    /// `state`'s value as of the last `consumeStateTransition()` call.
-    /// `@ObservationIgnored` since this is pure bookkeeping for that
-    /// method, never read by a View.
+    /// `state`'s value as of the last `checkAndClearStateTransition()`
+    /// call. `@ObservationIgnored` since this is pure bookkeeping for
+    /// that method, never read by a View.
     @ObservationIgnored
     private var previousState: State
 
@@ -58,6 +58,22 @@ public final class Carnival {
     /// same reason.
     public func togglePause() {
         state = (state == .animating) ? .paused : .animating
+    }
+
+    /// Whether the ferris wheel itself should keep turning: true unless
+    /// paused while riding it (`camera == .ferris`), in which case the
+    /// whole wheel (not just the ferris-view camera) holds still,
+    /// matching what someone actually sitting in a stopped carriage
+    /// would see — looking around from a fixed vantage up high or down
+    /// low, rather than the wheel visibly rotating out from under a
+    /// frozen eye. Paused on the coaster, by contrast, the wheel is just
+    /// background scenery still visibly turning while the coaster
+    /// camera itself is frozen — the same way it would keep turning if
+    /// you stepped off the ride and just watched. A property of
+    /// `camera`/`state` together, read by `Renderer.draw(in:)` each
+    /// frame to decide whether to advance the wheel's own rotation.
+    var wheelShouldTurn: Bool {
+        state == .animating || camera != .ferris
     }
 
     /// Reports whether `state` has changed since the last call to this
