@@ -17,6 +17,24 @@ public enum State: Equatable, Sendable {
     case paused
 }
 
+/// Where `CarnivalView`'s paused ride camera is currently looking.
+/// `Renderer`'s pause/look-around feature (macOS: two-finger trackpad
+/// drag; iOS: one-finger drag + pinch; tvOS: remote arrow presses)
+/// rotates `yaw`/`pitch` and scales `zoom`, while the eye itself stays
+/// exactly where the ride camera was paused. The defaults are the
+/// identity (no rotation, no zoom) — see `Carnival.lookAround`.
+public struct LookAround: Equatable, Sendable {
+    public var yaw: Float
+    public var pitch: Float
+    public var zoom: Float
+
+    public init(yaw: Float = 0, pitch: Float = 0, zoom: Float = 1) {
+        self.yaw = yaw
+        self.pitch = pitch
+        self.zoom = zoom
+    }
+}
+
 /// The model backing a `CarnivalView`. Own one, pass it to
 /// `CarnivalView(carnival:)`, and it's the single source of truth for
 /// the ride: set `camera`/`state` to control it from outside the view
@@ -28,18 +46,32 @@ public enum State: Equatable, Sendable {
 @Observable
 public final class Carnival {
     public var camera: CameraMode
-    public var state: State
 
-    /// `state`'s value as of the last `checkAndClearStateTransition()`
-    /// call. `@ObservationIgnored` since this is pure bookkeeping for
-    /// that method, never read by a View.
-    @ObservationIgnored
-    private var previousState: State
+    /// Setting this keeps `lookAround` in sync (see its `didSet`), so
+    /// that invariant holds regardless of whether `state` changes via
+    /// `togglePause()` or a direct assignment here.
+    public var state: State {
+        didSet {
+            guard state != oldValue else { return }
+            lookAround = (state == .paused) ? LookAround() : nil
+        }
+    }
+
+    /// Where the paused ride camera is looking — `nil` while animating,
+    /// since the ride camera otherwise just tracks the ride itself.
+    /// Freshly reset to the identity `LookAround()` the instant pausing
+    /// begins, and `nil`-ed out again the instant it resumes (see
+    /// `state`'s `didSet`), so a resume always returns cleanly to the
+    /// normal ride camera regardless of how far look-around had
+    /// drifted. `Renderer` reads and writes this directly while paused.
+    public var lookAround: LookAround?
 
     public init(camera: CameraMode = .coaster, state: State = .animating) {
         self.camera = camera
         self.state = state
-        self.previousState = state
+        // state's didSet doesn't run during initialization, so this
+        // mirrors it manually to keep the same invariant from the start.
+        self.lookAround = (state == .paused) ? LookAround() : nil
     }
 
     /// Switches `camera` to whichever of the two modes it isn't
@@ -74,20 +106,5 @@ public final class Carnival {
     /// frame to decide whether to advance the wheel's own rotation.
     var wheelShouldTurn: Bool {
         state == .animating || camera != .ferris
-    }
-
-    /// Reports whether `state` has changed since the last call to this
-    /// method, regardless of however it changed (`togglePause()`, a
-    /// direct `state = ...` assignment, etc), then clears that pending
-    /// change so the next call returns `false` until `state` changes
-    /// again. Intended to be polled once per frame by
-    /// `Renderer.draw(in:)`, which needs to detect pause/resume
-    /// transitions at frame boundaries to run their one-time side
-    /// effects -- not part of the public model surface, since no other
-    /// caller has a reason to poll for this.
-    func checkAndClearStateTransition() -> Bool {
-        guard state != previousState else { return false }
-        previousState = state
-        return true
     }
 }
