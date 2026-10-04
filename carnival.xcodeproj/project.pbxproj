@@ -52,10 +52,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		FE3C1C7A3068A74F0048B342 /* CarnivalApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarnivalApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE3C1C7A3068A74F0048B342 /* Carnival.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Carnival.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE3C1D0C306962050048B342 /* CarnivalAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CarnivalAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE3C1FE23069754C0048B342 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
-		FE61DB1709B611AE00F26546 /* carnival.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = carnival.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE61DB1709B611AE00F26546 /* CarnivalGLUT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarnivalGLUT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE61DB1909B611AE00F26546 /* carnival-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "carnival-Info.plist"; sourceTree = "<group>"; };
 		FE61DB3409B612C500F26546 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		FE857E2F0465815D00000102 /* carnival.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = carnival.c; sourceTree = "<group>"; };
@@ -141,8 +141,8 @@
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FE61DB1709B611AE00F26546 /* carnival.app */,
-				FE3C1C7A3068A74F0048B342 /* CarnivalApp.app */,
+				FE61DB1709B611AE00F26546 /* CarnivalGLUT.app */,
+				FE3C1C7A3068A74F0048B342 /* Carnival.app */,
 				FE3C1D0C306962050048B342 /* CarnivalAppUITests.xctest */,
 			);
 			name = Products;
@@ -159,9 +159,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		FE3C1C793068A74F0048B342 /* CarnivalApp */ = {
+		FE3C1C793068A74F0048B342 /* Carnival */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FE3C1C823068A74F0048B342 /* Build configuration list for PBXNativeTarget "CarnivalApp" */;
+			buildConfigurationList = FE3C1C823068A74F0048B342 /* Build configuration list for PBXNativeTarget "Carnival" */;
 			buildPhases = (
 				FE3C1C763068A74F0048B342 /* Sources */,
 				FE3C1C773068A74F0048B342 /* Frameworks */,
@@ -173,12 +173,12 @@
 			fileSystemSynchronizedGroups = (
 				FE3C1C7B3068A74F0048B342 /* CarnivalApp */,
 			);
-			name = CarnivalApp;
+			name = Carnival;
 			packageProductDependencies = (
 				FE6453E13071EA1F003EB10A /* CarnivalKit */,
 			);
 			productName = CarnivalApp;
-			productReference = FE3C1C7A3068A74F0048B342 /* CarnivalApp.app */;
+			productReference = FE3C1C7A3068A74F0048B342 /* Carnival.app */;
 			productType = "com.apple.product-type.application";
 		};
 		FE3C1D0B306962050048B342 /* CarnivalAppUITests */ = {
@@ -199,9 +199,9 @@
 			productReference = FE3C1D0C306962050048B342 /* CarnivalAppUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-		FE61DB1609B611AE00F26546 /* carnival */ = {
+		FE61DB1609B611AE00F26546 /* CarnivalGLUT */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FE61DB1A09B611AE00F26546 /* Build configuration list for PBXNativeTarget "carnival" */;
+			buildConfigurationList = FE61DB1A09B611AE00F26546 /* Build configuration list for PBXNativeTarget "CarnivalGLUT" */;
 			buildPhases = (
 				FE61DB1409B611AE00F26546 /* Sources */,
 				FE61DB1509B611AE00F26546 /* Frameworks */,
@@ -209,9 +209,9 @@
 			);
 			buildRules = (
 			);
-			name = carnival;
+			name = CarnivalGLUT;
 			productName = carnival;
-			productReference = FE61DB1709B611AE00F26546 /* carnival.app */;
+			productReference = FE61DB1709B611AE00F26546 /* CarnivalGLUT.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -249,8 +249,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FE61DB1609B611AE00F26546 /* carnival */,
-				FE3C1C793068A74F0048B342 /* CarnivalApp */,
+				FE61DB1609B611AE00F26546 /* CarnivalGLUT */,
+				FE3C1C793068A74F0048B342 /* Carnival */,
 				FE3C1D0B306962050048B342 /* CarnivalAppUITests */,
 			);
 		};
@@ -299,13 +299,13 @@
 /* Begin PBXTargetDependency section */
 		FE3C1D11306962050048B342 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FE3C1C793068A74F0048B342 /* CarnivalApp */;
+			target = FE3C1C793068A74F0048B342 /* Carnival */;
 			targetProxy = FE3C1D10306962050048B342 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		FE3C1C833068A74F0048B342 /* Development configuration for PBXNativeTarget "CarnivalApp" */ = {
+		FE3C1C833068A74F0048B342 /* Development configuration for PBXNativeTarget "Carnival" */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
@@ -368,6 +368,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -406,7 +407,7 @@
 			};
 			name = Development;
 		};
-		FE3C1C843068A74F0048B342 /* Deployment configuration for PBXNativeTarget "CarnivalApp" */ = {
+		FE3C1C843068A74F0048B342 /* Deployment configuration for PBXNativeTarget "Carnival" */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
@@ -463,6 +464,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -499,7 +501,7 @@
 			};
 			name = Deployment;
 		};
-		FE3C1C853068A74F0048B342 /* Default configuration for PBXNativeTarget "CarnivalApp" */ = {
+		FE3C1C853068A74F0048B342 /* Default configuration for PBXNativeTarget "Carnival" */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FE3C1FE23069754C0048B342 /* Config.xcconfig */;
 			buildSettings = {
@@ -556,6 +558,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -932,7 +935,7 @@
 			};
 			name = Default;
 		};
-		FE61DB1B09B611AE00F26546 /* Development configuration for PBXNativeTarget "carnival" */ = {
+		FE61DB1B09B611AE00F26546 /* Development configuration for PBXNativeTarget "CarnivalGLUT" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -955,13 +958,13 @@
 					Foundation,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bolsinga.carnival;
-				PRODUCT_NAME = carnival;
+				PRODUCT_NAME = CarnivalGLUT;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
 			name = Development;
 		};
-		FE61DB1C09B611AE00F26546 /* Deployment configuration for PBXNativeTarget "carnival" */ = {
+		FE61DB1C09B611AE00F26546 /* Deployment configuration for PBXNativeTarget "CarnivalGLUT" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -982,13 +985,13 @@
 					Foundation,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bolsinga.carnival;
-				PRODUCT_NAME = carnival;
+				PRODUCT_NAME = CarnivalGLUT;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
 			name = Deployment;
 		};
-		FE61DB1D09B611AE00F26546 /* Default configuration for PBXNativeTarget "carnival" */ = {
+		FE61DB1D09B611AE00F26546 /* Default configuration for PBXNativeTarget "CarnivalGLUT" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1007,7 +1010,7 @@
 					Foundation,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.bolsinga.carnival;
-				PRODUCT_NAME = carnival;
+				PRODUCT_NAME = CarnivalGLUT;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -1016,12 +1019,12 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FE3C1C823068A74F0048B342 /* Build configuration list for PBXNativeTarget "CarnivalApp" */ = {
+		FE3C1C823068A74F0048B342 /* Build configuration list for PBXNativeTarget "Carnival" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FE3C1C833068A74F0048B342 /* Development configuration for PBXNativeTarget "CarnivalApp" */,
-				FE3C1C843068A74F0048B342 /* Deployment configuration for PBXNativeTarget "CarnivalApp" */,
-				FE3C1C853068A74F0048B342 /* Default configuration for PBXNativeTarget "CarnivalApp" */,
+				FE3C1C833068A74F0048B342 /* Development configuration for PBXNativeTarget "Carnival" */,
+				FE3C1C843068A74F0048B342 /* Deployment configuration for PBXNativeTarget "Carnival" */,
+				FE3C1C853068A74F0048B342 /* Default configuration for PBXNativeTarget "Carnival" */,
 			);
 			defaultConfigurationName = Default;
 		};
@@ -1043,12 +1046,12 @@
 			);
 			defaultConfigurationName = Default;
 		};
-		FE61DB1A09B611AE00F26546 /* Build configuration list for PBXNativeTarget "carnival" */ = {
+		FE61DB1A09B611AE00F26546 /* Build configuration list for PBXNativeTarget "CarnivalGLUT" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FE61DB1B09B611AE00F26546 /* Development configuration for PBXNativeTarget "carnival" */,
-				FE61DB1C09B611AE00F26546 /* Deployment configuration for PBXNativeTarget "carnival" */,
-				FE61DB1D09B611AE00F26546 /* Default configuration for PBXNativeTarget "carnival" */,
+				FE61DB1B09B611AE00F26546 /* Development configuration for PBXNativeTarget "CarnivalGLUT" */,
+				FE61DB1C09B611AE00F26546 /* Deployment configuration for PBXNativeTarget "CarnivalGLUT" */,
+				FE61DB1D09B611AE00F26546 /* Default configuration for PBXNativeTarget "CarnivalGLUT" */,
 			);
 			defaultConfigurationName = Default;
 		};
