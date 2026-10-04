@@ -135,7 +135,11 @@ final class Renderer: NSObject, MTKViewDelegate {
         // The pixel format here must match the MTKView's own
         // colorPixelFormat. MetalView.swift doesn't set one explicitly,
         // so this relies on MTKView's default of .bgra8Unorm.
-        guard let library = try? device.makeDefaultLibrary(bundle: Bundle(for: Renderer.self)),
+        //
+        // Bundle.module (not Bundle(for:)) since Shaders.metal now
+        // compiles into this Swift package target's own resource
+        // bundle, not the bundle backing Renderer's compiled code.
+        guard let library = try? device.makeDefaultLibrary(bundle: Bundle.module),
             let vertexFunction = library.makeFunction(name: "carnival_vertex"),
             let fragmentFunction = library.makeFunction(name: "carnival_fragment")
         else { return nil }

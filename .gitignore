@@ -1,5 +1,6 @@
 .DS_Store
 /.build
+CarnivalKit/.build
 /Packages
 xcuserdata/
 Package.resolved
