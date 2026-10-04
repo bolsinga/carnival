@@ -90,7 +90,7 @@ int getCoasterPts(void)
 void drawStrut(int i)
 {
 	char Strut = 1;
-	int strut, height;
+	int strut, height = 0;
 	Coord support[3];
 	
 	/* The following are struts which can't extend to the ground, */

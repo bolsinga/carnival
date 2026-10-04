@@ -103,7 +103,7 @@ void carriage(Coord wheel1[3], Coord wheel2[3])
 void ferris(Coord angle, Coord* sight)
 {
 	int i;
-	Coord bottom; /* the angle of the 'bottom' spoke */
+	Coord bottom = 0; /* the angle of the 'bottom' spoke */
 	Coord center1[3] = {0.0, 0.0, 1.5 };
 	Coord center2[3] = {0.0, 0.0, -1.5 };
 	Coord axel1[3] = {0.0, 0.0, 2.5 };
