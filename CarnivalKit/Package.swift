@@ -14,6 +14,5 @@ let package = Package(
     ],
     targets: [
         .target(name: "CarnivalKit")
-    ],
-    swiftLanguageModes: [.v5]
+    ]
 )
