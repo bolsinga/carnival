@@ -89,7 +89,15 @@ private final class RemoteHandlingMTKView: MTKView {
 extension MetalView {
     // NSObject, so it can be a UIGestureRecognizer target on iOS (the
     // Objective-C target-action mechanism gesture recognizers use
-    // requires it).
+    // requires it). @MainActor since every use of this type -- SwiftUI's
+    // own make/update*View calls, the @objc gesture/key/press handlers
+    // below (always delivered on the main thread), and the UIKit/AppKit
+    // APIs it hands `self` to as a target (e.g. UIGestureRecognizer's
+    // init(target:action:), itself @MainActor-isolated) -- already only
+    // ever happens on the main actor; without this, passing `self` to
+    // those APIs is flagged under complete concurrency checking as
+    // sending a non-Sendable value across an isolation boundary.
+    @MainActor
     final class Coordinator: NSObject {
         private var renderer: Renderer?
         // Stored (not just captured locally in makeConfiguredView) so
