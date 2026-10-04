@@ -86,54 +86,21 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// site below.
     ///
     /// When `false`, elapsed time stops accumulating into
-    /// `coasterPosition` below, freezing the coaster camera's progress;
-    /// `draw(in:)`'s own pause/resume transition handling (see
-    /// `Carnival.checkAndClearStateTransition()`) freezes the ferris
-    /// camera's angle too (if riding it) — see `frozenCameraWheelAngle`. `clock.tick()`
-    /// itself keeps running every frame regardless, so there's no big
-    /// "catch up" jump when unpausing (the original instead stops
-    /// calling Display entirely via `glutIdleFunc(gAnimating ? Idle :
-    /// NULL)`, freezing the whole screen; this still renders
-    /// continuously, just with a frozen camera, since MTKView doesn't
-    /// have GLUT's "idle" concept to hook). Notably, `wheelElapsedTime`
-    /// below is deliberately exempt from this gate: pausing freezes the
-    /// camera, not the world — the wheel itself keeps visibly turning
-    /// while paused, the same way it would if you stepped out of the
-    /// ride and just watched.
+    /// `coasterPosition` below, freezing the coaster camera's progress.
+    /// `clock.tick()` itself keeps running every frame regardless, so
+    /// there's no big "catch up" jump when unpausing (the original
+    /// instead stops calling Display entirely via `glutIdleFunc
+    /// (gAnimating ? Idle : NULL)`, freezing the whole screen; this
+    /// still renders continuously, just with a frozen camera, since
+    /// MTKView doesn't have GLUT's "idle" concept to hook). See
+    /// `wheelElapsedTime` for the equivalent gate on the ferris wheel.
     private var isAnimating: Bool { carnival.state == .animating }
 
-    /// Drives the ferris wheel's own rendered rotation. Always
-    /// accumulates every frame regardless of `isAnimating` — see
-    /// `isAnimating`'s doc comment above, and `frozenCameraWheelAngle`
-    /// below.
+    /// Drives the ferris wheel's own rendered rotation (and, since the
+    /// ferris-view camera's angle is always computed directly from this
+    /// too, its position). Gated by `carnival.wheelShouldTurn` rather
+    /// than accumulating unconditionally — see there.
     private var wheelElapsedTime: Float = 0
-
-    /// While paused, the ferris-view camera's angle on the wheel — the
-    /// angle passed to `FerrisWheel.sight(angle:)` for `fwv` — freezes
-    /// at whatever the wheel's own live angle was the instant pausing
-    /// began, captured in `draw(in:)`'s pause/resume transition
-    /// handling. `nil` while animating,
-    /// meaning the camera should just track the wheel's current live
-    /// angle directly instead.
-    ///
-    /// This used to be its own independently-accumulating elapsed-time
-    /// counter (paced like `wheelElapsedTime` but gated on
-    /// `isAnimating`), which seemed reasonable but had a real bug: it
-    /// only stayed in sync with `wheelElapsedTime` by coincidence,
-    /// before the first ever pause. After any pause/resume, no matter
-    /// how brief, it permanently fell behind by exactly the paused
-    /// duration, since it stopped accumulating while paused but
-    /// `wheelElapsedTime` didn't. Even a fraction of a second of
-    /// accumulated pause time was enough angular drift to flip the
-    /// ferris-view eye from sitting in front of carriage 6's seatback
-    /// to sitting behind it — most noticeably right around the top of
-    /// the wheel's rotation, where the geometry's own front/back margin
-    /// is already the thinnest. Storing an explicit "frozen or not"
-    /// angle instead of a second clock makes it structurally
-    /// impossible to drift: while animating, the camera's angle is
-    /// always *exactly* the wheel's current angle, not a separately
-    /// accumulated approximation of it.
-    private var frozenCameraWheelAngle: Float?
 
     /// How far along the coaster track the camera currently is. Unlike
     /// the original's integer `gCurrentCoaster`, this accumulates
@@ -281,28 +248,19 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     func draw(in view: MTKView) {
         deltaTime = clock.tick()
-        // The wheel keeps visibly spinning even while paused (see
-        // isAnimating's doc comment) — only the camera's own position
-        // freezes.
-        wheelElapsedTime += Float(deltaTime)
+        if carnival.wheelShouldTurn {
+            wheelElapsedTime += Float(deltaTime)
+        }
 
-        if carnival.checkAndClearStateTransition() {
-            switch carnival.state {
-            case .animating:
-                // Resuming: go back to live-tracking the wheel's angle,
-                // and return to a clean, unmodified ride camera otherwise.
-                frozenCameraWheelAngle = nil
-                lookYaw = 0
-                lookPitch = 0
-                zoomScale = 1
-            case .paused:
-                // Pausing: freeze the ferris-view camera's angle at
-                // whatever the wheel's angle is right now, so it doesn't
-                // drift out of sync with the wheel's own rotation, which
-                // keeps going while paused — see frozenCameraWheelAngle's
-                // doc comment.
-                frozenCameraWheelAngle = -Self.wheelAngularVelocity * wheelElapsedTime
-            }
+        // Resuming: return to a clean, unmodified look-around — pausing
+        // itself needs no corresponding side effect here, since
+        // wheelShouldTurn already freezes the wheel continuously for as
+        // long as the pause+ferris condition holds, not just at the
+        // instant pausing began.
+        if carnival.checkAndClearStateTransition(), carnival.state == .animating {
+            lookYaw = 0
+            lookPitch = 0
+            zoomScale = 1
         }
 
         guard let descriptor = view.currentRenderPassDescriptor,
@@ -319,16 +277,14 @@ final class Renderer: NSObject, MTKViewDelegate {
         let wheelTranslation = SIMD3<Float>(-25.0, 6.5, 0.0)
         let wheelAngle = -Self.wheelAngularVelocity * wheelElapsedTime
         let wheelGeometry = FerrisWheel.geometry(angle: wheelAngle)
-        // The ferris-view camera's own position — tracks the wheel's
-        // live angle exactly while animating (so the eye always stays
-        // correctly placed relative to carriage 6's seat geometry), or
-        // holds at whatever angle was frozen when pausing began — see
-        // frozenCameraWheelAngle's doc comment.
+        // The ferris-view camera's own position — always tracks
+        // wheelAngle directly, so the eye stays correctly placed
+        // relative to carriage 6's seat geometry whether the wheel is
+        // currently turning or (per wheelShouldTurn) held still.
         // drawScene: fwv[0] += -25.0; fwv[1] += 6.5; (z untouched,
         // matching the translation's own z offset of 0).
-        let cameraWheelAngle = frozenCameraWheelAngle ?? wheelAngle
         let fwv =
-            FerrisWheel.sight(angle: cameraWheelAngle)
+            FerrisWheel.sight(angle: wheelAngle)
             + SIMD3<Float>(wheelTranslation.x, wheelTranslation.y, 0)
 
         if isAnimating {
