@@ -11,6 +11,9 @@ import SwiftUI
 @main
 struct CarnivalAppApp: App {
     @State private var carnival = Carnival()
+    #if os(macOS)
+    @Environment(\.openWindow) private var openWindow
+    #endif
 
     var body: some Scene {
         WindowGroup {
@@ -35,7 +38,35 @@ struct CarnivalAppApp: App {
                 }
                 .keyboardShortcut("t")  // defaults to the Command modifier: ⌘T
             }
+
+            #if os(macOS)
+            // In the File menu, right after "New Window" (the `.newItem`
+            // placement's own anchor) -- opens the "Original OpenGL"
+            // window below: a fresh NSOpenGLView (CarnivalGLView) showing
+            // the same scene as the original 1992 GLUT `carnival` app,
+            // calling straight into its untouched drawing code. Not
+            // main.c itself: GLUT's glutMainLoop() never returns and
+            // would block this app's own run loop, and its Key() calls
+            // exit(0) on Escape, which would quit this whole app rather
+            // than just close a window -- see CarnivalGLView.h/.m.
+            CommandGroup(after: .newItem) {
+                Button("OpenGL") {
+                    openWindow(id: "original-opengl")
+                }
+            }
+            #endif
         }
+        #endif
+
+        #if os(macOS)
+        // A dedicated Window, not WindowGroup: CarnivalGLView's state
+        // (and the rollerin/rollerout arrays it reads) are effectively
+        // singleton in spirit, so only one instance of this window ever
+        // makes sense.
+        Window("Original OpenGL", id: "original-opengl") {
+            CarnivalGLViewRepresentable()
+        }
+        .defaultSize(width: 640, height: 480)
         #endif
     }
 }
