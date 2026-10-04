@@ -7,8 +7,27 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-carnival:
     runs-on: xcode-27
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Switch to latest Xcode
+      run: sudo xcode-select -s "/Applications/Xcode_27.0.app/Contents/Developer"
+    - name: Build carnival
+      run: xcodebuild -verbose -scheme carnival
+
+  build-carnival-app:
+    runs-on: xcode-27
+
+    strategy:
+      fail-fast: false
+      matrix:
+        destination:
+          - 'platform=macOS'
+          - 'generic/platform=iOS Simulator'
+          - 'generic/platform=tvOS Simulator'
+          - 'generic/platform=visionOS Simulator'
 
     steps:
     - uses: actions/checkout@v7
@@ -16,7 +35,5 @@ jobs:
       run: sudo xcode-select -s "/Applications/Xcode_27.0.app/Contents/Developer"
     - name: Install Metal Toolchain
       run: xcodebuild -downloadComponent MetalToolchain
-    - name: Build carnival
-      run: xcodebuild -verbose -scheme carnival
     - name: Build CarnivalApp
-      run: xcodebuild -verbose -scheme CarnivalApp -destination 'platform=macOS'
+      run: xcodebuild -verbose -scheme CarnivalApp -destination '${{ matrix.destination }}'
