@@ -7,16 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FE17130D0866740F00B0F08D /* carnival.h in Headers */ = {isa = PBXBuildFile; fileRef = FE857E300465815D00000102 /* carnival.h */; };
-		FE17130E0866740F00B0F08D /* coaster.h in Headers */ = {isa = PBXBuildFile; fileRef = FE857E320465815D00000102 /* coaster.h */; };
-		FE17130F0866740F00B0F08D /* ferris.h in Headers */ = {isa = PBXBuildFile; fileRef = FE857E340465815D00000102 /* ferris.h */; };
-		FE1713100866740F00B0F08D /* tent.h in Headers */ = {isa = PBXBuildFile; fileRef = FE857E370465815D00000102 /* tent.h */; };
-		FE1713120866740F00B0F08D /* carnival.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E2F0465815D00000102 /* carnival.c */; };
-		FE1713130866740F00B0F08D /* coaster.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E310465815D00000102 /* coaster.c */; };
-		FE1713140866740F00B0F08D /* ferris.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E330465815D00000102 /* ferris.c */; };
-		FE1713150866740F00B0F08D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E350465815D00000102 /* main.c */; };
-		FE1713160866740F00B0F08D /* tent.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E360465815D00000102 /* tent.c */; };
-		FE1713180866740F00B0F08D /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE857E410465826700000102 /* GLUT.framework */; };
 		FE61DB1E09B611CD00F26546 /* carnival.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E2F0465815D00000102 /* carnival.c */; };
 		FE61DB1F09B611CE00F26546 /* coaster.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E310465815D00000102 /* coaster.c */; };
 		FE61DB2009B611CF00F26546 /* ferris.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E330465815D00000102 /* ferris.c */; };
@@ -43,14 +33,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		FE17131A0866740F00B0F08D /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolder = None;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		FE3C1C973068A7AA0048B342 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			dstPath = "";
@@ -70,7 +52,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		FE17131B0866740F00B0F08D /* carnival */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = carnival; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE3C1C7A3068A74F0048B342 /* CarnivalApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarnivalApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE3C1D0C306962050048B342 /* CarnivalAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CarnivalAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE3C1FE23069754C0048B342 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
@@ -104,12 +85,6 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		FE1713170866740F00B0F08D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-				FE1713180866740F00B0F08D /* GLUT.framework in Frameworks */,
-			);
-		};
 		FE3C1C773068A74F0048B342 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -166,7 +141,6 @@
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FE17131B0866740F00B0F08D /* carnival */,
 				FE61DB1709B611AE00F26546 /* carnival.app */,
 				FE3C1C7A3068A74F0048B342 /* CarnivalApp.app */,
 				FE3C1D0C306962050048B342 /* CarnivalAppUITests.xctest */,
@@ -184,36 +158,7 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		FE17130C0866740F00B0F08D /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			files = (
-				FE17130D0866740F00B0F08D /* carnival.h in Headers */,
-				FE17130E0866740F00B0F08D /* coaster.h in Headers */,
-				FE17130F0866740F00B0F08D /* ferris.h in Headers */,
-				FE1713100866740F00B0F08D /* tent.h in Headers */,
-			);
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
-		FE17130B0866740F00B0F08D /* carnival_tool */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FE61DAA409B60E2000F26546 /* Build configuration list for PBXNativeTarget "carnival_tool" */;
-			buildPhases = (
-				FE17130C0866740F00B0F08D /* Headers */,
-				FE1713110866740F00B0F08D /* Sources */,
-				FE1713170866740F00B0F08D /* Frameworks */,
-				FE1713190866740F00B0F08D /* Rez */,
-				FE17131A0866740F00B0F08D /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			name = carnival_tool;
-			productName = carnival;
-			productReference = FE17131B0866740F00B0F08D /* carnival */;
-			productType = "com.apple.product-type.tool";
-		};
 		FE3C1C793068A74F0048B342 /* CarnivalApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FE3C1C823068A74F0048B342 /* Build configuration list for PBXNativeTarget "CarnivalApp" */;
@@ -305,7 +250,6 @@
 			projectRoot = "";
 			targets = (
 				FE61DB1609B611AE00F26546 /* carnival */,
-				FE17130B0866740F00B0F08D /* carnival_tool */,
 				FE3C1C793068A74F0048B342 /* CarnivalApp */,
 				FE3C1D0B306962050048B342 /* CarnivalAppUITests */,
 			);
@@ -325,25 +269,7 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXRezBuildPhase section */
-		FE1713190866740F00B0F08D /* Rez */ = {
-			isa = PBXRezBuildPhase;
-			files = (
-			);
-		};
-/* End PBXRezBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		FE1713110866740F00B0F08D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-				FE1713120866740F00B0F08D /* carnival.c in Sources */,
-				FE1713130866740F00B0F08D /* coaster.c in Sources */,
-				FE1713140866740F00B0F08D /* ferris.c in Sources */,
-				FE1713150866740F00B0F08D /* main.c in Sources */,
-				FE1713160866740F00B0F08D /* tent.c in Sources */,
-			);
-		};
 		FE3C1C763068A74F0048B342 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -890,95 +816,6 @@
 			};
 			name = Default;
 		};
-		FE61DAA509B60E2000F26546 /* Development configuration for PBXNativeTarget "carnival_tool" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
-				FRAMEWORK_SEARCH_PATHS = "";
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-lGL",
-					"-lGLU",
-					"-lobjc",
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = carnival;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				ZERO_LINK = YES;
-			};
-			name = Development;
-		};
-		FE61DAA609B60E2000F26546 /* Deployment configuration for PBXNativeTarget "carnival_tool" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				COPY_PHASE_STRIP = YES;
-				DEAD_CODE_STRIPPING = YES;
-				FRAMEWORK_SEARCH_PATHS = "";
-				HEADER_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-lGL",
-					"-lGLU",
-					"-lobjc",
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = carnival;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				ZERO_LINK = NO;
-			};
-			name = Deployment;
-		};
-		FE61DAA709B60E2000F26546 /* Default configuration for PBXNativeTarget "carnival_tool" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				DEAD_CODE_STRIPPING = YES;
-				FRAMEWORK_SEARCH_PATHS = "";
-				HEADER_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = "\"$(SYSTEM_LIBRARY_DIR)/Frameworks/OpenGL.framework/Versions/A/Libraries\"";
-				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = (
-					"-lGL",
-					"-lGLU",
-					"-lobjc",
-				);
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = carnival;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
-			name = Default;
-		};
 		FE61DAAD09B60E2000F26546 /* Development configuration for PBXProject "carnival" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1194,15 +1031,6 @@
 				FE3C1D13306962050048B342 /* Development configuration for PBXNativeTarget "CarnivalAppUITests" */,
 				FE3C1D14306962050048B342 /* Deployment configuration for PBXNativeTarget "CarnivalAppUITests" */,
 				FE3C1D15306962050048B342 /* Default configuration for PBXNativeTarget "CarnivalAppUITests" */,
-			);
-			defaultConfigurationName = Default;
-		};
-		FE61DAA409B60E2000F26546 /* Build configuration list for PBXNativeTarget "carnival_tool" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				FE61DAA509B60E2000F26546 /* Development configuration for PBXNativeTarget "carnival_tool" */,
-				FE61DAA609B60E2000F26546 /* Deployment configuration for PBXNativeTarget "carnival_tool" */,
-				FE61DAA709B60E2000F26546 /* Default configuration for PBXNativeTarget "carnival_tool" */,
 			);
 			defaultConfigurationName = Default;
 		};
