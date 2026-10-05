@@ -59,7 +59,7 @@
 		FE61DB1709B611AE00F26546 /* CarnivalGLUT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarnivalGLUT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE61DB1909B611AE00F26546 /* carnival-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "carnival-Info.plist"; sourceTree = "<group>"; };
 		FE61DB3409B612C500F26546 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
-		FE64571B30735A46003EB10A /* CarnivalScreenSaver.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CarnivalScreenSaver.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE64571B30735A46003EB10A /* Carnival.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Carnival.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE857E2F0465815D00000102 /* carnival.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = carnival.c; sourceTree = "<group>"; };
 		FE857E300465815D00000102 /* carnival.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = carnival.h; sourceTree = "<group>"; };
 		FE857E310465815D00000102 /* coaster.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = coaster.c; sourceTree = "<group>"; };
@@ -172,7 +172,7 @@
 				FE61DB1709B611AE00F26546 /* CarnivalGLUT.app */,
 				FE3C1C7A3068A74F0048B342 /* Carnival.app */,
 				FE3C1D0C306962050048B342 /* CarnivalAppUITests.xctest */,
-				FE64571B30735A46003EB10A /* CarnivalScreenSaver.saver */,
+				FE64571B30735A46003EB10A /* Carnival.saver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -277,7 +277,7 @@
 				FE64572830735BE6003EB10A /* CarnivalKit */,
 			);
 			productName = CarnivalScreenSaver;
-			productReference = FE64571B30735A46003EB10A /* CarnivalScreenSaver.saver */;
+			productReference = FE64571B30735A46003EB10A /* Carnival.saver */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -1168,7 +1168,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Carnival;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1236,7 +1236,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Carnival;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1304,7 +1304,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Carnival;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
