@@ -32,7 +32,19 @@ private final class KeyHandlingMTKView: MTKView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        window?.makeFirstResponder(self)
+        // MTKView's own display link otherwise keeps running forever once
+        // started, which keeps this view (and everything retaining it --
+        // Renderer, Coordinator, any SwiftUI host above it) alive even
+        // after it's been removed from a window and should be released.
+        // Pausing here is what actually lets that whole chain deallocate.
+        // Seen in practice hosting this inside a macOS screen saver: each
+        // repeated preview left its predecessor's view running forever in
+        // the background, eventually degrading the one actually on screen.
+        guard let window else {
+            isPaused = true
+            return
+        }
+        window.makeFirstResponder(self)
     }
 
     override func keyDown(with event: NSEvent) {
@@ -65,6 +77,16 @@ private final class RemoteHandlingMTKView: MTKView {
 
     override var canBecomeFocused: Bool { true }
 
+    // See KeyHandlingMTKView's own override for why this matters: without
+    // it, this view's display link -- and everything it transitively
+    // retains -- would never deallocate once removed from a window.
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window == nil {
+            isPaused = true
+        }
+    }
+
     override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
         var handled = false
         for press in presses {
@@ -84,6 +106,20 @@ private final class RemoteHandlingMTKView: MTKView {
     }
 }
 #endif
+#endif
+
+#if os(iOS) || os(visionOS)
+// See KeyHandlingMTKView's own override for why this matters: without
+// it, this view's display link -- and everything it transitively
+// retains -- would never deallocate once removed from a window.
+private final class PausingMTKView: MTKView {
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window == nil {
+            isPaused = true
+        }
+    }
+}
 #endif
 
 extension MetalView {
@@ -207,7 +243,7 @@ extension MetalView {
                 }
             }
             #else
-            let view = MTKView()
+            let view = PausingMTKView()
             #if os(iOS)
             // Touch equivalent of the original's 't' (toggle coaster/
             // ferris camera) and ' ' (pause) keys — there's no keyboard
