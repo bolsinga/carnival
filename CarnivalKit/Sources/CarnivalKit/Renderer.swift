@@ -158,6 +158,14 @@ final class Renderer: NSObject, MTKViewDelegate {
     /// started.
     private let instanceID = UUID()
     private var hasLoggedFirstDraw = false
+    /// One-shot, same reasoning as `hasLoggedFirstDraw` -- these two
+    /// failure points were previously silent even on a genuine problem:
+    /// the top-of-`draw(in:)` guard bailing (no render pass descriptor/
+    /// command buffer/encoder) and a nil `currentDrawable` at present
+    /// time. Guards against log spam if either starts failing every
+    /// frame, the same way the zero-size case could.
+    private var hasLoggedRenderPassFailure = false
+    private var hasLoggedNilDrawableAtPresent = false
 
     init(device: MTLDevice, carnival: Carnival) throws(RendererError) {
         self.device = device
@@ -291,7 +299,15 @@ final class Renderer: NSObject, MTKViewDelegate {
         guard let descriptor = view.currentRenderPassDescriptor,
             let commandBuffer = commandQueue.makeCommandBuffer(),
             let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)
-        else { return }
+        else {
+            if !hasLoggedRenderPassFailure {
+                hasLoggedRenderPassFailure = true
+                rendererLogger.notice(
+                    "draw(in:) bailed: no render pass descriptor/command buffer/encoder: \(self.instanceID, privacy: .public)"
+                )
+            }
+            return
+        }
 
         // The ferris wheel's geometry (and its rider's sight position)
         // is recomputed every frame regardless of which camera mode is
@@ -440,6 +456,11 @@ final class Renderer: NSObject, MTKViewDelegate {
 
         if let drawable = view.currentDrawable {
             commandBuffer.present(drawable)
+        } else if !hasLoggedNilDrawableAtPresent {
+            hasLoggedNilDrawableAtPresent = true
+            rendererLogger.notice(
+                "draw(in:) has no currentDrawable to present: \(self.instanceID, privacy: .public)"
+            )
         }
         commandBuffer.commit()
     }
