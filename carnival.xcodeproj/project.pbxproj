@@ -19,6 +19,7 @@
 		FE6454983072C924003EB10A /* coaster.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E310465815D00000102 /* coaster.c */; platformFilters = (macos, ); };
 		FE6454993072C924003EB10A /* ferris.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E330465815D00000102 /* ferris.c */; platformFilters = (macos, ); };
 		FE64549A3072C924003EB10A /* tent.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E360465815D00000102 /* tent.c */; platformFilters = (macos, ); };
+		FE64572930735BE6003EB10A /* CarnivalKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE64572830735BE6003EB10A /* CarnivalKit */; };
 		FEAFFC4A241DD306008EC6AA /* README.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEAFFC49241DD2BF008EC6AA /* README.md */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +59,7 @@
 		FE61DB1709B611AE00F26546 /* CarnivalGLUT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarnivalGLUT.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE61DB1909B611AE00F26546 /* carnival-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "carnival-Info.plist"; sourceTree = "<group>"; };
 		FE61DB3409B612C500F26546 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		FE64571B30735A46003EB10A /* Carnival.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Carnival.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE857E2F0465815D00000102 /* carnival.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = carnival.c; sourceTree = "<group>"; };
 		FE857E300465815D00000102 /* carnival.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = carnival.h; sourceTree = "<group>"; };
 		FE857E310465815D00000102 /* coaster.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = coaster.c; sourceTree = "<group>"; };
@@ -95,6 +97,11 @@
 			path = CarnivalKit;
 			sourceTree = "<group>";
 		};
+		FE64571C30735A46003EB10A /* CarnivalScreenSaver */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CarnivalScreenSaver;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +123,12 @@
 				FE61DB3509B612C500F26546 /* OpenGL.framework in Frameworks */,
 			);
 		};
+		FE64571830735A46003EB10A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				FE64572930735BE6003EB10A /* CarnivalKit in Frameworks */,
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -129,8 +142,10 @@
 				C6A0FF2B0290797F04C91782 /* Documentation */,
 				FE3C1C7B3068A74F0048B342 /* CarnivalApp */,
 				FE3C1C8C3068A7AA0048B342 /* CarnivalKit */,
+				FE64571C30735A46003EB10A /* CarnivalScreenSaver */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				FE61DB1909B611AE00F26546 /* carnival-Info.plist */,
+				FE64572730735BE6003EB10A /* Frameworks */,
 			);
 			name = carnival;
 			sourceTree = "<group>";
@@ -157,6 +172,7 @@
 				FE61DB1709B611AE00F26546 /* CarnivalGLUT.app */,
 				FE3C1C7A3068A74F0048B342 /* Carnival.app */,
 				FE3C1D0C306962050048B342 /* CarnivalAppUITests.xctest */,
+				FE64571B30735A46003EB10A /* Carnival.saver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -169,7 +185,22 @@
 			name = Documentation;
 			sourceTree = "<group>";
 		};
+		FE64572730735BE6003EB10A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		FE64571630735A46003EB10A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			files = (
+			);
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		FE3C1C793068A74F0048B342 /* Carnival */ = {
@@ -227,6 +258,28 @@
 			productReference = FE61DB1709B611AE00F26546 /* CarnivalGLUT.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FE64571A30735A46003EB10A /* CarnivalScreenSaver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE64572430735A46003EB10A /* Build configuration list for PBXNativeTarget "CarnivalScreenSaver" */;
+			buildPhases = (
+				FE64571630735A46003EB10A /* Headers */,
+				FE64571730735A46003EB10A /* Sources */,
+				FE64571830735A46003EB10A /* Frameworks */,
+				FE64571930735A46003EB10A /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				FE64571C30735A46003EB10A /* CarnivalScreenSaver */,
+			);
+			name = CarnivalScreenSaver;
+			packageProductDependencies = (
+				FE64572830735BE6003EB10A /* CarnivalKit */,
+			);
+			productName = CarnivalScreenSaver;
+			productReference = FE64571B30735A46003EB10A /* Carnival.saver */;
+			productType = "com.apple.product-type.bundle";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -243,6 +296,9 @@
 					FE3C1D0B306962050048B342 = {
 						CreatedOnToolsVersion = 27.0;
 						TestTargetID = FE3C1C793068A74F0048B342;
+					};
+					FE64571A30735A46003EB10A = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -265,6 +321,7 @@
 				FE61DB1609B611AE00F26546 /* CarnivalGLUT */,
 				FE3C1C793068A74F0048B342 /* Carnival */,
 				FE3C1D0B306962050048B342 /* CarnivalAppUITests */,
+				FE64571A30735A46003EB10A /* CarnivalScreenSaver */,
 			);
 		};
 /* End PBXProject section */
@@ -276,6 +333,11 @@
 			);
 		};
 		FE3C1D0A306962050048B342 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		FE64571930735A46003EB10A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -305,6 +367,11 @@
 				FE61DB2009B611CF00F26546 /* ferris.c in Sources */,
 				FE61DB2209B611D200F26546 /* main.c in Sources */,
 				FE61DB2309B611D200F26546 /* tent.c in Sources */,
+			);
+		};
+		FE64571730735A46003EB10A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
 			);
 		};
 /* End PBXSourcesBuildPhase section */
@@ -1035,6 +1102,217 @@
 			};
 			name = Default;
 		};
+		FE64572130735A46003EB10A /* Development configuration for PBXNativeTarget "CarnivalScreenSaver" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = CarnivalScreenSaverView;
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
+				PRODUCT_NAME = Carnival;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Development;
+		};
+		FE64572230735A46003EB10A /* Deployment configuration for PBXNativeTarget "CarnivalScreenSaver" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = CarnivalScreenSaverView;
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
+				PRODUCT_NAME = Carnival;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Deployment;
+		};
+		FE64572330735A46003EB10A /* Default configuration for PBXNativeTarget "CarnivalScreenSaver" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = CarnivalScreenSaverView;
+				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
+				PRODUCT_NAME = Carnival;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Default;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1074,6 +1352,15 @@
 			);
 			defaultConfigurationName = Default;
 		};
+		FE64572430735A46003EB10A /* Build configuration list for PBXNativeTarget "CarnivalScreenSaver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE64572130735A46003EB10A /* Development configuration for PBXNativeTarget "CarnivalScreenSaver" */,
+				FE64572230735A46003EB10A /* Deployment configuration for PBXNativeTarget "CarnivalScreenSaver" */,
+				FE64572330735A46003EB10A /* Default configuration for PBXNativeTarget "CarnivalScreenSaver" */,
+			);
+			defaultConfigurationName = Default;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -1086,6 +1373,11 @@
 /* Begin XCSwiftPackageProductDependency section */
 		FE6453E13071EA1F003EB10A /* CarnivalKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			productName = CarnivalKit;
+		};
+		FE64572830735BE6003EB10A /* CarnivalKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FE6453E03071EA1F003EB10A /* XCLocalSwiftPackageReference "CarnivalKit" */;
 			productName = CarnivalKit;
 		};
 /* End XCSwiftPackageProductDependency section */

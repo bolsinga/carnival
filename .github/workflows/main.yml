@@ -17,6 +17,18 @@ jobs:
     - name: Build CarnivalGLUT
       run: xcodebuild -verbose -scheme CarnivalGLUT
 
+  build-carnival-screen-saver:
+    runs-on: xcode-27
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Switch to latest Xcode
+      run: sudo xcode-select -s "/Applications/Xcode_27.0.app/Contents/Developer"
+    - name: Install Metal Toolchain
+      run: xcodebuild -downloadComponent MetalToolchain
+    - name: Build CarnivalScreenSaver
+      run: xcodebuild -verbose -scheme CarnivalScreenSaver
+
   build-carnival:
     runs-on: xcode-27
 
