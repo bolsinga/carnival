@@ -7,6 +7,9 @@
 
 import CarnivalKit
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 @main
 struct CarnivalAppApp: App {
@@ -52,6 +55,19 @@ struct CarnivalAppApp: App {
             CommandGroup(after: .newItem) {
                 Button("OpenGL") {
                     openWindow(id: "original-opengl")
+                }
+
+                // Hands the embedded CarnivalScreenSaver.saver (copied into
+                // Contents/Resources by the Carnival target's Copy Files
+                // build phase) to the system's own screen-saver installer
+                // flow -- the same one that runs when someone double-clicks
+                // a downloaded .saver in Finder. Opening it this way needs
+                // no sandbox entitlement: the OS does the privileged copy
+                // into ~/Library/Screen Savers/, not this (sandboxed) app.
+                Button("Install Screen Saver…") {
+                    guard let url = Bundle.main.url(forResource: "Carnival", withExtension: "saver")
+                    else { return }
+                    NSWorkspace.shared.open(url)
                 }
             }
             #endif

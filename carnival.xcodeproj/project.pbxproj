@@ -20,6 +20,7 @@
 		FE6454993072C924003EB10A /* ferris.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E330465815D00000102 /* ferris.c */; platformFilters = (macos, ); };
 		FE64549A3072C924003EB10A /* tent.c in Sources */ = {isa = PBXBuildFile; fileRef = FE857E360465815D00000102 /* tent.c */; platformFilters = (macos, ); };
 		FE64572930735BE6003EB10A /* CarnivalKit in Frameworks */ = {isa = PBXBuildFile; productRef = FE64572830735BE6003EB10A /* CarnivalKit */; };
+		FE6458423073FF3A003EB10A /* Carnival.saver in CopyFiles */ = {isa = PBXBuildFile; fileRef = FE64571B30735A46003EB10A /* Carnival.saver */; platformFilters = (macos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FEAFFC4A241DD306008EC6AA /* README.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = FEAFFC49241DD2BF008EC6AA /* README.md */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +32,13 @@
 			remoteGlobalIDString = FE3C1C793068A74F0048B342;
 			remoteInfo = CarnivalApp;
 		};
+		FE64583F3073FF04003EB10A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FE64571A30735A46003EB10A;
+			remoteInfo = CarnivalScreenSaver;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -41,6 +49,14 @@
 			files = (
 			);
 			name = "Embed Frameworks";
+		};
+		FE6458413073FF24003EB10A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = Resources;
+			files = (
+				FE6458423073FF3A003EB10A /* Carnival.saver in CopyFiles */,
+			);
 		};
 		FE7BDA620A504121000C55E1 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -211,8 +227,12 @@
 				FE3C1C773068A74F0048B342 /* Frameworks */,
 				FE3C1C783068A74F0048B342 /* Resources */,
 				FE3C1C973068A7AA0048B342 /* Embed Frameworks */,
+				FE6458413073FF24003EB10A /* CopyFiles */,
 			);
 			buildRules = (
+			);
+			dependencies = (
+				FE6458403073FF04003EB10A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				FE3C1C7B3068A74F0048B342 /* CarnivalApp */,
@@ -381,6 +401,14 @@
 			isa = PBXTargetDependency;
 			target = FE3C1C793068A74F0048B342 /* Carnival */;
 			targetProxy = FE3C1D10306962050048B342 /* PBXContainerItemProxy */;
+		};
+		FE6458403073FF04003EB10A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilters = (
+				macos,
+			);
+			target = FE64571A30735A46003EB10A /* CarnivalScreenSaver */;
+			targetProxy = FE64583F3073FF04003EB10A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1168,6 +1196,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
+				PRODUCT_MODULE_NAME = CarnivalScreenSaver;
 				PRODUCT_NAME = Carnival;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1236,6 +1265,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
+				PRODUCT_MODULE_NAME = CarnivalScreenSaver;
 				PRODUCT_NAME = Carnival;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1304,6 +1334,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = gdb.CarnivalScreenSaver;
+				PRODUCT_MODULE_NAME = CarnivalScreenSaver;
 				PRODUCT_NAME = Carnival;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
