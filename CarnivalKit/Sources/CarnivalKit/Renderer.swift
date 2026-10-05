@@ -149,6 +149,16 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     private static let baseFovyRadians: Float = 60 * .pi / 180
 
+    /// Temporary, for diagnosing https://github.com/bolsinga/carnival/issues
+    /// -- a screen saver preview occasionally goes black after several
+    /// rapid-fire open/closes within the same long-lived host process,
+    /// with nothing else in the system log to explain why. Identifies
+    /// each `Renderer` instance in that log, and `hasLoggedFirstDraw`
+    /// below confirms whether a given instance's draw loop ever actually
+    /// started.
+    private let instanceID = UUID()
+    private var hasLoggedFirstDraw = false
+
     init(device: MTLDevice, carnival: Carnival) throws(RendererError) {
         self.device = device
         self.carnival = carnival
@@ -213,6 +223,11 @@ final class Renderer: NSObject, MTKViewDelegate {
         self.coasterTrack = coasterTrack
 
         super.init()
+        rendererLogger.notice("init: \(self.instanceID, privacy: .public)")
+    }
+
+    deinit {
+        rendererLogger.notice("deinit: \(self.instanceID, privacy: .public)")
     }
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -261,6 +276,11 @@ final class Renderer: NSObject, MTKViewDelegate {
                 "Pausing: view has a zero-size drawable (\(view.drawableSize.debugDescription, privacy: .public))"
             )
             return
+        }
+
+        if !hasLoggedFirstDraw {
+            hasLoggedFirstDraw = true
+            rendererLogger.notice("draw(in:) first successful call: \(self.instanceID, privacy: .public)")
         }
 
         deltaTime = clock.tick()
