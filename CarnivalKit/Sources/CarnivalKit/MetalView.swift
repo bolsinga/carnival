@@ -105,12 +105,23 @@ extension MetalView {
         // no capture list, only `self` — can reach it too.
         private var carnival: Carnival?
 
+        // Returns a plain, undelegated `MTKView` on failure rather than
+        // crashing -- `NSViewRepresentable`/`UIViewRepresentable` require a
+        // concrete view back, so there's no way to throw out of this.
+        // Instead, the failure itself is written to `carnival.rendererError`
+        // (see its doc comment) so it propagates to whatever embeds
+        // `CarnivalView`, rather than being logged and swallowed here.
         func makeConfiguredView(carnival: Carnival) -> MTKView {
             guard let device = MTLCreateSystemDefaultDevice() else {
-                fatalError("Metal is not supported on this device.")
+                carnival.rendererError = .metalNotSupported
+                return MTKView()
             }
-            guard let renderer = Renderer(device: device, carnival: carnival) else {
-                fatalError("Failed to create the Carnival renderer.")
+            let renderer: Renderer
+            do {
+                renderer = try Renderer(device: device, carnival: carnival)
+            } catch {
+                carnival.rendererError = error
+                return MTKView()
             }
             self.renderer = renderer
             self.carnival = carnival
