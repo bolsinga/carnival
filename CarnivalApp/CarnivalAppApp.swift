@@ -53,7 +53,7 @@ struct CarnivalAppApp: App {
             // exit(0) on Escape, which would quit this whole app rather
             // than just close a window -- see CarnivalGLView.h/.m.
             CommandGroup(after: .newItem) {
-                Button("OpenGL") {
+                Button("OpenGL…") {
                     openWindow(id: "original-opengl")
                 }
 
@@ -79,7 +79,7 @@ struct CarnivalAppApp: App {
         // (and the rollerin/rollerout arrays it reads) are effectively
         // singleton in spirit, so only one instance of this window ever
         // makes sense.
-        Window("Original OpenGL", id: "original-opengl") {
+        Window("OpenGL", id: "original-opengl") {
             CarnivalGLViewRepresentable()
         }
         .defaultSize(width: 640, height: 480)
