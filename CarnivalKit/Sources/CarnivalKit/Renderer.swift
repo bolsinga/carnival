@@ -1,5 +1,14 @@
 import MetalKit
+import os
 import simd
+
+/// Diagnostic only (the zero-size guard in `draw(in:)` below is the
+/// actual fix) -- without this, a host handing `MetalView` a zero-size
+/// drawable (observed in practice: System Settings' live Screen Saver
+/// list thumbnail) left no trace of why rendering silently stopped,
+/// since `CAMetalLayer`'s own `nextDrawable` failure is logged by
+/// QuartzCore, not anything identifiable as ours.
+private let rendererLogger = Logger(subsystem: "gdb.CarnivalKit", category: "Renderer")
 
 /// Everything that can go wrong setting up `Renderer`'s GPU pipeline.
 /// `Renderer.init` throws these instead of the `fatalError`s it used to --
@@ -207,8 +216,12 @@ final class Renderer: NSObject, MTKViewDelegate {
     }
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        guard size.height > 0 else { return }
+        guard size.width > 0, size.height > 0 else { return }
         aspectRatio = Float(size.width / size.height)
+        // Undoes draw(in:)'s own pause below once the view is actually
+        // given a real size -- e.g. a screen saver preview window
+        // opening after starting out zero-sized.
+        view.isPaused = false
     }
 
     private func draw(
@@ -230,6 +243,21 @@ final class Renderer: NSObject, MTKViewDelegate {
 
 
     func draw(in view: MTKView) {
+        // A zero-size drawable (e.g. a screen saver preview view that
+        // hasn't been laid out yet) can never produce a drawable --
+        // `view.currentRenderPassDescriptor` below would just trigger an
+        // endless, failing `CAMetalLayer nextDrawable` call every frame
+        // forever. Stop MTKView's own draw loop entirely instead;
+        // `mtkView(_:drawableSizeWillChange:)` above resumes it once a
+        // real size arrives.
+        guard view.drawableSize.width > 0, view.drawableSize.height > 0 else {
+            view.isPaused = true
+            rendererLogger.notice(
+                "Pausing: view has a zero-size drawable (\(view.drawableSize.debugDescription, privacy: .public))"
+            )
+            return
+        }
+
         deltaTime = clock.tick()
         if carnival.wheelShouldTurn {
             wheelElapsedTime += Float(deltaTime)
