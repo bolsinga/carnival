@@ -216,7 +216,12 @@ final class Renderer: NSObject, MTKViewDelegate {
     }
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-        guard size.width > 0, size.height > 0 else { return }
+        guard size.width > 0, size.height > 0 else {
+            rendererLogger.notice(
+                "drawableSizeWillChange: zero-size drawable (\(size.debugDescription, privacy: .public))"
+            )
+            return
+        }
         aspectRatio = Float(size.width / size.height)
         // Undoes draw(in:)'s own pause below once the view is actually
         // given a real size -- e.g. a screen saver preview window
