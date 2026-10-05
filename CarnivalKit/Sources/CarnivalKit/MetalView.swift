@@ -1,8 +1,17 @@
 import SwiftUI
 import MetalKit
+import os
 #if os(iOS) || os(tvOS)
 import UIKit
 #endif
+
+/// Temporary, alongside Renderer's own diagnostic logging -- pinpoints
+/// exactly when AppKit/UIKit actually reports a view's window as nil,
+/// so that moment can be compared against how much later Renderer's
+/// `deinit` fires. Narrows down whether a delay in releasing an old
+/// screen saver preview instance is AppKit's own notification being
+/// late, or something slower happening after that notification arrives.
+private let metalViewLogger = Logger(subsystem: "gdb.CarnivalKit", category: "MetalView")
 
 /// Hosts an `MTKView` inside SwiftUI. `MTKView.delegate` is `weak`, so the
 /// `Renderer` is retained by the `Coordinator` — without that, it would be
@@ -41,6 +50,9 @@ private final class KeyHandlingMTKView: MTKView {
         // repeated preview left its predecessor's view running forever in
         // the background, eventually degrading the one actually on screen.
         guard let window else {
+            metalViewLogger.notice(
+                "viewDidMoveToWindow: window is nil (\(ObjectIdentifier(self).debugDescription, privacy: .public))"
+            )
             isPaused = true
             return
         }
@@ -83,6 +95,9 @@ private final class RemoteHandlingMTKView: MTKView {
     override func didMoveToWindow() {
         super.didMoveToWindow()
         if window == nil {
+            metalViewLogger.notice(
+                "didMoveToWindow: window is nil (\(ObjectIdentifier(self).debugDescription, privacy: .public))"
+            )
             isPaused = true
         }
     }
@@ -116,6 +131,9 @@ private final class PausingMTKView: MTKView {
     override func didMoveToWindow() {
         super.didMoveToWindow()
         if window == nil {
+            metalViewLogger.notice(
+                "didMoveToWindow: window is nil (\(ObjectIdentifier(self).debugDescription, privacy: .public))"
+            )
             isPaused = true
         }
     }
