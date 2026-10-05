@@ -54,6 +54,14 @@ public struct LookAround: Equatable, Sendable {
 public final class Carnival {
     public var camera: CameraMode
 
+    /// Set by `MetalView.Coordinator.makeConfiguredView` if GPU/resource
+    /// setup fails, instead of crashing the host process. `nil` means setup
+    /// succeeded (the overwhelmingly common case). CarnivalKit itself has
+    /// no opinion on how to surface a failure -- this just makes it
+    /// observable to whatever embeds `CarnivalView` (an app, a screen
+    /// saver), which can react however makes sense for that context.
+    public var rendererError: RendererError?
+
     /// Setting this keeps `lookAround` in sync (see its `didSet`), so
     /// that invariant holds regardless of whether `state` changes via
     /// `togglePause()` or a direct assignment here.

@@ -1,6 +1,20 @@
 import MetalKit
 import simd
 
+/// Everything that can go wrong setting up `Renderer`'s GPU pipeline.
+/// `Renderer.init` throws these instead of the `fatalError`s it used to --
+/// a GPU/resource hiccup here shouldn't take down the whole host process,
+/// particularly for `CarnivalScreenSaver`, which runs inside a shared
+/// system process rather than its own app.
+public enum RendererError: Error {
+    case metalNotSupported
+    case commandQueueCreationFailed
+    case shaderLibraryLoadFailed
+    case renderPipelineStateCreationFailed
+    case depthStencilStateCreationFailed
+    case meshBufferCreationFailed(String)
+}
+
 /// A mesh's vertex/index buffers on the GPU, ready to draw.
 private struct MeshBuffers {
     let vertexBuffer: MTLBuffer
@@ -126,10 +140,12 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     private static let baseFovyRadians: Float = 60 * .pi / 180
 
-    init?(device: MTLDevice, carnival: Carnival) {
+    init(device: MTLDevice, carnival: Carnival) throws(RendererError) {
         self.device = device
         self.carnival = carnival
-        guard let commandQueue = device.makeCommandQueue() else { return nil }
+        guard let commandQueue = device.makeCommandQueue() else {
+            throw RendererError.commandQueueCreationFailed
+        }
         self.commandQueue = commandQueue
 
         // The pixel format here must match the MTKView's own
@@ -142,7 +158,9 @@ final class Renderer: NSObject, MTKViewDelegate {
         guard let library = try? device.makeDefaultLibrary(bundle: Bundle.module),
             let vertexFunction = library.makeFunction(name: "carnival_vertex"),
             let fragmentFunction = library.makeFunction(name: "carnival_fragment")
-        else { return nil }
+        else {
+            throw RendererError.shaderLibraryLoadFailed
+        }
 
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
         pipelineDescriptor.vertexFunction = vertexFunction
@@ -151,7 +169,9 @@ final class Renderer: NSObject, MTKViewDelegate {
         pipelineDescriptor.depthAttachmentPixelFormat = .depth32Float
 
         guard let pipelineState = try? device.makeRenderPipelineState(descriptor: pipelineDescriptor)
-        else { return nil }
+        else {
+            throw RendererError.renderPipelineStateCreationFailed
+        }
         self.pipelineState = pipelineState
 
         // Equivalent of the original's glEnable(GL_DEPTH_TEST).
@@ -159,19 +179,25 @@ final class Renderer: NSObject, MTKViewDelegate {
         depthStencilDescriptor.depthCompareFunction = .less
         depthStencilDescriptor.isDepthWriteEnabled = true
         guard let depthStencilState = device.makeDepthStencilState(descriptor: depthStencilDescriptor)
-        else { return nil }
+        else {
+            throw RendererError.depthStencilStateCreationFailed
+        }
         self.depthStencilState = depthStencilState
 
         let coasterTrack = Coaster.computeTrack()
         let coasterMesh = TubeMesh.make(
             paths: Coaster.tubePaths(track: coasterTrack), radius: Self.tubeRadius,
             sides: Self.tubeSides)
-        guard
-            let groundAndMountains = MeshBuffers(
-                device: device, mesh: StaticScene.groundAndMountains()),
-            let tent = MeshBuffers(device: device, mesh: Tent.mesh()),
-            let coaster = MeshBuffers(device: device, mesh: coasterMesh)
-        else { return nil }
+        guard let groundAndMountains = MeshBuffers(device: device, mesh: StaticScene.groundAndMountains())
+        else {
+            throw RendererError.meshBufferCreationFailed("groundAndMountains")
+        }
+        guard let tent = MeshBuffers(device: device, mesh: Tent.mesh()) else {
+            throw RendererError.meshBufferCreationFailed("tent")
+        }
+        guard let coaster = MeshBuffers(device: device, mesh: coasterMesh) else {
+            throw RendererError.meshBufferCreationFailed("coaster")
+        }
         self.groundAndMountains = groundAndMountains
         self.tent = tent
         self.coaster = coaster
