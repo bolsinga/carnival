@@ -17,7 +17,7 @@ final class CarnivalScreenSaverView: ScreenSaverView {
     override init?(frame: NSRect, isPreview: Bool) {
         super.init(frame: frame, isPreview: isPreview)
         let camera: CameraMode = Bool.random() ? .coaster : .ferris
-        let hosting = NSHostingView(rootView: ContentView(carnival: Carnival(camera: camera)))
+        let hosting = NSHostingView(rootView: CarnivalView(carnival: Carnival(camera: camera)))
         hosting.frame = bounds
         hosting.autoresizingMask = [.width, .height]
         addSubview(hosting)

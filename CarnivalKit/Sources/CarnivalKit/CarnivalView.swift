@@ -15,8 +15,16 @@ public struct CarnivalView: View {
     }
 
     public var body: some View {
-        MetalView(carnival: carnival)
-            .ignoresSafeArea()
+        if let rendererError = carnival.rendererError {
+            ContentUnavailableView(
+                "Unable to Show the Carnival",
+                systemImage: "exclamationmark.triangle",
+                description: Text(String(describing: rendererError))
+            )
+        } else {
+            MetalView(carnival: carnival)
+                .ignoresSafeArea()
+        }
     }
 }
 

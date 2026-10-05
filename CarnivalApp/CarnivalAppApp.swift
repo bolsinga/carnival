@@ -17,7 +17,7 @@ struct CarnivalAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(carnival: carnival)
+            CarnivalView(carnival: carnival)
         }
         #if os(macOS) || os(iOS)
         .commands {
