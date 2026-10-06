@@ -7,10 +7,8 @@ import UIKit
 
 /// Temporary, alongside Renderer's own diagnostic logging -- pinpoints
 /// exactly when AppKit/UIKit actually reports a view's window as nil,
-/// so that moment can be compared against how much later Renderer's
-/// `deinit` fires. Narrows down whether a delay in releasing an old
-/// screen saver preview instance is AppKit's own notification being
-/// late, or something slower happening after that notification arrives.
+/// so that moment can be compared against whether (and how much later,
+/// if ever) Renderer's `deinit` fires for the same instance.
 private let metalViewLogger = Logger(subsystem: "gdb.CarnivalKit", category: "MetalView")
 
 /// Hosts an `MTKView` inside SwiftUI. `MTKView.delegate` is `weak`, so the
@@ -41,14 +39,14 @@ private final class KeyHandlingMTKView: MTKView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        // MTKView's own display link otherwise keeps running forever once
-        // started, which keeps this view (and everything retaining it --
-        // Renderer, Coordinator, any SwiftUI host above it) alive even
-        // after it's been removed from a window and should be released.
-        // Pausing here is what actually lets that whole chain deallocate.
-        // Seen in practice hosting this inside a macOS screen saver: each
-        // repeated preview left its predecessor's view running forever in
-        // the background, eventually degrading the one actually on screen.
+        // MTKView's own display link otherwise keeps calling draw(in:)
+        // forever once started, even after this view has been removed
+        // from a window. Pausing here stops that wasted drawing; it does
+        // *not* reliably release the view itself -- whatever else is
+        // still holding onto it (observed in practice hosting this
+        // inside a macOS screen saver: the host process's own view
+        // controller) can keep it, and everything it retains, alive well
+        // after this fires.
         guard let window else {
             metalViewLogger.notice(
                 "viewDidMoveToWindow: window is nil (\(ObjectIdentifier(self).debugDescription, privacy: .public))"
@@ -90,8 +88,8 @@ private final class RemoteHandlingMTKView: MTKView {
     override var canBecomeFocused: Bool { true }
 
     // See KeyHandlingMTKView's own override for why this matters: without
-    // it, this view's display link -- and everything it transitively
-    // retains -- would never deallocate once removed from a window.
+    // it, this view's display link would otherwise keep calling draw(in:)
+    // forever once removed from a window.
     override func didMoveToWindow() {
         super.didMoveToWindow()
         if window == nil {

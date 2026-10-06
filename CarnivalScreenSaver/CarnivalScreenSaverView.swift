@@ -22,8 +22,6 @@ private let screenSaverViewLogger = Logger(subsystem: "gdb.CarnivalKit", categor
 /// separate processes that can host a saver (System Settings' preview vs.
 /// the real screensaver engine), so this sidesteps that entirely.
 final class CarnivalScreenSaverView: ScreenSaverView {
-    private let instanceID = UUID()
-
     override init?(frame: NSRect, isPreview: Bool) {
         super.init(frame: frame, isPreview: isPreview)
         let camera: CameraMode = Bool.random() ? .coaster : .ferris
@@ -32,7 +30,7 @@ final class CarnivalScreenSaverView: ScreenSaverView {
         hosting.autoresizingMask = [.width, .height]
         addSubview(hosting)
         animationTimeInterval = 1.0 / 30.0
-        screenSaverViewLogger.notice("init: \(self.instanceID, privacy: .public) isPreview=\(isPreview, privacy: .public)")
+        screenSaverViewLogger.notice("init: isPreview=\(isPreview, privacy: .public)")
     }
 
     required init?(coder: NSCoder) {
@@ -40,6 +38,6 @@ final class CarnivalScreenSaverView: ScreenSaverView {
     }
 
     deinit {
-        screenSaverViewLogger.notice("deinit: \(self.instanceID, privacy: .public)")
+        screenSaverViewLogger.notice("deinit")
     }
 }

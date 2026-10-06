@@ -149,14 +149,10 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     private static let baseFovyRadians: Float = 60 * .pi / 180
 
-    /// Temporary, for diagnosing https://github.com/bolsinga/carnival/issues
-    /// -- a screen saver preview occasionally goes black after several
-    /// rapid-fire open/closes within the same long-lived host process,
-    /// with nothing else in the system log to explain why. Identifies
-    /// each `Renderer` instance in that log, and `hasLoggedFirstDraw`
-    /// below confirms whether a given instance's draw loop ever actually
-    /// started.
-    private let instanceID = UUID()
+    /// Diagnostic only, for an intermittent black screen seen with this
+    /// screen saver after several rapid-fire open/closes within the
+    /// same long-lived host process. Confirms whether a given instance's
+    /// draw loop ever actually started.
     private var hasLoggedFirstDraw = false
     /// One-shot, same reasoning as `hasLoggedFirstDraw` -- these two
     /// failure points were previously silent even on a genuine problem:
@@ -231,11 +227,11 @@ final class Renderer: NSObject, MTKViewDelegate {
         self.coasterTrack = coasterTrack
 
         super.init()
-        rendererLogger.notice("init: \(self.instanceID, privacy: .public)")
+        rendererLogger.notice("init")
     }
 
     deinit {
-        rendererLogger.notice("deinit: \(self.instanceID, privacy: .public)")
+        rendererLogger.notice("deinit")
     }
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -288,7 +284,7 @@ final class Renderer: NSObject, MTKViewDelegate {
 
         if !hasLoggedFirstDraw {
             hasLoggedFirstDraw = true
-            rendererLogger.notice("draw(in:) first successful call: \(self.instanceID, privacy: .public)")
+            rendererLogger.notice("draw(in:) first successful call")
         }
 
         deltaTime = clock.tick()
@@ -303,8 +299,7 @@ final class Renderer: NSObject, MTKViewDelegate {
             if !hasLoggedRenderPassFailure {
                 hasLoggedRenderPassFailure = true
                 rendererLogger.notice(
-                    "draw(in:) bailed: no render pass descriptor/command buffer/encoder: \(self.instanceID, privacy: .public)"
-                )
+                    "draw(in:) bailed: no render pass descriptor/command buffer/encoder")
             }
             return
         }
@@ -458,9 +453,7 @@ final class Renderer: NSObject, MTKViewDelegate {
             commandBuffer.present(drawable)
         } else if !hasLoggedNilDrawableAtPresent {
             hasLoggedNilDrawableAtPresent = true
-            rendererLogger.notice(
-                "draw(in:) has no currentDrawable to present: \(self.instanceID, privacy: .public)"
-            )
+            rendererLogger.notice("draw(in:) has no currentDrawable to present")
         }
         commandBuffer.commit()
     }
