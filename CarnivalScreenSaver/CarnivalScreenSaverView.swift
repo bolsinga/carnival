@@ -1,6 +1,14 @@
 import CarnivalKit
 import ScreenSaver
 import SwiftUI
+import os
+
+/// Temporary, for diagnosing an intermittent black screen after several
+/// rapid-fire open/closes of a screen saver preview within the same
+/// long-lived host process -- confirms whether old instances actually
+/// get deallocated between clicks, alongside Renderer's own init/deinit
+/// logging under the same subsystem.
+private let screenSaverViewLogger = Logger(subsystem: "gdb.CarnivalKit", category: "CarnivalScreenSaverView")
 
 /// Hosts `CarnivalKit`'s `CarnivalView` -- the same animated roller-coaster/
 /// ferris-wheel scene shown in `CarnivalApp` -- as a macOS screen saver.
@@ -22,9 +30,14 @@ final class CarnivalScreenSaverView: ScreenSaverView {
         hosting.autoresizingMask = [.width, .height]
         addSubview(hosting)
         animationTimeInterval = 1.0 / 30.0
+        screenSaverViewLogger.notice("init: isPreview=\(isPreview, privacy: .public)")
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) is not supported")
+    }
+
+    deinit {
+        screenSaverViewLogger.notice("deinit")
     }
 }

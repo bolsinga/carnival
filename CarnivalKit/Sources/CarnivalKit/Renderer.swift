@@ -149,6 +149,20 @@ final class Renderer: NSObject, MTKViewDelegate {
 
     private static let baseFovyRadians: Float = 60 * .pi / 180
 
+    /// Diagnostic only, for an intermittent black screen seen with this
+    /// screen saver after several rapid-fire open/closes within the
+    /// same long-lived host process. Confirms whether a given instance's
+    /// draw loop ever actually started.
+    private var hasLoggedFirstDraw = false
+    /// One-shot, same reasoning as `hasLoggedFirstDraw` -- these two
+    /// failure points were previously silent even on a genuine problem:
+    /// the top-of-`draw(in:)` guard bailing (no render pass descriptor/
+    /// command buffer/encoder) and a nil `currentDrawable` at present
+    /// time. Guards against log spam if either starts failing every
+    /// frame, the same way the zero-size case could.
+    private var hasLoggedRenderPassFailure = false
+    private var hasLoggedNilDrawableAtPresent = false
+
     init(device: MTLDevice, carnival: Carnival) throws(RendererError) {
         self.device = device
         self.carnival = carnival
@@ -213,6 +227,11 @@ final class Renderer: NSObject, MTKViewDelegate {
         self.coasterTrack = coasterTrack
 
         super.init()
+        rendererLogger.notice("init")
+    }
+
+    deinit {
+        rendererLogger.notice("deinit")
     }
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -263,6 +282,11 @@ final class Renderer: NSObject, MTKViewDelegate {
             return
         }
 
+        if !hasLoggedFirstDraw {
+            hasLoggedFirstDraw = true
+            rendererLogger.notice("draw(in:) first successful call")
+        }
+
         deltaTime = clock.tick()
         if carnival.wheelShouldTurn {
             wheelElapsedTime += Float(deltaTime)
@@ -271,7 +295,14 @@ final class Renderer: NSObject, MTKViewDelegate {
         guard let descriptor = view.currentRenderPassDescriptor,
             let commandBuffer = commandQueue.makeCommandBuffer(),
             let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)
-        else { return }
+        else {
+            if !hasLoggedRenderPassFailure {
+                hasLoggedRenderPassFailure = true
+                rendererLogger.notice(
+                    "draw(in:) bailed: no render pass descriptor/command buffer/encoder")
+            }
+            return
+        }
 
         // The ferris wheel's geometry (and its rider's sight position)
         // is recomputed every frame regardless of which camera mode is
@@ -420,6 +451,9 @@ final class Renderer: NSObject, MTKViewDelegate {
 
         if let drawable = view.currentDrawable {
             commandBuffer.present(drawable)
+        } else if !hasLoggedNilDrawableAtPresent {
+            hasLoggedNilDrawableAtPresent = true
+            rendererLogger.notice("draw(in:) has no currentDrawable to present")
         }
         commandBuffer.commit()
     }

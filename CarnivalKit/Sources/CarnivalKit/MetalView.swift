@@ -1,8 +1,15 @@
 import SwiftUI
 import MetalKit
+import os
 #if os(iOS) || os(tvOS)
 import UIKit
 #endif
+
+/// Temporary, alongside Renderer's own diagnostic logging -- pinpoints
+/// exactly when AppKit/UIKit actually reports a view's window as nil,
+/// so that moment can be compared against whether (and how much later,
+/// if ever) Renderer's `deinit` fires for the same instance.
+private let metalViewLogger = Logger(subsystem: "gdb.CarnivalKit", category: "MetalView")
 
 /// Hosts an `MTKView` inside SwiftUI. `MTKView.delegate` is `weak`, so the
 /// `Renderer` is retained by the `Coordinator` — without that, it would be
@@ -32,7 +39,22 @@ private final class KeyHandlingMTKView: MTKView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
-        window?.makeFirstResponder(self)
+        // MTKView's own display link otherwise keeps calling draw(in:)
+        // forever once started, even after this view has been removed
+        // from a window. Pausing here stops that wasted drawing; it does
+        // *not* reliably release the view itself -- whatever else is
+        // still holding onto it (observed in practice hosting this
+        // inside a macOS screen saver: the host process's own view
+        // controller) can keep it, and everything it retains, alive well
+        // after this fires.
+        guard let window else {
+            metalViewLogger.notice(
+                "viewDidMoveToWindow: window is nil (\(ObjectIdentifier(self).debugDescription, privacy: .public))"
+            )
+            isPaused = true
+            return
+        }
+        window.makeFirstResponder(self)
     }
 
     override func keyDown(with event: NSEvent) {
@@ -65,6 +87,19 @@ private final class RemoteHandlingMTKView: MTKView {
 
     override var canBecomeFocused: Bool { true }
 
+    // See KeyHandlingMTKView's own override for why this matters: without
+    // it, this view's display link would otherwise keep calling draw(in:)
+    // forever once removed from a window.
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window == nil {
+            metalViewLogger.notice(
+                "didMoveToWindow: window is nil (\(ObjectIdentifier(self).debugDescription, privacy: .public))"
+            )
+            isPaused = true
+        }
+    }
+
     override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
         var handled = false
         for press in presses {
@@ -84,6 +119,23 @@ private final class RemoteHandlingMTKView: MTKView {
     }
 }
 #endif
+#endif
+
+#if os(iOS) || os(visionOS)
+// See KeyHandlingMTKView's own override for why this matters: without
+// it, this view's display link -- and everything it transitively
+// retains -- would never deallocate once removed from a window.
+private final class PausingMTKView: MTKView {
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window == nil {
+            metalViewLogger.notice(
+                "didMoveToWindow: window is nil (\(ObjectIdentifier(self).debugDescription, privacy: .public))"
+            )
+            isPaused = true
+        }
+    }
+}
 #endif
 
 extension MetalView {
@@ -207,7 +259,7 @@ extension MetalView {
                 }
             }
             #else
-            let view = MTKView()
+            let view = PausingMTKView()
             #if os(iOS)
             // Touch equivalent of the original's 't' (toggle coaster/
             // ferris camera) and ' ' (pause) keys — there's no keyboard
